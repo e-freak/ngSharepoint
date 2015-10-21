@@ -5,11 +5,19 @@ angular
         var default_limit = 500;
         var Query = function() {};
         Query.prototype.unpackItem = function(item) {
+            var query = this;
             var obj = {};
-            this.__values.forEach(function(field) {
-                var value = item.get_item(field);
-                obj[field] = value;
-            });
+            if (Array.isArray(query.__values)) {
+                query.__values.forEach(function(key) {
+                    var value = item.get_item(key);
+                    obj[key] = value;
+                });                
+            }else {
+                Object.getOwnPropertyNames(query.__values).forEach(function(key) {
+                    var value = item.get_item(key);
+                    obj[key] = value;
+                });
+            }
             return obj;
         };
         Query.prototype.packItem = function(item) {
