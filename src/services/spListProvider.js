@@ -1,5 +1,5 @@
 angular
-    .module('ngSharepoint', [])
+    .module('ngSharepoint')
     .provider('$spList', function () {
         var siteUrl = "";
         var default_limit = 500;
