@@ -132,7 +132,7 @@ angular
         Insert_Into_Query.prototype = new Query();
         Insert_Into_Query.prototype.value = function(key, field) {
             this.__values[key] = field;
-
+            return this;
         };
         Insert_Into_Query.prototype.execute = function() {
             var query = this;
