@@ -3,21 +3,29 @@ angular
     .provider('$spList', function () {
         var siteUrl = "";
         var default_limit = 500;
-        var Select_Query = function(list, fields) {
-            this.__list = list;
-            this.__fields = fields;
-            this.__where = null;
-            this.__limit = null;
-            return this;
-        };
-        Select_Query.prototype.unpackItem = function(item) {
+        var Query = function() {};
+        Query.prototype.unpackItem = function(item) {
             var obj = {};
-            this.__fields.forEach(function(field) {
+            this.__values.forEach(function(field) {
                 var value = item.get_item(field);
                 obj[field] = value;
             });
             return obj;
         };
+        Query.prototype.packItem = function(item) {
+            var query = this;
+            Object.getOwnPropertyNames(query.__values).forEach(function(key) {
+                item.set_item(key, query.__values[key]);
+            });
+        };
+        var Select_Query = function(list, fields) {
+            this.__list = list;
+            this.__values = fields;
+            this.__where = null;
+            this.__limit = null;
+            return this;
+        };
+        Select_Query.prototype = new Query();
         Select_Query.prototype.where = function(field) {
             this.__where = new Where_Query(this, field);
             return this.__where;
@@ -36,7 +44,7 @@ angular
                     query.__where.push(caml);
                 }
                 caml.push('<ViewFields>');
-                query.__fields.forEach(function(field) {
+                query.__values.forEach(function(field) {
                     caml.push('<FieldRef Name="' + field + '"/>');
                 });
                 caml.push('</ViewFields>');
