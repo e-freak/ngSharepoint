@@ -14,6 +14,14 @@ angular
             this.__limit = null;
             return this;
         };
+        Select_Query.prototype.unpackItem = function(item) {
+            var obj = {};
+            this.__fields.forEach(function(field) {
+                var value = item.get_item(field);
+                obj[field] = value;
+            });
+            return obj;
+        };
         Select_Query.prototype.where = function(field) {
             this.__where = new Where_Query(this, field);
             return this.__where;
@@ -45,7 +53,13 @@ angular
                 clientContext.load(items);
                 clientContext.executeQueryAsync(
                     function(sender, args) {
-                        resolve(args);
+                        var result = [];
+                        var itemIterator = items.getEnumerator();
+                        while (itemIterator.moveNext()) {
+                           var item = itemIterator.get_current();
+                           result.push(query.unpackItem(item));
+                        } 
+                        resolve(result);
                     },
                     function(sender, args) {
                         reject(args);
