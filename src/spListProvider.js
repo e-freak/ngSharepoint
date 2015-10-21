@@ -8,17 +8,18 @@ angular
         @param fields  An Array of fields to query
         */
         var Select_Query = function(list, fields) {
-            this.list = list;
-            this.fields = fields;
-            this.where = null;
-            this.limit = null;
+            this.__list = list;
+            this.__fields = fields;
+            this.__where = null;
+            this.__limit = null;
+            return this;
         };
         Select_Query.prototype.where = function(field) {
-            this.where = new Where_Query(this, field);
-            return this.where;
+            this.__where = new Where_Query(this, field);
+            return this.__where;
         };
         Select_Query.prototype.limit = function(amount) {
-            this.limit = amount;
+            this.__limit = amount;
         };
         Select_Query.prototype.execute = function() {
             var query = this;
@@ -27,16 +28,16 @@ angular
                 var list = clientContext.get_web().get_lists().getByTitle(query.list);
                 var camlQuery = new SP.CamlQuery();
                 var caml = ['<View>'];
-                if (query.where !== null) {
-                    query.where.push(caml);
+                if (query.__where !== null) {
+                    query.__where.push(caml);
                 }
                 caml.push('<ViewFields>');
-                query.fields.forEach(function(field) {
+                query.__fields.forEach(function(field) {
                     caml.push('<FieldRef Name="' + field + '"/>');
                 });
                 caml.push('</ViewFields>');
-                if (limit !== null) {
-                    caml.push('<RowLimit>' + limit + '</RowLimit>');
+                if (query.__limit !== null) {
+                    caml.push('<RowLimit>' + query.__limit + '</RowLimit>');
                 }
                 caml.push('</View>');
                 camlQuery.set_viewXml(caml.join(''));
@@ -53,28 +54,28 @@ angular
             });
         };
         var Where_Query = function(query, field) {
-            this.query = query;
-            this.field = field;
-            this.value = "";
-            this.operator = "";
+            this.__query = query;
+            this.__field = field;
+            this.__value = "";
+            this.__operator = "";
         };
         Where_Query.prototype.equals = function(value) {
-            this.operator = "equals";
-            this.value = value;
-            return this.query;
+            this.__operator = "equals";
+            this.__value = value;
+            return this.__query;
         };
 
         Where_Query.prototype.push = function(caml) {
             caml.push('<Query>');
             caml.push('<Where>');
-            switch (this.operator) {
+            switch (this.__operator) {
                 case "equals":
                     caml.push('<Eq>');
                     break;
             }
-            caml.push('<FieldRef Name="' + this.field + '"/>');
-            caml.push('<Value Type="Number">' + this.value + '</Value>');
-            switch (this.operator) {
+            caml.push('<FieldRef Name="' + this.__field + '"/>');
+            caml.push('<Value Type="Number">' + this.__value + '</Value>');
+            switch (this.__operator) {
                 case "equals":
                     caml.push('</Eq>');
                     break;
