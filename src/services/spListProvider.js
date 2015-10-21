@@ -71,6 +71,78 @@ angular
                 );
             });
         };
+        var Update_Query = function(list) {
+            this.__list = list;
+            this.__values = {};
+            this.__where = null;
+        };
+        Update_Query.prototype = new Query();
+        Update_Query.prototype.where = function(field) {
+            this.__where = new Where_Query(this, field);
+            return this.__where;
+        };
+        Update_Query.prototype.execute = function() {
+            var query = this;
+            return new Promise(function(resolve, reject) {
+                var clientContext = new SP.ClientContext(siteUrl);
+                var list = clientContext.get_web().get_lists().getByTitle(query.__list);
+                var camlQuery = new SP.CamlQuery();
+                var caml = ['<View>'];
+                if (query.__where !== null) {
+                    query.__where.push(caml);
+                }
+                caml.push('</View>');
+                camlQuery.set_viewXml(caml.join(''));
+                var items = list.getItems(camlQuery);
+                clientContext.load(items);
+                clientContext.executeQueryAsync(function(sender, args) {
+                    var itemIterator = items.getEnumerator();
+                    while (itemIterator.moveNext()) {
+                        var item = itemIterator.get_current();
+                        query.packItem(item);
+                        item.update();
+                    }
+                    clientContext.executeQueryAsync(function(sender, args) {
+                        resolve(args);
+                    }, function(sender, args) {
+                        reject(args);
+                    });
+                }, function(sender, args) {
+                    reject(args);
+                });
+            });
+        };
+        Update_Query.prototype.set = function(key, value) {
+            this.__values[key] = value;
+            return this;
+        };
+        var Insert_Into_Query = function(list) {
+            this.__list = list;
+            this.__values = {};
+            return this;
+        };
+        Insert_Into_Query.prototype = new Query();
+        Insert_Into_Query.prototype.value = function(key, field) {
+            this.__values[key] = field;
+
+        };
+        Insert_Into_Query.prototype.execute = function() {
+            var query = this;
+            return new Promise(function(resolve, reject) {
+                var clientContext = new SP.ClientContext(siteUrl);
+                var list = clientContext.get_web().get_lists().getByTitle(query.__list);
+                var itemInfo = new SP.ListItemCreationInformation();
+                var item = list.addItem(itemInfo);
+                query.packItem(item);
+                item.update();
+                clientContext.load(item);
+                clientContext.executeQueryAsync(function(sender, args) {
+                    resolve(unpackItem(item));
+                }, function(sender, args) {
+                    reject(args);
+                });
+            });
+        };
         var Where_Query = function(query, field) {
             this.__query = query;
             this.__field = field;
@@ -111,6 +183,12 @@ angular
                 return ({
                     select: function(from, fields) {
                         return new Select_Query(from, fields);
+                    },
+                    update: function(list) {
+                        return new Update_Query(list);
+                    },
+                    insertInto: function(list) {
+                        return new Insert_Into_Query(list);
                     }
                 });
             }
