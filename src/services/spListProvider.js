@@ -145,7 +145,7 @@ angular
                 item.update();
                 clientContext.load(item);
                 clientContext.executeQueryAsync(function(sender, args) {
-                    resolve(unpackItem(item));
+                    resolve(query.unpackItem(item));
                 }, function(sender, args) {
                     reject(args);
                 });
