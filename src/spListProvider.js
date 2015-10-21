@@ -23,7 +23,7 @@ angular
         };
         Select_Query.prototype.execute = function() {
             var query = this;
-            return $q(function(resolve, reject) {
+            return new Promise(function(resolve, reject) {
                 var clientContext = new SP.ClientContext(siteUrl);
                 var list = clientContext.get_web().get_lists().getByTitle(query.list);
                 var camlQuery = new SP.CamlQuery();
