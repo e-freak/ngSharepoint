@@ -3,10 +3,6 @@ angular
     .provider('$spList', function () {
         var siteUrl = "";
         var default_limit = 500;
-        /*
-        @param list    The List to run the query on
-        @param fields  An Array of fields to query
-        */
         var Select_Query = function(list, fields) {
             this.__list = list;
             this.__fields = fields;
