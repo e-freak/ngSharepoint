@@ -25,7 +25,7 @@ angular
             var query = this;
             return new Promise(function(resolve, reject) {
                 var clientContext = new SP.ClientContext(siteUrl);
-                var list = clientContext.get_web().get_lists().getByTitle(query.list);
+                var list = clientContext.get_web().get_lists().getByTitle(query.__list);
                 var camlQuery = new SP.CamlQuery();
                 var caml = ['<View>'];
                 if (query.__where !== null) {
