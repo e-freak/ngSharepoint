@@ -15,8 +15,9 @@ angular
             var query = this;
             return $q(function(resolve, reject) {
                 var clientContext = $sp.getContext();
+                var list = clientContext.get_web().get_lists().getByTitle(query.__list);
                 var itemInfo = new SP.ListItemCreationInformation();
-                var item = query.__list.addItem(itemInfo);
+                var item = list.addItem(itemInfo);
                 query.packItem(item);
                 item.update();
                 clientContext.load(item);

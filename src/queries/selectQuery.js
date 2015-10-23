@@ -26,6 +26,7 @@ angular
             var query = this;
             return $q(function(resolve, reject) {
                 var clientContext = $sp.getContext();
+                var list = clientContext.get_web().get_lists().getByTitle(query.__list);
                 var camlQuery = new SP.CamlQuery();
                 var caml = ['<View>'];
                 if (query.__where !== null) {
@@ -41,7 +42,7 @@ angular
                 }
                 caml.push('</View>');
                 camlQuery.set_viewXml(caml.join(''));
-                var items = query.__list.getItems(camlQuery);
+                var items = list.getItems(camlQuery);
                 clientContext.load(items);
                 clientContext.executeQueryAsync(
                     function(sender, args) {
