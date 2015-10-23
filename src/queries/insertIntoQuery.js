@@ -28,4 +28,5 @@ angular
                 });
             });
         };
+        return (InsertIntoQuery);
 	}]);

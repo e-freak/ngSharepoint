@@ -4,4 +4,5 @@ angular
 		var JoinQuery = function() {
 
 		};
+		return (JoinQuery);
 	}]);
