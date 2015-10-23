@@ -1,7 +1,7 @@
 angular
 	.module('ngSharepoint')
 	.provider('$sp', function() {
-		var siteUrl;
+		var siteUrl = "";
 		return {
 			setSiteUrl: function (newUrl) {
 				siteUrl = newUrl;
