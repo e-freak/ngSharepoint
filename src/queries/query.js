@@ -2,7 +2,7 @@ angular
 	.module('ngSharepoint')
 	.factory('Query', function() {
 		var Query = function() {
-			this.__queries = {};
+			//this.__queries = {};
 		};
         Query.prototype.unpackItem = function(item) {
             var query = this;

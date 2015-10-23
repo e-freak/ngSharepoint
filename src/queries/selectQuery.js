@@ -5,8 +5,8 @@ angular
             this.__values = fields;
             this.__where = null;
             this.__limit = null;
-            this.__queries.where = [];
-            this.__queries.limit = [];
+            //this.__queries.where = [];
+            //this.__queries.limit = [];
             return this;
         };
         SelectQuery.prototype = new Query();

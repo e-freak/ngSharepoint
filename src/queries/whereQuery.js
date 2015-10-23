@@ -6,7 +6,7 @@ angular
             this.__field = field;
             this.__value = "";
             this.__operator = "";
-            this.__query.__queries.where.push(this);
+            //this.__query.__queries.where.push(this);
             this.__operators = {
                 BEGINS_WITH: ['<BeginsWith>', '</BeginsWith>'],
                 CONTAINS: ['<Contains>', '</Contains>'],
@@ -33,7 +33,6 @@ angular
         WhereQuery.prototype.push = function(caml) {
             caml.push('<Query>');
             caml.push('<Where>');
-            caml.push(this.__operator[0]);
             switch (this.__operator) {
                 case "equals":
                     caml.push('<Eq>');
