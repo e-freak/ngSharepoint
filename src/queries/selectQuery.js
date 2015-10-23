@@ -1,6 +1,6 @@
 angular
 	.module('ngSharepoint')
-	.factory('SelectQuery', ['$q', '$sp', 'Query', 'WhereQuery', function($q, $sp, WhereQuery, Query) {
+	.factory('SelectQuery', ['$q', '$sp', 'Query', 'WhereQuery', function($q, $sp, Query, WhereQuery) {
         var SelectQuery = function(fields) {
             this.__values = fields;
             this.__where = null;
