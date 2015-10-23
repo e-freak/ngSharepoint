@@ -32,10 +32,14 @@ angular
                 clientContext.executeQueryAsync(
                     function(sender, args) {
                         var itemIterator = items.getEnumerator();
+                        var a = [];
                         while (itemIterator.moveNext()) {
                            var item = itemIterator.get_current();
-                           item.deleteObject();
+                           a.push(item);
                         }
+                        a.forEach(function(item) {
+                            item.deleteObject();
+                        });
                         clientContext.executeQueryAsync(function(sender, args) {
                             resolve(args);
                         }, function(sender, args) {
