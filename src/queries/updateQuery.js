@@ -13,7 +13,7 @@ angular
 			return this;
 		};
 		UpdateQuery.prototype.where = function(key) {
-            var query = new WhereQuery(this, field);
+            var query = new WhereQuery(this, key);
             this.__where.push(query);
             return query;
 		};
