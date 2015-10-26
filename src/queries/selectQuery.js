@@ -3,7 +3,7 @@ angular
 	.factory('SelectQuery', ['$q', '$sp', 'Query', 'WhereQuery', function($q, $sp, Query, WhereQuery) {
         var SelectQuery = function(fields) {
             this.__values = fields;
-            this.__where = null;
+            this.__where = [];
             this.__limit = null;
             //this.__queries.where = [];
             //this.__queries.limit = [];
@@ -15,8 +15,9 @@ angular
         	return this;
         };
         SelectQuery.prototype.where = function(field) {
-            this.__where = new WhereQuery(this, field);
-            return this.__where;
+            var query = new WhereQuery(this, field);
+            this.__where.push(query);
+            return query;
         };
         SelectQuery.prototype.limit = function(amount) {
             this.__limit = amount;
@@ -29,8 +30,22 @@ angular
                 var list = clientContext.get_web().get_lists().getByTitle(query.__list);
                 var camlQuery = new SP.CamlQuery();
                 var caml = ['<View>'];
-                if (query.__where !== null) {
-                    query.__where.push(caml);
+                if (query.__where.length === 1) {
+                    caml.push('<Query>');
+                    caml.push('<Where>');
+                    query.__where[0].push(caml);
+                    caml.push('</Where>');
+                    caml.push('</Query>');
+                }else if (query.__where.length > 1) {
+                    caml.push('<Query>');
+                    caml.push('<Where>');
+                    caml.push('<And>');
+                    query.__where.forEach(function(where) {
+                        where.push(caml);
+                    });
+                    caml.push('</And>');
+                    caml.push('</Where>');
+                    caml.push('</Query>');
                 }
                 caml.push('<ViewFields>');
                 query.__values.forEach(function(field) {

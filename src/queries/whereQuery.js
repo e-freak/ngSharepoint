@@ -31,8 +31,6 @@ angular
             this.__operator = this.__operators.BEGINS_WITH;
         };
         WhereQuery.prototype.push = function(caml) {
-            caml.push('<Query>');
-            caml.push('<Where>');
             switch (this.__operator) {
                 case "equals":
                     caml.push('<Eq>');
@@ -45,8 +43,6 @@ angular
                     caml.push('</Eq>');
                     break;
             }
-            caml.push('</Where>');
-            caml.push('</Query>');
         };
         return (WhereQuery);
 	});
