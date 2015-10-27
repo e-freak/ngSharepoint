@@ -3,3 +3,5 @@ node_js:
   - "stable"
 before_script:
   - npm install grunt-cli -g
+script:
+  - bundle exec grunt dist
