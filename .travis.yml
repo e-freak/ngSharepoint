@@ -1,7 +1,16 @@
 language: node_js
 node_js:
-  - "stable"
+- stable
 before_script:
-  - npm install grunt-cli -g
+- npm install grunt-cli -g
 script:
-  - grunt dist
+- grunt dist
+deploy:
+  provider: releases
+  api_key:
+    secure: HuVq1T5iE2aycXNEk6kSoqnuFglKdIdZ+FLyJPICTo6ceDWnv5QPNd49BdzuEr1Ip5S0KHCLW+vT33BQpTIhFDnvN2oLN+O4SSOtB+PNySGCl4GWFoVGsy/YWgOSe+rvTg9HCTwrh8jI5h305FvFLsmyKc6EE0Gjo7W1ui4n4+YqhOzB4pYbEsTt/4hCuDEVIu5+8TKBJdcyyRGBBuHiESBziC++d0iRku2eXnJKV+GNYTT2jawSFR9yBOD/xVk5NB4GAMxMSH9ZdaMIDK70lr/+lyFTej5YR5bnFmzLiOBev3kSuvmPv8UTWpWh9myNAEmjxn+ixREU1rADwWJbe7wINeY1y2fkh6vmpHbWBltXeg6sS38XuH21q8hUIukZSWa+seD1B/0bs3FTswRg46iYhFpYIBJwG67TQ/R1fD3CJWju7nLNAEPyoosCs1c4Zk/ZyOKAk96ld/MKqMKZLZTOyZx78WSsHEusLpjoN/olJ2QXtfwEcJV1yhV6yBafyNpWEXs5RvDp4b/kvkiaD2iKRRhFREbqJXm3lc31PIWLJGmV2F0xkg3PkSjEdw2Q/4WnF2uZjqi7VlaOUpuy0y346GgXpxfUUsI2YjmYgtQv9ymJs41bRPbirMcKKCzDF2MwwHdzEjGOVEOYWKyOIKfuve8EbcCPCqFD1sJjGz8=
+  file: dist/angular-sharepoint.min.js
+  skip_cleanup: true
+  on:
+    repo: maxjoehnk/ngSharepoint
+    tags: true
