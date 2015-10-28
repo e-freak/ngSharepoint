@@ -7,3 +7,16 @@ Sharepoint Bindings for AngularJS.
 ###Features
 - Access Sharepoint Lists with an SQL Like Syntax
 - Build and Run custom CAML Queries on Sharepoint Lists
+
+###Usage
+First you'll need to add ngSharepoint as a dependency in your Angular Module Definition
+```js
+angular.module('myApp', ['ngSharepoint']);
+```
+Then configure ngSharepoint to connect to your Sharepoin instance
+```js
+angular.module('myApp')
+  .config(['$spProvider', function($spProvider) {
+    $spProvider.setSiteUrl("http://path-to-your-sharepoi.nt");
+  }]);
+```
