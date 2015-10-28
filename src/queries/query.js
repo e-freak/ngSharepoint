@@ -10,12 +10,12 @@ angular
             if (Array.isArray(query.__values)) {
                 query.__values.forEach(function(key) {
                     var value = item.get_item(key);
-                    obj[key] = value;
+                    obj[key] = __trim(value);
                 });                
             }else {
                 Object.getOwnPropertyNames(query.__values).forEach(function(key) {
                     var value = item.get_item(key);
-                    obj[key] = value;
+                    obj[key] = __trim(value);
                 });
             }
             return obj;
@@ -23,11 +23,16 @@ angular
         Query.prototype.packItem = function(item) {
             var query = this;
             Object.getOwnPropertyNames(query.__values).forEach(function(key) {
-                item.set_item(key, query.__values[key]);
+                item.set_item(key, __trim(query.__values[key]));
             });
         };
         Query.prototype.then = function(success, reject) {
         	return this.__execute().then(success, reject);
+        };
+        Query.prototype.__trim = function(item) {
+            if (item !== null && item !== undefined) {
+                return item.trim();
+            }
         };
 		return (Query);
 	});
