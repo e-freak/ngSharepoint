@@ -13,16 +13,16 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		concat: {
 			dev: {
-				src: ['src/*.js', 'src/**/*.js'],
+				src: ['src/*.js', 'src/**/*.js', '!src/*.spec.js', '!src/**/*.spec.js'],
 				dest: 'dist/angular-sharepoint.js'
 			},
 			dist: {
-				src: ['src/*.js', 'src/**/*.js'],
+				src: ['src/*.js', 'src/**/*.js', '!src/*.spec.js', '!src/**/*.spec.js'],
 				dest: 'tmp/concat.js'
 			}
 		},
 		jshint: {
-			default: ['src/*.js', 'src/**/*.js']
+			default: ['src/*.js', 'src/**/*.js', '!src/*.spec.js', '!src/**/*.spec.js']
 		},
 		ngAnnotate: {
 			dist: {
