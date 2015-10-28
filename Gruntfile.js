@@ -7,7 +7,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-ng-annotate');
 
 	grunt.registerTask('default', ['jshint', 'concat:dev']);
-	grunt.registerTask('dist', ['jshint'/*, 'karma:dist'*/, 'concat:dist', 'ngAnnotate:dist', 'uglify:dist', 'clean']);
+	grunt.registerTask('dist', ['jshint', 'karma:dist', 'concat:dist', 'ngAnnotate:dist', 'uglify:dist', 'clean']);
 	grunt.registerTask('test', ['jshint', 'concat:dev', 'karma:dev']);
 
 	grunt.initConfig({
