@@ -4,11 +4,17 @@
 
 Sharepoint Bindings for AngularJS.
 
-###Features
+##Features
 - Access Sharepoint Lists with an SQL Like Syntax
 - Build and Run custom CAML Queries on Sharepoint Lists
 
-###Usage
+##Installation
+You can install ngSharepoint from bower with
+```
+bower install ngSharepoint
+```
+
+##Usage
 First you'll need to add ngSharepoint as a dependency in your Angular Module Definition
 ```js
 angular.module('myApp', ['ngSharepoint']);
