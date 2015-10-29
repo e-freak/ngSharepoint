@@ -28,10 +28,12 @@
     "grunt-contrib-uglify": "^0.9.2",
     "grunt-karma": "^0.12.1",
     "grunt-ng-annotate": "^1.0.1",
+    "istanbul": "^0.4.0",
     "jasmine-core": "^2.3.4",
     "karma": "^0.13.11",
     "karma-chrome-launcher": "^0.2.1",
     "karma-coverage": "^0.5.3",
+    "karma-istanbul-reporter": "0.0.1",
     "karma-jasmine": "^0.3.6",
     "karma-phantomjs-launcher": "^0.2.1",
     "phantomjs": "^1.9.18"

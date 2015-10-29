@@ -48,7 +48,15 @@ module.exports = function(grunt) {
 					'src/**/*.js',
 					'test/unit/**/*.js'
 				],
-				singleRun: true
+				singleRun: true,
+				preprocessors: {
+					'src/*.js': 'coverage'
+				},
+				reporters: ['progress', 'coverage'],
+				coverageReporter: {
+				  type : 'lcovonly',
+				  dir : 'coverage/'
+				}
 			},
 			dev: {
 				browsers: ['Chrome']
