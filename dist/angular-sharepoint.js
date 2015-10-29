@@ -413,14 +413,14 @@ angular
 			}
 		};
 		CamlTag.prototype.build = function() {
-			this.caml.push(this.__buildTag());
-			for (var i = 0; i < 0; i++) {
-				this.caml[i] = this.caml[i].build();
+			var query = this.__buildTag();
+			for (var i = 0; i < this.caml.length; i++) {
+				query += this.caml[i].build();
 			}
-			if (this.caml.length > 1) {
-				this.caml.push('</' + this.name + '>');
+			if (this.caml.length > 0) {
+				query += '</' + this.name + '>';
 			}
-			return this.caml.join('');
+			return query;
 		};
 		return (CamlTag);
 	});
