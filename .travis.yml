@@ -23,6 +23,8 @@ after_success:
   - eval "$(ssh-agent -s)" #start the ssh agent
   - chmod 600 .travis/deploy_key # this key should have push access
   - ssh-add .travis/deploy_key
+  - git config user.email "maxjoehnk@gmail.com"
+  - git config user.name "Travis CI"
   - git remote add deploy git@github.com:maxjoehnk/bower-ngSharepoint.git
   - git add dist/angular-sharepoint.min.js
   - git add dist/angular-sharepoint.js
