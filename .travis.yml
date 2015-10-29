@@ -17,17 +17,3 @@ deploy:
 before_install:
 - npm install -g bower
 - bower install
-- openssl aes-256-cbc -K $encrypted_e9c933085fc2_key -iv $encrypted_e9c933085fc2_iv
-  -in .travis/deploy_key.enc -out .travis/deploy_key -d
-after_success:
-  - eval "$(ssh-agent -s)" #start the ssh agent
-  - chmod 600 .travis/deploy_key # this key should have push access
-  - ssh-add .travis/deploy_key
-  - git config user.email "maxjoehnk@gmail.com"
-  - git config user.name "Travis CI"
-  - git remote add deploy git@github.com:maxjoehnk/bower-ngSharepoint.git
-  - git checkout master
-  - git add dist/angular-sharepoint.min.js
-  - git add dist/angular-sharepoint.js
-  - git commit -m "Build by Travis-CI"
-  - git push deploy -f
