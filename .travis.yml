@@ -14,3 +14,15 @@ deploy:
   on:
     repo: maxjoehnk/ngSharepoint
     tags: true
+before_install:
+- bower install
+
+
+#- openssl aes-256-cbc -K $encrypted_e9c933085fc2_key -iv $encrypted_e9c933085fc2_iv
+#  -in .travis/deploy_key.enc -out .travis/deploy_key -d
+#after_success:
+#  - eval "$(ssh-agent -s)" #start the ssh agent
+#  - chmod 600 .travis/deploy_key # this key should have push access
+#  - ssh-add .travis/deploy_key
+#  - git remote add deploy https://github.com/maxjoehnk/ngSharepoint.git
+#  - git push deploy
