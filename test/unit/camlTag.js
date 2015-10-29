@@ -5,6 +5,6 @@ describe('The CamlTag should build a valid XML String', function() {
 		CamlTag = _CamlTag_;
 	}));
 	it('builds a valid XML Tag', function() {
-		expect(new CamlTag('Test').build()).toEqual('<Test></Test>');
+		expect(new CamlTag('Test').build()).toEqual('<Test/>');
 	});
 });
