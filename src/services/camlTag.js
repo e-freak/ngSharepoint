@@ -19,7 +19,7 @@ angular
 				this.caml[i] = this.caml[i].build();
 			}
 			this.caml.push('</' + this.tag + '>');
-			return this.caml.join[''];
+			return this.caml.join('');
 		};
 		return (CamlTag);
 	});
