@@ -23,5 +23,5 @@ after_success:
   - eval "$(ssh-agent -s)" #start the ssh agent
   - chmod 600 .travis/deploy_key # this key should have push access
   - ssh-add .travis/deploy_key
-  - git remote add deploy https://github.com/maxjoehnk/bower-ngSharepoint.git
-  - git push deploy
+  - git remote add deploy git@github.com:maxjoehnk/bower-ngSharepoint.git
+  - git push deploy -f
