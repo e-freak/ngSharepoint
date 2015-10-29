@@ -20,7 +20,7 @@ First you'll need to add ngSharepoint as a dependency in your Angular Module Def
 ```js
 angular.module('myApp', ['ngSharepoint']);
 ```
-Then configure ngSharepoint to connect to your Sharepoin instance
+Then configure ngSharepoint to connect to your Sharepoint instance
 ```js
 angular.module('myApp')
   .config(['$spProvider', function($spProvider) {
