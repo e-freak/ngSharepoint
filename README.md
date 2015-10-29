@@ -5,7 +5,7 @@
 Sharepoint Bindings for AngularJS.
 
 ##Features
-- Access Sharepoint Lists with an SQL Like Syntax
+- Access Sharepoint Lists with a SQL Like Syntax
 - Build and Run custom CAML Queries on Sharepoint Lists
 
 ##Installation
