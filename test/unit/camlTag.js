@@ -1,6 +1,10 @@
 describe('The CamlTag should build a valid XML String', function() {
+	var CamlTag;
+	beforeEach(module('ngSharepoint'));
+	beforeEach(inject(function(_CamlTag_) {
+		CamlTag = _CamlTag_;
+	}));
 	it('builds a valid XML Tag', function() {
-		var tag = new CamlTag('Test');
-		expect(tag.build()).toEqual('<Test></Test>');
+		expect(new CamlTag('Test').build()).toEqual('<Test></Test>');
 	});
 });
