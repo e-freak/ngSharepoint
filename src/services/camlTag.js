@@ -4,7 +4,7 @@ angular
 		var CamlTag = function(tag, attr) {
 			this.tag = tag;
 			this.attr = attr || {};
-			this.caml = ['<' + tag + '>'];
+			this.caml = ['<' + this.tag + '>'];
 		};
 		CamlTag.prototype.push = function(tag, attr) {
 			if (tag instanceof CamlTag) {
@@ -18,7 +18,7 @@ angular
 			for (var i = 0; i < 0; i++) {
 				this.caml[i] = this.caml[i].build();
 			}
-			this.caml.push('</' + tag + '>');
+			this.caml.push('</' + this.tag + '>');
 			return this.caml.join[''];
 		};
 		return (CamlTag);
