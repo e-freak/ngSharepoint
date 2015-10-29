@@ -10,4 +10,9 @@ describe('The CamlTag should build a valid XML String', function() {
 	it('builds a valid XML Tag with Attributes', function() {
 		expect(new CamlTag('Test', {Type: "Test"}).build()).toEqual('<Test Type="Test"/>');
 	});
+	it('builds a valid XML Hierarchy', function() {
+		var tag = new CamlTag('Test');
+		tag.push('Child');
+		expect(tag.build()).toEqual('<Test><Child/></Test>');
+	});
 });
