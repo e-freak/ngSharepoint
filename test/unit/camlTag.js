@@ -15,4 +15,7 @@ describe('The CamlTag should build a valid XML String', function() {
 		tag.push('Child');
 		expect(tag.build()).toEqual('<Test><Child/></Test>');
 	});
+	it('builds a valid XML Tag with a value', function() {
+		expect(new CamlTag('Test', {}, 'Value').build()).toEqual('<Test>Value</Test>');
+	});
 });
