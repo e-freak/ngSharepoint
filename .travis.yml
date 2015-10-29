@@ -15,6 +15,7 @@ deploy:
     repo: maxjoehnk/ngSharepoint
     tags: true
 before_install:
+- npm install -g bower
 - bower install
 
 
