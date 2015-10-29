@@ -22,3 +22,7 @@ after_script:
 addons:
     code_climate:
         repo_token: 2363a951f4b303fb71efda36cd30ebc31512034e1b9bdbc57097177620df77a5
+cache:
+  directories:
+    - bower_components
+    - node_modules
