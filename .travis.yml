@@ -26,5 +26,5 @@ after_success:
   - git remote add deploy git@github.com:maxjoehnk/bower-ngSharepoint.git
   - git add dist/angular-sharepoint.min.js
   - git add dist/angular-sharepoint.js
-  - git commit -m "Build by Travis-CI: $TRAVIS_JOB_ID"
+  - git commit -m "Build by Travis-CI"
   - git push deploy -f
