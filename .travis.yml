@@ -26,6 +26,7 @@ after_success:
   - git config user.email "maxjoehnk@gmail.com"
   - git config user.name "Travis CI"
   - git remote add deploy git@github.com:maxjoehnk/bower-ngSharepoint.git
+  - git checkout master
   - git add dist/angular-sharepoint.min.js
   - git add dist/angular-sharepoint.js
   - git commit -m "Build by Travis-CI"
