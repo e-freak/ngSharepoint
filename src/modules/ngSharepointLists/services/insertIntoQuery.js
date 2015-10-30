@@ -1,5 +1,5 @@
 angular
-	.module('ngSharepoint')
+	.module('ngSharepointLists')
 	.factory('InsertIntoQuery', ['$q', '$sp', 'Query', function($q, $sp, Query) {
 		var InsertIntoQuery = function(list) {
 			this.__list = list;
