@@ -28,36 +28,25 @@ angular
             return $q(function(resolve, reject) {
                 var clientContext = $sp.getContext();
                 var list = clientContext.get_web().get_lists().getByTitle(query.__list);
-                var camlQuery = new SP.CamlQuery();
-                var caml = ['<View>'];
+                var camlBuilder = new CamlBuilder();
+                var camlView = camlBuilder.push('View');
                 if (query.__where.length === 1) {
-                    caml.push('<Query>');
-                    caml.push('<Where>');
-                    query.__where[0].push(caml);
-                    caml.push('</Where>');
-                    caml.push('</Query>');
+                    var camlWhere = camlView.push('Query').push('Where');
+                    camlWhere.push(query.__where[0]);
                 }else if (query.__where.length > 1) {
-                    caml.push('<Query>');
-                    caml.push('<Where>');
-                    caml.push('<And>');
+                    var camlAnd = camlView.push('Query').push('Where').push('And');
                     query.__where.forEach(function(where) {
-                        where.push(caml);
+                        camlAnd.push(where);
                     });
-                    caml.push('</And>');
-                    caml.push('</Where>');
-                    caml.push('</Query>');
                 }
-                caml.push('<ViewFields>');
+                var viewFields = camlView.push('ViewFields');
                 query.__values.forEach(function(field) {
-                    caml.push('<FieldRef Name="' + field + '"/>');
+                    viewFields.push('FieldRef', {Name: field});
                 });
-                caml.push('</ViewFields>');
                 if (query.__limit !== null) {
-                    caml.push('<RowLimit>' + query.__limit + '</RowLimit>');
+                    camlView.push('RowLimit', {}, query.__limit);
                 }
-                caml.push('</View>');
-                camlQuery.set_viewXml(caml.join(''));
-                var items = list.getItems(camlQuery);
+                var items = list.getItems(camlBuilder.build());
                 clientContext.load(items);
                 clientContext.executeQueryAsync(
                     function(sender, args) {
