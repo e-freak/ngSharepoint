@@ -6,12 +6,14 @@ angular
 			this.caml = [];
 		};
 		CamlBuilder.prototype.push = function(tag, attr, value) {
+			var camlTag;
 			if (tag instanceof CamlTag) {
-				this.caml.push(tag);
+				camlTag = tag;
 			}else {
-				var camlTag = new CamlTag(tag, attr, value);
-				this.caml.push(camlTag);
+				camlTag = new CamlTag(tag, attr, value);
 			}
+			this.caml.push(camlTag);
+			return camlTag;
 		};
 		CamlBuilder.prototype.findByName = function(name) {
 			var result = [];

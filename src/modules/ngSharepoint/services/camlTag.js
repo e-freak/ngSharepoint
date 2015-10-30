@@ -30,14 +30,16 @@ angular
 			return xml;
 		};
 		CamlTag.prototype.push = function(tag, attr) {
+			var camlTag;
 			if (tag instanceof CamlTag) {
-				this.caml.push(tag);
+				camlTag = tag;
 			}else {
-				var camlTag = new CamlTag(tag, attr);
-				this.caml.push(camlTag);
+				camlTag = new CamlTag(tag, attr);
 			}
+			this.caml.push(camlTag);
+			return camlTag;
 		};
-		CamlTag.prototype.setVal = function(value) {
+		CamlTag.prototype.setValue = function(value) {
 			this.value = value;
 		};
 		CamlTag.prototype.build = function() {
