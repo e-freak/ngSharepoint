@@ -20,5 +20,5 @@ describe('The CamlTag should build a valid XML String', function() {
 	});
 	it('builds a valid XML Tag with a value and attributes', function() {
 		expect(new CamlTag('Test', {Attr: 'attr'}, 'Value').build()).toEqual('<Test Attr="attr">Value</Test>');
-	})
+	});
 });
