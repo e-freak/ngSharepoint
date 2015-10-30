@@ -13,11 +13,11 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		concat: {
 			dev: {
-				src: ['src/*.js', 'src/**/*.js'],
+				src: ['src/*.js', 'src/**/*.js', '!src/modules/ngSharepointMocks/*'],
 				dest: 'dist/angular-sharepoint.js'
 			},
 			dist: {
-				src: ['src/*.js', 'src/**/*.js'],
+				src: ['src/*.js', 'src/**/*.js', '!src/modules/ngSharepointMocks/*'],
 				dest: 'tmp/concat.js'
 			}
 		},
