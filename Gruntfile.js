@@ -17,8 +17,12 @@ module.exports = function(grunt) {
 				dest: 'dist/angular-sharepoint.js'
 			},
 			dist: {
-				src: ['src/*.js', 'src/**/*.js', '!src/modules/ngSharepointMocks/*'],
-				dest: 'tmp/concat.js'
+				files: {
+					'tmp/angular-sharepoint-full.js':['src/*.js', 'src/**/*.js', '!src/modules/ngSharepointMocks/*'],
+					'tmp/angular-sharepoint.js':['src/modules/ngSharepoint/**/*.js'],
+					'tmp/angular-sharepoint-lists.js':['src/modules/ngSharepointLists/**/*.js'],
+					'tmp/angular-sharepoint-mocks.js':['src/modules/ngSharepointMocks/**/*.js']
+				}
 			}
 		},
 		jshint: {
@@ -27,7 +31,10 @@ module.exports = function(grunt) {
 		ngAnnotate: {
 			dist: {
 				files: {
-					'dist/angular-sharepoint.js': ['tmp/concat.js']
+					'dist/angular-sharepoint.js': ['tmp/angular-sharepoint.js'],
+					'dist/angular-sharepoint-full.js': ['tmp/angular-sharepoint-full.js'],
+					'dist/angular-sharepoint-lists.js': ['tmp/angular-sharepoint-lists.js'],
+					'dist/angular-sharepoint-mocks.js': ['tmp/angular-sharepoint-mocks.js']
 				}
 			}
 		},
@@ -35,7 +42,10 @@ module.exports = function(grunt) {
 			dist: {
 				compress: true,
 				files: {
-					'dist/angular-sharepoint.min.js': ['dist/angular-sharepoint.js']
+					'dist/angular-sharepoint.min.js': ['dist/angular-sharepoint.js'],
+					'dist/angular-sharepoint-full.min.js': ['dist/angular-sharepoint-full.js'],
+					'dist/angular-sharepoint-lists.min.js': ['dist/angular-sharepoint-lists.js'],
+					'dist/angular-sharepoint-mocks.min.js': ['dist/angular-sharepoint-mocks.js'],
 				}
 			}
 		},
