@@ -25,7 +25,7 @@ angular
                 var camlView = camlBuilder.push('View');
                 var queryTag;
                 if (query.__where.length === 1) {
-                    queryTag = camlView.push('Query')
+                    queryTag = camlView.push('Query');
                     query.__where[0].push(queryTag.push('Where'));
                 }else if (query.__where.length > 1) {
                     queryTag = camlView.push('Query');
