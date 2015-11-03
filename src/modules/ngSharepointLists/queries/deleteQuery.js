@@ -23,12 +23,12 @@ angular
                 var list = clientContext.get_web().get_lists().getByTitle(query.__list);
                 var camlBuilder = new CamlBuilder();
                 var camlView = camlBuilder.push('View');
-                var caml = ['<View>'];
+                var queryTag;
                 if (query.__where.length === 1) {
-                    var queryTag = camlView.push('Query')
+                    queryTag = camlView.push('Query')
                     query.__where[0].push(queryTag.push('Where'));
                 }else if (query.__where.length > 1) {
-                    var queryTag = camlView.push('Query');
+                    queryTag = camlView.push('Query');
                     var andTag = queryTag.push('Where').push('And');
                     query.__where.forEach(function(where) {
                         where.push(andTag);
