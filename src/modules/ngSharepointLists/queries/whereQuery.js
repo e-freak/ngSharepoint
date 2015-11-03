@@ -3,7 +3,6 @@ angular
 	.factory('WhereQuery', function() {
         var WhereQuery = function(query, field) {
             this.__query = query;
-            this.__field = field;
             this.__value = "";
             this.__operator = "";
             //this.__query.__queries.where.push(this);
@@ -21,6 +20,12 @@ angular
                 NOT_EQUALS: ['<Neq>', '</Neq>'],
                 NOT_INCLUDES: ['<NotIncludes>', '</NotIncludes>']
             };
+            if (typeof field == "string") {
+                this.__field = field;
+            }else {
+                this.__fields = field;
+                this.__operator = "equals";
+            }
         };
         WhereQuery.prototype.equals = function(value) {
             this.__operator = "equals";
@@ -31,17 +36,23 @@ angular
             this.__operator = this.__operators.BEGINS_WITH;
         };
         WhereQuery.prototype.push = function(caml) {
-            switch (this.__operator) {
-                case "equals":
-                    caml.push('<Eq>');
-                    break;
-            }
-            caml.push('<FieldRef Name="' + this.__field + '"/>');
-            caml.push('<Value Type="Number">' + this.__value + '</Value>');
-            switch (this.__operator) {
-                case "equals":
-                    caml.push('</Eq>');
-                    break;
+            var query = this;
+            if (angular.isUndefined(query.__fields)) {
+                var op;
+                switch (query.__operator) {
+                    case "equals":
+                        op = caml.push('Eq');
+                        break;
+                }
+                op.push('FieldRef', {Name: query.__field});
+                op.push('Value', {Type: 'Number'}, query.__value);
+            }else {
+                var and = caml.push('And');
+                Object.getOwnPropertyNames(query.__fields).forEach(function(field) {
+                    var op = and.push('Eq');
+                    op.push('FieldRef', {Name: field});
+                    op.push('Value', {Type: 'Number'}, query.__fields[field]);
+                });
             }
         };
         return (WhereQuery);
