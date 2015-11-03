@@ -21,28 +21,20 @@ angular
             return $q(function(resolve, reject) {
                 var clientContext = $sp.getContext();
                 var list = clientContext.get_web().get_lists().getByTitle(query.__list);
-                var camlQuery = new SP.CamlQuery();
+                var camlBuilder = new CamlBuilder();
+                var camlView = camlBuilder.push('View');
                 var caml = ['<View>'];
                 if (query.__where.length === 1) {
-                    caml.push('<Query>');
-                    caml.push('<Where>');
-                    query.__where[0].push(caml);
-                    caml.push('</Where>');
-                    caml.push('</Query>');
+                    var queryTag = camlView.push('Query')
+                    query.__where[0].push(queryTag.push('Where'));
                 }else if (query.__where.length > 1) {
-                    caml.push('<Query>');
-                    caml.push('<Where>');
-                    caml.push('<And>');
+                    var queryTag = camlView.push('Query');
+                    var andTag = queryTag.push('Where').push('And');
                     query.__where.forEach(function(where) {
-                        where.push(caml);
+                        where.push(andTag);
                     });
-                    caml.push('</And>');
-                    caml.push('</Where>');
-                    caml.push('</Query>');
                 }
-                caml.push('</View>');
-                camlQuery.set_viewXml(caml.join(''));
-                var items = list.getItems(camlQuery);
+                var items = list.getItems(camlBuilder.build());
                 clientContext.load(items);
                 clientContext.executeQueryAsync(
                     function(sender, args) {
