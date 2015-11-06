@@ -1,6 +1,6 @@
 angular
 	.module('ngSharepointLists')
-	.factory('SelectQuery', ['$q', '$sp', 'Query', 'WhereQuery', function($q, $sp, Query, WhereQuery) {
+	.factory('SelectQuery', ['$q', '$sp', 'CamlBuilder', 'Query', 'WhereQuery', function($q, $sp, CamlBuilder, Query, WhereQuery) {
         var SelectQuery = function(fields) {
             this.__values = fields;
             this.__where = [];
@@ -42,11 +42,11 @@ angular
                     var queryTag = camlView.push('Query');
                     if (query.__where.length === 1) {
                         var camlWhere = queryTag.push('Where');
-                        camlWhere.push(query.__where[0]);
+                        query.__where[0].push(camlWhere);
                     }else if (query.__where.length > 1) {
                         var camlAnd = queryTag.push('Where').push('And');
                         query.__where.forEach(function(where) {
-                            camlAnd.push(where);
+                            where.push(camlAnd);
                         });
                     }
                     if (query.__order.length > 0) {

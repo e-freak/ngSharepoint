@@ -1,6 +1,6 @@
 angular
 	.module('ngSharepointLists')
-	.factory('DeleteQuery', ['$q', '$sp', 'WhereQuery', 'Query', function($q, $sp, WhereQuery, Query) {
+	.factory('DeleteQuery', ['$q', '$sp', 'CamlBuilder', 'WhereQuery', 'Query', function($q, $sp, CamlBuilder, WhereQuery, Query) {
 		var DeleteQuery = function() {
             this.__where = [];
             this.__list = null;

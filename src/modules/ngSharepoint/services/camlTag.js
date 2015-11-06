@@ -4,7 +4,7 @@ angular
 		var CamlTag = function(name, attr, value) {
 			this.name = name;
 			this.attr = attr || {};
-			this.value = value || undefined;
+			this.value = value;
 			this.caml = [];
 		};
 		CamlTag.prototype.__buildTag = function() {
@@ -29,12 +29,12 @@ angular
 			}
 			return xml;
 		};
-		CamlTag.prototype.push = function(tag, attr) {
+		CamlTag.prototype.push = function(tag, attr, value) {
 			var camlTag;
 			if (tag instanceof CamlTag) {
 				camlTag = tag;
 			}else {
-				camlTag = new CamlTag(tag, attr);
+				camlTag = new CamlTag(tag, attr, value);
 			}
 			this.caml.push(camlTag);
 			return camlTag;
