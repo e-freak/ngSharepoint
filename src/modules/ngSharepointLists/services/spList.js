@@ -37,7 +37,7 @@ angular
       SPList.prototype.delete = function(query) {
         return this.__list.delete(query);
       };
-      var RestSPList = function() {
+      var RestSPList = function(title) {
         this.title = title;
       };
       RestSPList.prototype.select = function(query) {
