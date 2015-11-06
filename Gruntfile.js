@@ -6,7 +6,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-karma');
 	grunt.loadNpmTasks('grunt-ng-annotate');
 
-	grunt.registerTask('default', ['jshint', 'concat:dev']);
+	grunt.registerTask('default', ['jshint', 'karma:dist', 'concat:dev']);
 	grunt.registerTask('dist', ['jshint', 'karma:dist', 'concat:dist', 'ngAnnotate:dist', 'uglify:dist', 'clean']);
 	grunt.registerTask('test', ['jshint', 'concat:dev', 'karma:dev']);
 
@@ -18,9 +18,10 @@ module.exports = function(grunt) {
 			},
 			dist: {
 				files: {
-					'tmp/angular-sharepoint-full.js':['src/*.js', 'src/**/*.js', '!src/modules/ngSharepointMocks/*'],
-					'tmp/angular-sharepoint.js':['src/modules/ngSharepoint/**/*.js'],
-					'tmp/angular-sharepoint-lists.js':['src/modules/ngSharepointLists/**/*.js'],
+					'tmp/angular-sharepoint.js':['src/*.js', 'src/**/*.js', '!src/modules/ngSharepointMocks/*'],
+					//'tmp/angular-sharepoint-full.js':['src/*.js', 'src/**/*.js', '!src/modules/ngSharepointMocks/*'],
+					//'tmp/angular-sharepoint.js':['src/modules/ngSharepoint/**/*.js'],
+					//'tmp/angular-sharepoint-lists.js':['src/modules/ngSharepointLists/**/*.js'],
 					'tmp/angular-sharepoint-mocks.js':['src/modules/ngSharepointMocks/**/*.js']
 				}
 			}
@@ -32,8 +33,8 @@ module.exports = function(grunt) {
 			dist: {
 				files: {
 					'dist/angular-sharepoint.js': ['tmp/angular-sharepoint.js'],
-					'dist/angular-sharepoint-full.js': ['tmp/angular-sharepoint-full.js'],
-					'dist/angular-sharepoint-lists.js': ['tmp/angular-sharepoint-lists.js'],
+					//'dist/angular-sharepoint-full.js': ['tmp/angular-sharepoint-full.js'],
+					//'dist/angular-sharepoint-lists.js': ['tmp/angular-sharepoint-lists.js'],
 					'dist/angular-sharepoint-mocks.js': ['tmp/angular-sharepoint-mocks.js']
 				}
 			}
@@ -43,8 +44,8 @@ module.exports = function(grunt) {
 				compress: true,
 				files: {
 					'dist/angular-sharepoint.min.js': ['dist/angular-sharepoint.js'],
-					'dist/angular-sharepoint-full.min.js': ['dist/angular-sharepoint-full.js'],
-					'dist/angular-sharepoint-lists.min.js': ['dist/angular-sharepoint-lists.js'],
+					//'dist/angular-sharepoint-full.min.js': ['dist/angular-sharepoint-full.js'],
+					//'dist/angular-sharepoint-lists.min.js': ['dist/angular-sharepoint-lists.js'],
 					'dist/angular-sharepoint-mocks.min.js': ['dist/angular-sharepoint-mocks.js'],
 				}
 			}
