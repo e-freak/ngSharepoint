@@ -25,7 +25,7 @@ angular
 			return result;
 		};
 		CamlBuilder.prototype.build = function() {
-			for (var i = 0; i < 0; i++) {
+			for (var i = 0; i < this.caml.length; i++) {
 				this.caml[i] = this.caml[i].build();
 			}
 			this.camlQuery.set_viewXml(this.caml.join(''));
