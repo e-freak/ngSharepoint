@@ -6,8 +6,8 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-karma');
 	grunt.loadNpmTasks('grunt-ng-annotate');
 
-	grunt.registerTask('default', ['jshint', 'karma:dist', 'concat:dev']);
-	grunt.registerTask('dist', ['jshint', 'karma:dist', 'concat:dist', 'ngAnnotate:dist', 'uglify:dist', 'clean']);
+	grunt.registerTask('default', ['jshint', 'concat:dev', 'karma:dist']);
+	grunt.registerTask('dist', ['jshint', 'concat:dist', 'ngAnnotate:dist', 'karma:dist', 'uglify:dist', 'clean']);
 	grunt.registerTask('test', ['jshint', 'concat:dev', 'karma:dev']);
 
 	grunt.initConfig({
@@ -18,7 +18,7 @@ module.exports = function(grunt) {
 			},
 			dist: {
 				files: {
-					'tmp/angular-sharepoint.js':['src/*.js', 'src/**/*.js', '!src/modules/ngSharepointMocks/*'],
+					'tmp/angular-sharepoint.js':['src/*.js', 'src/**/*.js', '!src/**/*.spec.js', '!src/modules/ngSharepointMocks/*'],
 					//'tmp/angular-sharepoint-full.js':['src/*.js', 'src/**/*.js', '!src/modules/ngSharepointMocks/*'],
 					//'tmp/angular-sharepoint.js':['src/modules/ngSharepoint/**/*.js'],
 					//'tmp/angular-sharepoint-lists.js':['src/modules/ngSharepointLists/**/*.js'],
@@ -27,7 +27,7 @@ module.exports = function(grunt) {
 			}
 		},
 		jshint: {
-			default: ['src/*.js', 'src/**/*.js']
+			default: ['src/*.js', 'src/**/*.js', '!src/**/*.spec.js']
 		},
 		ngAnnotate: {
 			dist: {
@@ -56,8 +56,8 @@ module.exports = function(grunt) {
 				files: [
 					'bower_components/angular/angular.min.js',
 					'bower_components/angular-mocks/angular-mocks.js',
-					'src/**/*.js',
-					'test/unit/**/*.js'
+					'dist/angular-sharepoint.js',
+					'src/**/*.spec.js'
 				],
 				singleRun: true,
 				preprocessors: {
