@@ -1,5 +1,5 @@
 angular
-	.module('ngSharepointUsers')
+	.module('ngSharepoint.Users')
 	.factory('SPUser', ['$q', '$http', '$sp', function($q, $http, $sp) {
 		var SPUser = function(accountName, load) {
 			var user = this;
@@ -30,7 +30,7 @@ angular
 		};
 		SPUser.prototype.load = function() {
 			return this.__list.load();
-		}
+		};
 		var JsomSPUser = function(accountName) {
 			this.accountName = accountName;
 		};

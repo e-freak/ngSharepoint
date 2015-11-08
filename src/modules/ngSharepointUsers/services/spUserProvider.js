@@ -1,6 +1,6 @@
 angular
-    .module('ngSharepointUsers')
-    .factory('$spUser', ['$q', '$sp', 'SPUser', function ($q, $sp, SPUser) {
+    .module('ngSharepoint.Users')
+    .provider('$spUser', ['$q', '$sp', 'SPUser', function ($q, $sp, SPUser) {
         return {
             $get: ['$q', '$sp', function($q, $sp) {
                 return({
