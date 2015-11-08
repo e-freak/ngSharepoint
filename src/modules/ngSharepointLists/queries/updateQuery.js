@@ -1,5 +1,5 @@
 angular
-	.module('ngSharepointLists')
+	.module('ngSharepoint.Lists')
 	.factory('UpdateQuery', ['$q', '$sp', 'CamlBuilder', 'WhereQuery', 'Query', function($q, $sp, CamlBuilder, WhereQuery, Query) {
 		var UpdateQuery = function(list) {
 			this.__list = list;

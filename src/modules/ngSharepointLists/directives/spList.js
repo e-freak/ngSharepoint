@@ -1,5 +1,5 @@
 angular
-	.module('ngSharepointLists')
+	.module('ngSharepoint.Lists')
 	.directive('spList', ['$spList', function($spList) {
 		return {
 			restrict: 'A',

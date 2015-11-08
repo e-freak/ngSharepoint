@@ -1,5 +1,5 @@
 angular
-	.module('ngSharepointLists')
+	.module('ngSharepoint.Lists')
 	.factory('Query', function() {
 		var Query = function() {
 			//this.__queries = {};

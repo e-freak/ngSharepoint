@@ -1,5 +1,5 @@
 angular
-	.module('ngSharepointLists')
+	.module('ngSharepoint.Lists')
 	.factory('SelectQuery', ['$q', '$sp', 'CamlBuilder', 'Query', 'WhereQuery', function($q, $sp, CamlBuilder, Query, WhereQuery) {
         var SelectQuery = function(fields) {
             this.__values = fields;

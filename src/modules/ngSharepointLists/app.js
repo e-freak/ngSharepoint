@@ -1,2 +1,2 @@
 angular
-	.module('ngSharepointLists', ['ngSharepoint']);
+	.module('ngSharepoint.Lists', ['ngSharepoint']);

@@ -1,5 +1,5 @@
 angular
-	.module('ngSharepointLists')
+	.module('ngSharepoint.Lists')
 	.factory('JoinQuery', ['$q', '$sp', function ($q, $sp) {
 		var JoinQuery = function() {
 

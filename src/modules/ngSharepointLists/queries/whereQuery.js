@@ -1,5 +1,5 @@
 angular
-	.module('ngSharepointLists')
+	.module('ngSharepoint.Lists')
 	.factory('WhereQuery', function() {
         var WhereQuery = function(query, field) {
             this.__query = query;
