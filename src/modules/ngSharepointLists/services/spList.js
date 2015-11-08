@@ -66,6 +66,37 @@ angular
           }, reject);
         });
       };
+      RestSPList.prototype.insert = function(data) {
+        var endpoint = "_api/web/Lists/GetByTitle('" + this.title + "')/items";
+        var body = {
+          __metadata: {
+            type: 'SP.Data.TestListItem'
+          }
+        };
+        var headers = {
+          "X-RequestDigest": $("#__REQUESTDIGEST").val(),
+          "Accept": "application/json; odata=verbose",
+          "Content-Type": "application/json; odata=verbose"
+        };
+        Object.getOwnPropertyNames(data).forEach(function(key) {
+          var value = data[key];
+          if (value !== null && value !== undefined && typeof value == 'string') {
+            value = value.trim();
+          }
+          body[key] = value;
+        });
+        return $q(function(resolve, reject) {
+          $http({
+            method: 'POST',
+            url: $sp.getSiteUrl() + endpoint,
+            data: body,
+            headers: headers
+          }).then(function(data) {
+            //TODO: Parse Result
+          }, reject);
+        });
+      };
+      //JsomSPList
       var JsomSPList = function(title) {
         this.title = title;
       };
