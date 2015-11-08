@@ -16,7 +16,7 @@ You can install ngSharepoint from bower with
 ```
 bower install ngSharepoint
 ```
-or download it directly from the Repo.
+or download it directly from [here](https://github.com/maxjoehnk/ngSharepoint/tree/master/dist).
 
 ##Usage
 First you'll need to add ngSharepoint as a dependency in your Angular Module Definition
