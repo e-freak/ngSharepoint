@@ -8,8 +8,11 @@
 Sharepoint Bindings for AngularJS.
 
 ##Features
+- Connect to a Sharepoint Instance either with either the JSOM or RESTful API
 - Access Sharepoint Lists with a SQL Like Syntax
 - Build and Run custom CAML Queries on Sharepoint Lists
+- Automatic (de)serialization of Classes to List Objects (implement __deserialize and __serialize for it to work)
+- Pre-built directives for Lists and Userprofiles
 
 ##Installation
 You can install ngSharepoint from bower with
