@@ -23,10 +23,11 @@ First you'll need to add ngSharepoint as a dependency in your Angular Module Def
 ```js
 angular.module('myApp', ['ngSharepoint']);
 ```
-Then configure ngSharepoint to connect to your Sharepoint instance
+Then configure ngSharepoint to connect to your Sharepoint instance and use either the JSOM or REST Connection Mode.
 ```js
 angular.module('myApp')
   .config(['$spProvider', function($spProvider) {
     $spProvider.setSiteUrl("http://path-to-your-sharepoi.nt");
+    $spProvider.setConnectionMode("JSOM"); //Optional
   }]);
 ```
