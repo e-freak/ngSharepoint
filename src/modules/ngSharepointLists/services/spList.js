@@ -20,6 +20,16 @@ angular
         });
     }])
     .factory('SPList', ['$q', '$http', '$sp', function($q, $http, $sp) {
+      /**
+       * @ngdoc object
+       * @name  SPList
+       * @param {string} title The List Title
+       * 
+       * @module  ngSharepoint.Lists
+       *
+       * @description
+       * SPList represents a Sharepoint List
+       */
       var SPList = function(title) {
         this.title = title;
         if ($sp.getConnectionMode() == "JSOM") {
@@ -28,15 +38,33 @@ angular
           this.__list = new RestSPList(title);
         }
       };
+      /**
+       * @ngdoc function
+       * @name  SPList#insert  
+       * @param  {object} data The Data you wanna insert
+       * @return {Promise}      A Promise which resolves when the insertion was sucessful
+       */
       SPList.prototype.insert = function(data) {
         return this.__list.insert(data);
       };
+      /** 
+       * @ngdoc function
+       * @name  SPList#select
+       * @param {SP.CamlQuery} query A CamlQuery to filter for
+       * @return {Promise} A Promise which resolves to the selected data
+       */
       SPList.prototype.select = function(query) {
         return this.__list.select(query);
       };
+      /**
+       * @ngdoc function
+       * @param  {SP.CamlQuery} query A CamlQuery to filter for
+       * @return {Promise}       [description]
+       */
       SPList.prototype.delete = function(query) {
         return this.__list.delete(query);
       };
+      //RestSPList
       var RestSPList = function(title) {
         this.title = title;
       };
