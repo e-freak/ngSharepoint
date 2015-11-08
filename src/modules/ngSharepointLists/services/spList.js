@@ -88,5 +88,58 @@ angular
           });
         });
       };
+      JsomSPList.prototype.insert = function(data) {
+        var list = this;
+        return $q(function(resolve, reject) {
+          var clientContext = $sp.getContext();
+          var list = clientContext.get_web().get_lists().getByTitle(list.title);
+          var itemInfo = new SP.ListItemCreationInformation();
+          var item = list.addItem(itemInfo);
+          Object.getOwnPropertyNames(data).forEach(function(key) {
+            var value = data[key];
+            if (value !== null && value !== undefined && typeof value == 'string') {
+              value = value.trim();
+            }
+            item.set_item(key, value);
+          });
+          item.update();
+          clientContext.load(item);
+          clientContext.executeQueryAsync(function(sender, args) {
+              resolve(query.unpackItem(item));
+          }, function(sender, args) {
+              reject(args);
+          });
+        });
+      };
+      JsomSPList.prototype.delete = function(query) {
+        var list = this;
+        return $q(function(resolve, reject) {
+          var clientContext = $sp.getContext();
+          var list = clientContext.get_web().get_lists().getByTitle(list.title);
+          var items = list.getItems(query);
+          clientContext.load(items);
+          clientContext.executeQueryAsync(
+              function(sender, args) {
+                  var itemIterator = items.getEnumerator();
+                  var a = [];
+                  while (itemIterator.moveNext()) {
+                     var item = itemIterator.get_current();
+                     a.push(item);
+                  }
+                  a.forEach(function(item) {
+                      item.deleteObject();
+                  });
+                  clientContext.executeQueryAsync(function(sender, args) {
+                      resolve(args);
+                  }, function(sender, args) {
+                      reject(args);
+                  });
+              },
+              function(sender, args) {
+                  reject(args);
+              }
+          );
+        });
+      };
       return (SPList);
     }]);
