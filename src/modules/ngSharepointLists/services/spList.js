@@ -45,7 +45,7 @@ angular
        * @return {Promise}      A Promise which resolves when the insertion was sucessful
        */
       SPList.prototype.insert = function(data) {
-        return this.__list.insert(data);
+        return this.__list.insert(data).catch($spLog.error);
       };
       /** 
        * @ngdoc function
@@ -54,7 +54,7 @@ angular
        * @return {Promise} A Promise which resolves to the selected data
        */
       SPList.prototype.select = function(query) {
-        return this.__list.select(query);
+        return this.__list.select(query).catch($spLog.error);
       };
       /**
        * @ngdoc function
@@ -62,7 +62,16 @@ angular
        * @return {Promise}       [description]
        */
       SPList.prototype.delete = function(query) {
-        return this.__list.delete(query);
+        return this.__list.delete(query).catch($spLog.error);
+      };
+      /**
+       * @ngdoc function
+       * @param  {SP.CamlQuery} query  A CamlQuery which selects the rows to update
+       * @param  {object} data The Data you wanna update 
+       * @return {Promise}        A Promise which resolves when the update was sucessfull
+       */
+      SPList.prototype.update = function(query, data) {
+        return this.__list.update(query, data).catch($spLog.error);
       };
       //RestSPList
       var RestSPList = function(title) {
