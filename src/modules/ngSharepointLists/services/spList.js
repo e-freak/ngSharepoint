@@ -19,7 +19,7 @@ angular
             }
         });
     }])
-    .factory('SPList', ['$q', '$http', '$sp', function($q, $http, $sp) {
+    .factory('SPList', ['$q', '$http', '$sp', '$spLog', function($q, $http, $sp, $spLog) {
       /**
        * @ngdoc object
        * @name  SPList
@@ -132,6 +132,12 @@ angular
             //TODO: Parse Result
           }, reject);
         });
+      };
+      RestSPList.prototype.delete = function(query) {
+        //TODO: Implement
+      };
+      RestSPList.prototype.update = function(query, data) {
+        //TODO: Implement
       };
       //JsomSPList
       var JsomSPList = function(title) {
