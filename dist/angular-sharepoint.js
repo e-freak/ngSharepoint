@@ -117,6 +117,39 @@ angular
 
 angular
 	.module('ngSharepoint')
+	.provider('$spLog', function() {
+		var prefix = "[ngSharepoint] ";
+		var enabled = true;
+		return {
+			setPrefix: function(prefix) {
+				this.prefix = "[" + prefix + "] ";
+			},
+			setEnabled: function(enabled) {
+				this.enabled = enabled;
+			},
+			$get: function() {
+				return ({
+					error: function(msg) {
+						if (enabled) {
+							console.error(prefix + msg);
+						}
+					},
+					warn: function(msg) {
+						if (enabled) {
+							console.warn(prefix + msg);
+						}
+					},
+					log: function(msg) {
+						if (enabled) {
+							console.log(prefix + msg);
+						}
+					}
+				});
+			}
+		};
+	});
+angular
+	.module('ngSharepoint')
 	.provider('$sp', function() {
 		var siteUrl = "";
 		var connMode = "JSOM"; //possible values: JSOM, REST
@@ -185,7 +218,7 @@ angular
 	}]);
 angular
 	.module('ngSharepoint.Lists')
-	.factory('DeleteQuery', ['$q', '$sp', 'CamlBuilder', 'WhereQuery', 'Query', function($q, $sp, CamlBuilder, WhereQuery, Query) {
+	.factory('DeleteQuery', ['$spList', 'CamlBuilder', 'WhereQuery', 'Query', function($spList, CamlBuilder, WhereQuery, Query) {
 		var DeleteQuery = function() {
             this.__where = [];
             this.__list = null;
@@ -202,53 +235,26 @@ angular
             return query;
         };
 		DeleteQuery.prototype.__execute = function() {
-            var query = this;
-            return $q(function(resolve, reject) {
-                var clientContext = $sp.getContext();
-                var list = clientContext.get_web().get_lists().getByTitle(query.__list);
-                var camlBuilder = new CamlBuilder();
-                var camlView = camlBuilder.push('View');
-                var queryTag;
-                if (query.__where.length === 1) {
-                    queryTag = camlView.push('Query');
-                    query.__where[0].push(queryTag.push('Where'));
-                }else if (query.__where.length > 1) {
-                    queryTag = camlView.push('Query');
-                    var andTag = queryTag.push('Where').push('And');
-                    query.__where.forEach(function(where) {
-                        where.push(andTag);
-                    });
-                }
-                var items = list.getItems(camlBuilder.build());
-                clientContext.load(items);
-                clientContext.executeQueryAsync(
-                    function(sender, args) {
-                        var itemIterator = items.getEnumerator();
-                        var a = [];
-                        while (itemIterator.moveNext()) {
-                           var item = itemIterator.get_current();
-                           a.push(item);
-                        }
-                        a.forEach(function(item) {
-                            item.deleteObject();
-                        });
-                        clientContext.executeQueryAsync(function(sender, args) {
-                            resolve(args);
-                        }, function(sender, args) {
-                            reject(args);
-                        });
-                    },
-                    function(sender, args) {
-                        reject(args);
-                    }
-                );
-            });
+            var camlBuilder = new CamlBuilder();
+            var camlView = camlBuilder.push('View');
+            var queryTag;
+            if (this.__where.length === 1) {
+                queryTag = camlView.push('Query');
+                this.__where[0].push(queryTag.push('Where'));
+            }else if (this.__where.length > 1) {
+                queryTag = camlView.push('Query');
+                var andTag = queryTag.push('Where').push('And');
+                this.__where.forEach(function(where) {
+                    where.push(andTag);
+                });
+            }
+            return $spList.getList(this.__list).delete(camlBuilder.build());
         };
         return (DeleteQuery);
 	}]);
 angular
 	.module('ngSharepoint.Lists')
-	.factory('InsertIntoQuery', ['$q', '$sp', 'Query', function($q, $sp, Query) {
+	.factory('InsertIntoQuery', ['$spList', 'Query', function($spList, Query) {
 		var InsertIntoQuery = function(list) {
 			this.__list = list;
 			this.__values = {};
@@ -260,21 +266,7 @@ angular
 			return this;
 		};
 		InsertIntoQuery.prototype.__execute = function() {
-            var query = this;
-            return $q(function(resolve, reject) {
-                var clientContext = $sp.getContext();
-                var list = clientContext.get_web().get_lists().getByTitle(query.__list);
-                var itemInfo = new SP.ListItemCreationInformation();
-                var item = list.addItem(itemInfo);
-                query.packItem(item);
-                item.update();
-                clientContext.load(item);
-                clientContext.executeQueryAsync(function(sender, args) {
-                    resolve(query.unpackItem(item));
-                }, function(sender, args) {
-                    reject(args);
-                });
-            });
+            return $spList.getList(this.__list).insert(this.__values);
         };
         return (InsertIntoQuery);
 	}]);
@@ -328,7 +320,7 @@ angular
 	});
 angular
 	.module('ngSharepoint.Lists')
-	.factory('SelectQuery', ['$q', '$sp', 'CamlBuilder', 'Query', 'WhereQuery', function($q, $sp, CamlBuilder, Query, WhereQuery) {
+	.factory('SelectQuery', ['$spList', 'CamlBuilder', 'Query', 'WhereQuery', function($spList, CamlBuilder, Query, WhereQuery) {
         var SelectQuery = function(fields) {
             this.__values = fields;
             this.__where = [];
@@ -360,60 +352,40 @@ angular
             return this;
         };
         SelectQuery.prototype.__execute = function() {
-            var query = this;
-            return $q(function(resolve, reject) {
-                var clientContext = $sp.getContext();
-                var list = clientContext.get_web().get_lists().getByTitle(query.__list);
-                var camlBuilder = new CamlBuilder();
-                var camlView = camlBuilder.push('View');
-                if (query.__where.length > 0 || query.__order.length > 0) {
-                    var queryTag = camlView.push('Query');
-                    if (query.__where.length === 1) {
-                        var camlWhere = queryTag.push('Where');
-                        query.__where[0].push(camlWhere);
-                    }else if (query.__where.length > 1) {
-                        var camlAnd = queryTag.push('Where').push('And');
-                        query.__where.forEach(function(where) {
-                            where.push(camlAnd);
-                        });
-                    }
-                    if (query.__order.length > 0) {
-                        var camlOrder = queryTag.push('OrderBy');
-                        query.__order.forEach(function(order) {
-                            camlOrder.push('FieldRef', {Name: order.field, Ascending: order.asc});
-                        });
-                    }
+            var camlBuilder = new CamlBuilder();
+            var camlView = camlBuilder.push('View');
+            if (query.__where.length > 0 || query.__order.length > 0) {
+                var queryTag = camlView.push('Query');
+                if (query.__where.length === 1) {
+                    var camlWhere = queryTag.push('Where');
+                    query.__where[0].push(camlWhere);
+                }else if (query.__where.length > 1) {
+                    var camlAnd = queryTag.push('Where').push('And');
+                    query.__where.forEach(function(where) {
+                        where.push(camlAnd);
+                    });
                 }
-                var viewFields = camlView.push('ViewFields');
-                query.__values.forEach(function(field) {
-                    viewFields.push('FieldRef', {Name: field});
-                });
-                if (query.__limit !== null) {
-                    camlView.push('RowLimit', {}, query.__limit);
+                if (query.__order.length > 0) {
+                    var camlOrder = queryTag.push('OrderBy');
+                    query.__order.forEach(function(order) {
+                        camlOrder.push('FieldRef', {Name: order.field, Ascending: order.asc});
+                    });
                 }
-                var items = list.getItems(camlBuilder.build());
-                clientContext.load(items);
-                clientContext.executeQueryAsync(
-                    function(sender, args) {
-                        var result = [];
-                        var itemIterator = items.getEnumerator();
-                        while (itemIterator.moveNext()) {
-                           var item = itemIterator.get_current();
-                           result.push(query.unpackItem(item));
-                        } 
-                        resolve(result);
-                    },
-                    function(sender, args) {
-                        reject(args);
-                    }
-                );
+            }
+            var viewFields = camlView.push('ViewFields');
+            query.__values.forEach(function(field) {
+                viewFields.push('FieldRef', {Name: field});
             });
+            if (query.__limit !== null) {
+                camlView.push('RowLimit', {}, query.__limit);
+            }
+            return $spList.getList(this.__list).select(camlBuilder.build());
         };
 		return (SelectQuery);
 	}]);
 angular
 	.module('ngSharepoint.Lists')
-	.factory('UpdateQuery', ['$q', '$sp', 'CamlBuilder', 'WhereQuery', 'Query', function($q, $sp, CamlBuilder, WhereQuery, Query) {
+	.factory('UpdateQuery', ['$spList', 'CamlBuilder', 'WhereQuery', 'Query', function($spList, CamlBuilder, WhereQuery, Query) {
 		var UpdateQuery = function(list) {
 			this.__list = list;
 			this.__values = {};
@@ -431,41 +403,20 @@ angular
             return query;
 		};
 		UpdateQuery.prototype.__execute = function() {
-            var query = this;
-            return $q(function(resolve, reject) {
-                var clientContext = $sp.getContext();
-                var list = clientContext.get_web().get_lists().getByTitle(query.__list);
-                var camlBuilder = new CamlBuilder();
-                var camlView = camlBuilder.push('View');
-                var queryTag;
-                if (query.__where.length === 1) {
-                    queryTag = camlView.push('Query');
-                    query.__where[0].push(queryTag.push('Where'));
-                }else if (query.__where.length > 1) {
-                    queryTag = camlView.push('Query');
-                    var andTag = queryTag.push('Where').push('And');
-                    query.__where.forEach(function(where) {
-                        where.push(andTag);
-                    });
-                }
-                var items = list.getItems(camlBuilder.build());
-                clientContext.load(items);
-                clientContext.executeQueryAsync(function(sender, args) {
-                    var itemIterator = items.getEnumerator();
-                    while (itemIterator.moveNext()) {
-                        var item = itemIterator.get_current();
-                        query.packItem(item);
-                        item.update();
-                    }
-                    clientContext.executeQueryAsync(function(sender, args) {
-                        resolve(args);
-                    }, function(sender, args) {
-                        reject(args);
-                    });
-                }, function(sender, args) {
-                    reject(args);
+            var camlBuilder = new CamlBuilder();
+            var camlView = camlBuilder.push('View');
+            var queryTag;
+            if (query.__where.length === 1) {
+                queryTag = camlView.push('Query');
+                query.__where[0].push(queryTag.push('Where'));
+            }else if (query.__where.length > 1) {
+                queryTag = camlView.push('Query');
+                var andTag = queryTag.push('Where').push('And');
+                query.__where.forEach(function(where) {
+                    where.push(andTag);
                 });
-            });
+            }
+            return $spList.getList(this.__list).update(camlBuilder.build(), this.__values);
         };
         return (UpdateQuery);
 	}]);
@@ -530,10 +481,10 @@ angular
 	});
 angular
     .module('ngSharepoint.Lists')
-    .factory('$spList', ['$sp', 'SelectQuery', 'UpdateQuery', 'InsertIntoQuery', 'DeleteQuery', function ($sp, SelectQuery, UpdateQuery, InsertIntoQuery, DeleteQuery) {
+    .factory('$spList', ['SPList', 'SelectQuery', 'UpdateQuery', 'InsertIntoQuery', 'DeleteQuery', function (SPList, SelectQuery, UpdateQuery, InsertIntoQuery, DeleteQuery) {
         return ({
             getList: function(title) {
-              return null;
+              return new SPList(title);
             },
             select: function(fields) {
                 return new SelectQuery(fields);
@@ -549,7 +500,7 @@ angular
             }
         });
     }])
-    .factory('SPList', ['$q', '$http', '$sp', function($q, $http, $sp) {
+    .factory('SPList', ['$q', '$http', '$sp', '$spLog', function($q, $http, $sp, $spLog) {
       /**
        * @ngdoc object
        * @name  SPList
@@ -575,7 +526,7 @@ angular
        * @return {Promise}      A Promise which resolves when the insertion was sucessful
        */
       SPList.prototype.insert = function(data) {
-        return this.__list.insert(data);
+        return this.__list.insert(data).catch($spLog.error);
       };
       /** 
        * @ngdoc function
@@ -584,7 +535,7 @@ angular
        * @return {Promise} A Promise which resolves to the selected data
        */
       SPList.prototype.select = function(query) {
-        return this.__list.select(query);
+        return this.__list.select(query).catch($spLog.error);
       };
       /**
        * @ngdoc function
@@ -592,7 +543,16 @@ angular
        * @return {Promise}       [description]
        */
       SPList.prototype.delete = function(query) {
-        return this.__list.delete(query);
+        return this.__list.delete(query).catch($spLog.error);
+      };
+      /**
+       * @ngdoc function
+       * @param  {SP.CamlQuery} query  A CamlQuery which selects the rows to update
+       * @param  {object} data The Data you wanna update 
+       * @return {Promise}        A Promise which resolves when the update was sucessfull
+       */
+      SPList.prototype.update = function(query, data) {
+        return this.__list.update(query, data).catch($spLog.error);
       };
       //RestSPList
       var RestSPList = function(title) {
@@ -654,6 +614,12 @@ angular
           }, reject);
         });
       };
+      RestSPList.prototype.delete = function(query) {
+        //TODO: Implement
+      };
+      RestSPList.prototype.update = function(query, data) {
+        //TODO: Implement
+      };
       //JsomSPList
       var JsomSPList = function(title) {
         this.title = title;
@@ -684,13 +650,7 @@ angular
           var list = clientContext.get_web().get_lists().getByTitle(list.title);
           var itemInfo = new SP.ListItemCreationInformation();
           var item = list.addItem(itemInfo);
-          Object.getOwnPropertyNames(data).forEach(function(key) {
-            var value = data[key];
-            if (value !== null && value !== undefined && typeof value == 'string') {
-              value = value.trim();
-            }
-            item.set_item(key, value);
-          });
+          list.__pack(item, data);
           item.update();
           clientContext.load(item);
           clientContext.executeQueryAsync(function(sender, args) {
@@ -730,12 +690,64 @@ angular
           );
         });
       };
+      JsomSPList.prototype.update = function(query, data) {
+        var list = this;
+        return $q(function(resolve, reject) {
+          var clientContext = $sp.getContext();
+          var list = clientContext.get_web().get_lists().getByTitle(query.__list);
+          var items = list.getItems(query);
+          clientContext.load(items);
+          clientContext.executeQueryAsync(function(sender, args) {
+            var itemIterator = items.getEnumerator();
+            while (itemIterator.moveNext()) {
+              var item = itemIterator.get_current();
+              list.__pack(item, data);
+              item.update();
+            }
+            clientContext.executeQueryAsync(function(sender, args) {
+                resolve(args);
+            }, function(sender, args) {
+                reject(args);
+            });
+          }, function(sender, args) {
+              reject(args);
+          });
+        });
+      };
+      JsomSPList.prototype.__pack = function(item, data) {
+        Object.getOwnPropertyNames(data).forEach(function(key) {
+          var value = data[key];
+          if (value !== null && value !== undefined && typeof value == 'string') {
+            value = value.trim();
+          }
+          item.set_item(key, value);
+        });
+      };
       return (SPList);
     }]);
 
 angular
   .module('ngSharepoint.Users', ['ngSharepoint']);
 
+angular
+	.module('ngSharepoint.Users')
+	.directive('spUser', ['$spUser', function($spUser) {
+		return {
+			restrict: 'E',
+			scope: {
+				'name': '@'
+			},
+			transclude: true,
+			template: '<div ng-transclude></div>',
+			link: function(scope, element, attrs) {
+				scope.$watch(attrs.name, function(value) {
+					$spUser.getUser(value).then(function(user) {
+						scope.user = user;
+					});
+				});
+			}
+		};
+	}]);
 angular
 	.module('ngSharepoint.Users')
 	.factory('SPUser', ['$q', '$http', '$sp', function($q, $http, $sp) {
