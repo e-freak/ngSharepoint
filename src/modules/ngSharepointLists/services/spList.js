@@ -163,13 +163,7 @@ angular
           var list = clientContext.get_web().get_lists().getByTitle(list.title);
           var itemInfo = new SP.ListItemCreationInformation();
           var item = list.addItem(itemInfo);
-          Object.getOwnPropertyNames(data).forEach(function(key) {
-            var value = data[key];
-            if (value !== null && value !== undefined && typeof value == 'string') {
-              value = value.trim();
-            }
-            item.set_item(key, value);
-          });
+          list.__pack(item, data);
           item.update();
           clientContext.load(item);
           clientContext.executeQueryAsync(function(sender, args) {
