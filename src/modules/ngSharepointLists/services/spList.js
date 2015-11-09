@@ -209,5 +209,38 @@ angular
           );
         });
       };
+      JsomSPList.prototype.update = function(query, data) {
+        var list = this;
+        return $q(function(resolve, reject) {
+          var clientContext = $sp.getContext();
+          var list = clientContext.get_web().get_lists().getByTitle(query.__list);
+          var items = list.getItems(query);
+          clientContext.load(items);
+          clientContext.executeQueryAsync(function(sender, args) {
+            var itemIterator = items.getEnumerator();
+            while (itemIterator.moveNext()) {
+              var item = itemIterator.get_current();
+              list.__pack(item, data);
+              item.update();
+            }
+            clientContext.executeQueryAsync(function(sender, args) {
+                resolve(args);
+            }, function(sender, args) {
+                reject(args);
+            });
+          }, function(sender, args) {
+              reject(args);
+          });
+        });
+      };
+      JsomSPList.prototype.__pack = function(item, data) {
+        Object.getOwnPropertyNames(data).forEach(function(key) {
+          var value = data[key];
+          if (value !== null && value !== undefined && typeof value == 'string') {
+            value = value.trim();
+          }
+          item.set_item(key, value);
+        });
+      };
       return (SPList);
     }]);
