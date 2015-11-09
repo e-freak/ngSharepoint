@@ -1,6 +1,6 @@
 angular
 	.module('ngSharepoint.Lists')
-	.factory('InsertIntoQuery', ['$q', '$sp', 'Query', function($q, $sp, Query) {
+	.factory('InsertIntoQuery', ['$spList', 'Query', function($spList, Query) {
 		var InsertIntoQuery = function(list) {
 			this.__list = list;
 			this.__values = {};
@@ -12,21 +12,7 @@ angular
 			return this;
 		};
 		InsertIntoQuery.prototype.__execute = function() {
-            var query = this;
-            return $q(function(resolve, reject) {
-                var clientContext = $sp.getContext();
-                var list = clientContext.get_web().get_lists().getByTitle(query.__list);
-                var itemInfo = new SP.ListItemCreationInformation();
-                var item = list.addItem(itemInfo);
-                query.packItem(item);
-                item.update();
-                clientContext.load(item);
-                clientContext.executeQueryAsync(function(sender, args) {
-                    resolve(query.unpackItem(item));
-                }, function(sender, args) {
-                    reject(args);
-                });
-            });
+            return $spList.getList(this.__list).insert(this.__values);
         };
         return (InsertIntoQuery);
 	}]);
