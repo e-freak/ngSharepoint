@@ -2,7 +2,6 @@ angular
 	.module('ngSharepoint')
 	.factory('CamlBuilder', ['CamlTag', function(CamlTag) {
 		var CamlBuilder = function() {
-			this.camlQuery = new SP.CamlQuery();
 			this.caml = [];
 		};
 		CamlBuilder.prototype.push = function(tag, attr, value) {
@@ -28,8 +27,7 @@ angular
 			for (var i = 0; i < this.caml.length; i++) {
 				this.caml[i] = this.caml[i].build();
 			}
-			this.camlQuery.set_viewXml(this.caml.join(''));
-			return this.camlQuery;
+			return this.caml.join('');
 		};
 		return (CamlBuilder);
 	}]);
