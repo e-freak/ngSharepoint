@@ -1,9 +1,9 @@
 angular
     .module('ngSharepoint.Lists')
-    .factory('$spList', ['$sp', 'SelectQuery', 'UpdateQuery', 'InsertIntoQuery', 'DeleteQuery', function ($sp, SelectQuery, UpdateQuery, InsertIntoQuery, DeleteQuery) {
+    .factory('$spList', ['SPList', 'SelectQuery', 'UpdateQuery', 'InsertIntoQuery', 'DeleteQuery', function (SPList, SelectQuery, UpdateQuery, InsertIntoQuery, DeleteQuery) {
         return ({
             getList: function(title) {
-              return null;
+              return new SPList(title);
             },
             select: function(fields) {
                 return new SelectQuery(fields);
