@@ -90,6 +90,22 @@ angular
 		return (CamlTag);
 	});
 angular
+	.module('ngSharepoint')
+	.factory('$spCamlParser', function() {
+		var CamlParser = function(query) {
+			this.parser = new DOMParser();
+			this.doc = this.parser.parseFromString(query);
+		};
+		CamlParser.prototype.getViewFields = function() {
+			return [];
+		};
+		return ({
+			parse: function(query) {
+				return new CamlParser(query);
+			}
+		});
+	});
+angular
   .module('ngSharepoint')
   .factory('SPContext', ['$q', '$sp', function($q, $sp) {
     var SPContext = function() {
@@ -498,7 +514,7 @@ angular
             }
         });
     }])
-    .factory('SPList', ['$q', '$http', '$sp', '$spLog', function($q, $http, $sp, $spLog) {
+    .factory('SPList', ['$q', '$http', '$sp', '$spLog', '$spCamlParser', function($q, $http, $sp, $spLog, $spCamlParser) {
       /**
        * @ngdoc object
        * @name  SPList
@@ -635,7 +651,7 @@ angular
             var itemIterator = items.getEnumerator();
             while (itemIterator.moveNext()) {
               var item = itemIterator.get_current();
-              result.push(query.unpackItem(item));
+              result.push(list.__unpack(item, $spCamlParser.parse(query).getViewFields()));
             }
             resolve(result);
           }, function(sender, args) {
@@ -654,7 +670,7 @@ angular
           item.update();
           clientContext.load(item);
           clientContext.executeQueryAsync(function(sender, args) {
-              resolve(query.unpackItem(item));
+              resolve(data);
           }, function(sender, args) {
               reject(args);
           });
@@ -726,6 +742,22 @@ angular
           }
           item.set_item(key, value);
         });
+      };
+      JsomSPList.prototype.__unpack = function(item, fields) {
+        var query = this;
+        var obj = {};
+        var cols = fields;
+        if (!Array.isArray(fields)) {
+          cols = Object.getOwnPropertyNames(fields);
+        }
+        cols.forEach(function(key) {
+            var value = item.get_item(key);
+            if (value !== null && value !== undefined && typeof value == 'string') {
+              value = value.trim();
+            }
+            obj[key] = value;
+        });                
+        return obj;
       };
       return (SPList);
     }]);
