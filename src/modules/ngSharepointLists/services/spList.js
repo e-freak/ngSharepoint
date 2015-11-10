@@ -248,5 +248,21 @@ angular
           item.set_item(key, value);
         });
       };
+      JsomSPList.prototype.__unpack = function(item, fields) {
+        var query = this;
+        var obj = {};
+        var cols = fields;
+        if (!Array.isArray(fields)) {
+          cols = Object.getOwnPropertyNames(fields);
+        }
+        cols.forEach(function(key) {
+            var value = item.get_item(key);
+            if (value !== null && value !== undefined && typeof value == 'string') {
+              value = value.trim();
+            }
+            obj[key] = value;
+        });                
+        return obj;
+      };
       return (SPList);
     }]);
