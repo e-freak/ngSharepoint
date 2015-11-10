@@ -18,7 +18,7 @@ module.exports = function(grunt) {
 			},
 			dist: {
 				files: {
-					'tmp/angular-sharepoint.js':['src/*.js', 'src/**/*.js', '!src/**/*.spec.js', '!src/modules/ngSharepointMocks/*'],
+					'tmp/angular-sharepoint.js':['src/*.js', 'src/**/*.js', '!src/**/*.spec.js', '!src/modules/ngSharepointMocks/**/*.js'],
 					//'tmp/angular-sharepoint-full.js':['src/*.js', 'src/**/*.js', '!src/modules/ngSharepointMocks/*'],
 					//'tmp/angular-sharepoint.js':['src/modules/ngSharepoint/**/*.js'],
 					//'tmp/angular-sharepoint-lists.js':['src/modules/ngSharepointLists/**/*.js'],
