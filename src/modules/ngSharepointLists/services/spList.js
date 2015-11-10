@@ -147,7 +147,9 @@ angular
         return $q(function(resolve, reject) {
           var context = $sp.getContext();
           var list = context.get_web().get_lists().getByTitle(this.title);
-          var items = list.getItems(query.build());
+          var camlQuery = new SP.CamlQuery();
+          camlQuery.set_viewXml(query);
+          var items = list.getItems(camlQuery);
           context.load(items);
           context.executeQueryAsync(function() {
             var result = [];
@@ -184,7 +186,9 @@ angular
         return $q(function(resolve, reject) {
           var clientContext = $sp.getContext();
           var list = clientContext.get_web().get_lists().getByTitle(list.title);
-          var items = list.getItems(query);
+          var camlQuery = new SP.CamlQuery();
+          camlQuery.set_viewXml(query);
+          var items = list.getItems(camlQuery);
           clientContext.load(items);
           clientContext.executeQueryAsync(
               function(sender, args) {
@@ -214,7 +218,9 @@ angular
         return $q(function(resolve, reject) {
           var clientContext = $sp.getContext();
           var list = clientContext.get_web().get_lists().getByTitle(query.__list);
-          var items = list.getItems(query);
+          var camlQuery = new SP.CamlQuery();
+          camlQuery.set_viewXml(query);
+          var items = list.getItems(camlQuery);
           clientContext.load(items);
           clientContext.executeQueryAsync(function(sender, args) {
             var itemIterator = items.getEnumerator();
