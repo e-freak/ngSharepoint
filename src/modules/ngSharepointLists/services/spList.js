@@ -19,7 +19,7 @@ angular
             }
         });
     }])
-    .factory('SPList', ['$q', '$http', '$sp', '$spLog', function($q, $http, $sp, $spLog) {
+    .factory('SPList', ['$q', '$http', '$sp', '$spLog', '$spCamlParser', function($q, $http, $sp, $spLog, $spCamlParser) {
       /**
        * @ngdoc object
        * @name  SPList
