@@ -156,7 +156,7 @@ angular
             var itemIterator = items.getEnumerator();
             while (itemIterator.moveNext()) {
               var item = itemIterator.get_current();
-              result.push(query.unpackItem(item));
+              result.push(list.__unpack(item, $spCamlParser.parse(query).getViewFields()));
             }
             resolve(result);
           }, function(sender, args) {
