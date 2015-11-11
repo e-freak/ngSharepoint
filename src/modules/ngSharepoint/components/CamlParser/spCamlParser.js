@@ -18,17 +18,17 @@ angular
 				}
 			}
 			var queryTags = parser.doc.getElementsByTagName('Query');
-			if (queryTags.length == 1) {
+			if (queryTags.length === 1) {
 				var queryTag = queryTags[0];
 				for (var j = 0; j < queryTag.childNodes.length; j++) {
 					var queryNode = queryTag.childNodes[j];
-					if (queryNode.nodeName == 'Where' || queryNode.nodeName == 'And' || queryNode.nodeName == 'Or') {
+					if (queryNode.nodeName === 'Where' || queryNode.nodeName === 'And' || queryNode.nodeName === 'Or') {
 						parser.__parseWhere(queryNode, parser.where);
 					}
 				}
 			}
 			var rowLimitTags = parser.doc.getElementsByTagName('RowLimit');
-			if (rowLimitTags.length == 1) {
+			if (rowLimitTags.length === 1) {
 				parser.limit = parseInt(rowLimitTags[0].childNodes[0].nodeValue);
 			}
 			return parser;
@@ -36,12 +36,12 @@ angular
 		CamlParser.prototype.__parseWhere = function(tag, parentObject) {
 			var parser = this;
 			var obj = {};
-			if (tag.nodeName == 'Where') {
+			if (tag.nodeName === 'Where') {
 				var node = tag.childNodes[0];
 				obj.operator = node.nodeName;
 				obj.column = node.getElementsByTagName('FieldRef')[0].attributes.Name.value;
 				obj.value = node.getElementsByTagName('Value')[0].childNodes[0].nodeValue;
-			}else if (tag.nodeName == 'And' || tag.nodeName == 'Or') {
+			}else if (tag.nodeName === 'And' || tag.nodeName === 'Or') {
 				obj.concat = tag.nodeName;
 				obj.queries = [];
 				for (var i = 0; i < tag.childNodes.length; i++) {
