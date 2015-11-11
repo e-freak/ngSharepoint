@@ -27,9 +27,9 @@ angular
 					}
 				}
 			}
-			var rowLimitTag = camlQuery.getElementsByTagName('RowLimit')[0];
-			if (rowLimitTag !== null) {
-				parser.limit = rowLimitTag.childNodes[0].nodeValue;
+			var rowLimitTags = parser.doc.getElementsByTagName('RowLimit');
+			if (rowLimitTags.length == 1) {
+				parser.limit = parseInt(rowLimitTags[0].childNodes[0].nodeValue);
 			}
 			return parser;
 		};
@@ -72,7 +72,7 @@ angular
 			return this.limit;
 		};
 		CamlParser.prototype.hasLimit = function() {
-			return (this.limit !== null && this.limit !== undefined && this.limit >= 0);
+			return (this.limit !== null && this.limit !== undefined && !isNaN(this.limit) && this.limit >= 0);
 		};
 		CamlParser.prototype.getQuery = function() {
 			return this.query;
