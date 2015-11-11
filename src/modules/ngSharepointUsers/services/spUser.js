@@ -7,7 +7,7 @@ angular
 				load = true;
 			}
 			user.accountName = accountName;
-			if ($sp.getConnectionMode() == "JSOM") {
+			if ($sp.getConnectionMode() === "JSOM") {
 				user.__list = new JsomSPUser(accountName);
 			}else {
 				user.__list = new RestSPUser(accountName);
