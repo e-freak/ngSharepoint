@@ -30,7 +30,7 @@ angular
         	return this.__execute().then(success, reject);
         };
         Query.prototype.__trim = function(value) {
-            if (value !== null && value !== undefined && typeof value == 'string') {
+            if (value !== null && value !== undefined && typeof value === 'string') {
                 return value.trim();
             }else {
                 return value;

@@ -8,7 +8,7 @@ angular
 				siteUrl = newUrl;
 			},
 			setConnectionMode: function(connMode) { //Only JSOM Supported for now
-				if (connMode == "JSOM" || connMode == "REST") {
+				if (connMode === "JSOM" || connMode === "REST") {
 					this.connMode = connMode;
 				}
 			},

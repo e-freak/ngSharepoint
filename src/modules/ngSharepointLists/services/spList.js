@@ -32,7 +32,7 @@ angular
        */
       var SPList = function(title) {
         this.title = title;
-        if ($sp.getConnectionMode() == "JSOM") {
+        if ($sp.getConnectionMode() === "JSOM") {
           this.__list = new JsomSPList(title);
         }else {
           this.__list = new RestSPList(title);
@@ -117,7 +117,7 @@ angular
         };
         Object.getOwnPropertyNames(data).forEach(function(key) {
           var value = data[key];
-          if (value !== null && value !== undefined && typeof value == 'string') {
+          if (value !== null && value !== undefined && typeof value === 'string') {
             value = value.trim();
           }
           body[key] = value;
@@ -242,7 +242,7 @@ angular
       JsomSPList.prototype.__pack = function(item, data) {
         Object.getOwnPropertyNames(data).forEach(function(key) {
           var value = data[key];
-          if (value !== null && value !== undefined && typeof value == 'string') {
+          if (value !== null && value !== undefined && typeof value === 'string') {
             value = value.trim();
           }
           item.set_item(key, value);
@@ -257,7 +257,7 @@ angular
         }
         cols.forEach(function(key) {
             var value = item.get_item(key);
-            if (value !== null && value !== undefined && typeof value == 'string') {
+            if (value !== null && value !== undefined && typeof value === 'string') {
               value = value.trim();
             }
             obj[key] = value;

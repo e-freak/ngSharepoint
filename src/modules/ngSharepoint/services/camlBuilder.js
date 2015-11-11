@@ -17,7 +17,7 @@ angular
 		CamlBuilder.prototype.findByName = function(name) {
 			var result = [];
 			this.caml.forEach(function(caml) {
-				if (caml.name == name) {
+				if (caml.name === name) {
 					result.push(caml);
 				}
 			});
