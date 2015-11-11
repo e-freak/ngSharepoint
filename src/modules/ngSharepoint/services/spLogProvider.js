@@ -16,21 +16,27 @@ angular
 						if (enabled) {
 							if (typeof msg === "object") {
 								console.error(prefix + "Object: %O", msg);
-							}else console.error(prefix + msg);
+							}else {
+								console.error(prefix + msg);
+							}
 						}
 					},
 					warn: function(msg) {
 						if (enabled) {
 							if (typeof msg === "object") {
 								console.warn(prefix + "Object: %O", msg);
-							}else console.warn(prefix + msg);
+							}else {
+								console.warn(prefix + msg);
+							}
 						}
 					},
 					log: function(msg) {
 						if (enabled) {
 							if (typeof msg === "object") {
 								console.log(prefix + "Object: %O", msg);
-							}else console.log(prefix + msg);
+							}else {
+								console.log(prefix + msg);
+							}
 						}
 					}
 				});
