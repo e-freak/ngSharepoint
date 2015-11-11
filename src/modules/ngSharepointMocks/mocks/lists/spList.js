@@ -1,6 +1,6 @@
 angular
 	.module('ngSharepoint.Mocks')
-	.factory('SPList', ['$spCamlParser', 'lists', function($spCamlParser, lists) {
+	.factory('SPList', ['$q', '$spCamlParser', 'lists', function($q, $spCamlParser, lists) {
 		var SPList = function(title) {
 			this.title = title;
 			this.list = lists[title]; //{cols: [], data:[[]]}
