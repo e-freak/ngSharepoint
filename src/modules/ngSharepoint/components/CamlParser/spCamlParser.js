@@ -55,8 +55,14 @@ angular
 		CamlParser.prototype.getViewFields = function() {
 			return this.viewFields;
 		};
+		CamlParser.prototype.hasViewFields = function() {
+			return this.viewFields.length > 0;
+		};
 		CamlParser.prototype.getWhere = function() {
 			return this.where;
+		};
+		CamlParser.prototype.hasWhere = function() {
+			return (this.where !== null && this.where !== undefined && Object.getOwnPropertyNames(this.where) > 0);
 		};
 		CamlParser.prototype.getQuery = function() {
 			return this.query;
