@@ -18,10 +18,11 @@ module.exports = function(grunt) {
 			},
 			dist: {
 				files: {
-					'tmp/angular-sharepoint.js':['src/*.js', 'src/**/*.js', '!src/**/*.spec.js', '!src/modules/ngSharepointMocks/**/*.js'],
-					//'tmp/angular-sharepoint-full.js':['src/*.js', 'src/**/*.js', '!src/modules/ngSharepointMocks/*'],
-					//'tmp/angular-sharepoint.js':['src/modules/ngSharepoint/**/*.js'],
-					//'tmp/angular-sharepoint-lists.js':['src/modules/ngSharepointLists/**/*.js'],
+					//'tmp/angular-sharepoint.js':['src/*.js', 'src/**/*.js', '!src/**/*.spec.js', '!src/modules/ngSharepointMocks/**/*.js'],
+					'tmp/angular-sharepoint-full.js':['src/*.js', 'src/**/*.js', '!src/**/*.spec.js', '!src/modules/ngSharepointMocks/**/*.js'],
+					'tmp/angular-sharepoint.js':['src/modules/ngSharepoint/**/*.js', '!src/modules/ngSharepoint/**/*.spec.js'],
+					'tmp/angular-sharepoint-lists.js':['src/modules/ngSharepointLists/**/*.js'],
+					'tmp/angular-sharepoint-users.js':['src/modules/ngSharepointUsers/**/*.js'],
 					'tmp/angular-sharepoint-mocks.js':['src/modules/ngSharepointMocks/**/*.js']
 				}
 			}
@@ -33,8 +34,9 @@ module.exports = function(grunt) {
 			dist: {
 				files: {
 					'dist/angular-sharepoint.js': ['tmp/angular-sharepoint.js'],
-					//'dist/angular-sharepoint-full.js': ['tmp/angular-sharepoint-full.js'],
-					//'dist/angular-sharepoint-lists.js': ['tmp/angular-sharepoint-lists.js'],
+					'dist/angular-sharepoint-lists.js': ['tmp/angular-sharepoint-lists.js'],
+					'dist/angular-sharepoint-users.js': ['tmp/angular-sharepoint-users.js'],
+					'dist/angular-sharepoint-full.js': ['tmp/angular-sharepoint-full.js'],
 					'dist/angular-sharepoint-mocks.js': ['tmp/angular-sharepoint-mocks.js']
 				}
 			}
@@ -44,8 +46,9 @@ module.exports = function(grunt) {
 				compress: true,
 				files: {
 					'dist/angular-sharepoint.min.js': ['dist/angular-sharepoint.js'],
-					//'dist/angular-sharepoint-full.min.js': ['dist/angular-sharepoint-full.js'],
-					//'dist/angular-sharepoint-lists.min.js': ['dist/angular-sharepoint-lists.js'],
+					'dist/angular-sharepoint-lists.min.js': ['dist/angular-sharepoint-lists.js'],
+					'dist/angular-sharepoint-users.min.js': ['dist/angular-sharepoint-users.js'],
+					'dist/angular-sharepoint-full.min.js': ['dist/angular-sharepoint-full.js'],
 					'dist/angular-sharepoint-mocks.min.js': ['dist/angular-sharepoint-mocks.js']
 				}
 			}
@@ -56,7 +59,7 @@ module.exports = function(grunt) {
 				files: [
 					'bower_components/angular/angular.min.js',
 					'bower_components/angular-mocks/angular-mocks.js',
-					'dist/angular-sharepoint.js',
+					'dist/angular-sharepoint-full.js',
 					'src/**/*.spec.js'
 				],
 				singleRun: true,
