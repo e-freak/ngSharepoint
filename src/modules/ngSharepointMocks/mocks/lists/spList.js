@@ -6,8 +6,13 @@ angular
 			this.list = lists[title]; //{cols: [], data:[[]]}
 		};
 		SPList.prototype.insert = function(data) {
+			var list = this;
 			return $q(function(resolve, reject) {
-				this.list.data.push(data);
+				var alignedData = [];
+				for (var i = 0; i < list.list.cols.length; i++) {
+					alignedData[i] = data[list.list.cols[i]];
+				}
+				this.list.data.push(alignedData);
 				resolve();
 			});
 		};
