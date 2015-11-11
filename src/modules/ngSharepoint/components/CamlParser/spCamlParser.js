@@ -27,6 +27,10 @@ angular
 					}
 				}
 			}
+			var rowLimitTag = camlQuery.getElementsByTagName('RowLimit')[0];
+			if (rowLimitTag !== null) {
+				parser.limit = rowLimitTag.childNodes[0].nodeValue;
+			}
 			return parser;
 		};
 		CamlParser.prototype.__parseWhere = function(tag, parentObject) {
@@ -63,6 +67,12 @@ angular
 		};
 		CamlParser.prototype.hasWhere = function() {
 			return (this.where !== null && this.where !== undefined && Object.getOwnPropertyNames(this.where) > 0);
+		};
+		CamlParser.prototype.getLimit = function() {
+			return this.limit;
+		};
+		CamlParser.prototype.hasLimit = function() {
+			return (this.limit !== null && this.limit !== undefined && this.limit >= 0);
 		};
 		CamlParser.prototype.getQuery = function() {
 			return this.query;
