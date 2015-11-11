@@ -46,7 +46,7 @@ module.exports = function(grunt) {
 					'dist/angular-sharepoint.min.js': ['dist/angular-sharepoint.js'],
 					//'dist/angular-sharepoint-full.min.js': ['dist/angular-sharepoint-full.js'],
 					//'dist/angular-sharepoint-lists.min.js': ['dist/angular-sharepoint-lists.js'],
-					'dist/angular-sharepoint-mocks.min.js': ['dist/angular-sharepoint-mocks.js'],
+					'dist/angular-sharepoint-mocks.min.js': ['dist/angular-sharepoint-mocks.js']
 				}
 			}
 		},
@@ -65,8 +65,8 @@ module.exports = function(grunt) {
 				},
 				reporters: ['progress', 'coverage'],
 				coverageReporter: {
-				  type : 'lcovonly',
-				  dir : 'coverage/'
+					type : 'lcovonly',
+					dir : 'coverage/'
 				}
 			},
 			dev: {
