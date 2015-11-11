@@ -8,37 +8,41 @@ angular
 			parser.where = {}; //{concat: 'and', queries: [{comparator: '', column: '', value: ''}, {concat: 'or', queries: []}]}
 			parser.orderBy = []; //[{col: '', asc: true}]
 			parser.limit = -1;
-			parser.doc = new DOMParser().parseFromString(query);
-			var viewFieldsTags = doc.getElementsByTagName('ViewFields');
+			parser.doc = new DOMParser().parseFromString(query, 'text/xml');
+			var viewFieldsTags = parser.doc.getElementsByTagName('ViewFields');
 			if (viewFieldsTags.length === 1) {
 				var fieldTags = viewFieldsTags[0].getElementsByTagName('FieldRef');
-				fieldTags.forEach(function(field) {
+				for (var i = 0; i < fieldTags.length; i++) {
+					var field = fieldTags[i];
 					parser.viewFields.push(field.attributes.Name.value);
-				});
-			}
-			var queryTag = parser.doc.getElementsByTagName('Query');
-			queryTag.childNodes.forEach(function(queryNode) {
-				if (queryNode.nodeName == 'Where' || queryNode.nodeName == 'And' || queryNode.nodeName == 'Or') {
-					parser.__parseWhere(queryNode, parser.where);
 				}
-			});
+			}
+			var queryTags = parser.doc.getElementsByTagName('Query');
+			if (queryTags.length == 1) {
+				var queryTag = queryTags[0];
+				for (var j = 0; j < queryTag.childNodes.length; j++) {
+					var queryNode = queryTag.childNodes[j];
+					if (queryNode.nodeName == 'Where' || queryNode.nodeName == 'And' || queryNode.nodeName == 'Or') {
+						parser.__parseWhere(queryNode, parser.where);
+					}
+				}
+			}
 			return parser;
 		};
 		CamlParser.prototype.__parseWhere = function(tag, parentObject) {
 			var parser = this;
 			var obj = {};
 			if (tag.nodeName == 'Where') {
-				tag.childNodes.forEach(function(node) {
-					obj.operator = node.nodeName;
-					obj.column = node.getElementsByTagName('FieldRef')[0].attributes.Name.value;
-					obj.value = node.getElementsByTagName('Value')[0].childNodes[0];
-				});
+				var node = tag.childNodes[0];
+				obj.operator = node.nodeName;
+				obj.column = node.getElementsByTagName('FieldRef')[0].attributes.Name.value;
+				obj.value = node.getElementsByTagName('Value')[0].childNodes[0].nodeValue;
 			}else if (tag.nodeName == 'And' || tag.nodeName == 'Or') {
 				obj.concat = tag.nodeName;
 				obj.queries = [];
-				tag.childNodes.forEach(function(childNode) {
-					parser.__parseWhere(tag.childNode, obj.queries);
-				});
+				for (var i = 0; i < tag.childNodes.length; i++) {
+					parser.__parseWhere(tag.childNode[i], obj.queries);					
+				}
 			}
 			if (Array.isArray(parentObject)) {
 				parentObject.push(obj);
