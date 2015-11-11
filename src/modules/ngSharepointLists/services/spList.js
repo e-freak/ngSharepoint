@@ -144,9 +144,10 @@ angular
         this.title = title;
       };
       JsomSPList.prototype.select = function(query) {
+        var that = this;
         return $q(function(resolve, reject) {
           var context = $sp.getContext();
-          var list = context.get_web().get_lists().getByTitle(this.title);
+          var list = context.get_web().get_lists().getByTitle(that.title);
           var camlQuery = new SP.CamlQuery();
           camlQuery.set_viewXml(query);
           var items = list.getItems(camlQuery);
@@ -165,10 +166,10 @@ angular
         });
       };
       JsomSPList.prototype.insert = function(data) {
-        var list = this;
+        var that = this;
         return $q(function(resolve, reject) {
           var clientContext = $sp.getContext();
-          var list = clientContext.get_web().get_lists().getByTitle(list.title);
+          var list = clientContext.get_web().get_lists().getByTitle(that.title);
           var itemInfo = new SP.ListItemCreationInformation();
           var item = list.addItem(itemInfo);
           list.__pack(item, data);
@@ -182,10 +183,10 @@ angular
         });
       };
       JsomSPList.prototype.delete = function(query) {
-        var list = this;
+        var that = this;
         return $q(function(resolve, reject) {
           var clientContext = $sp.getContext();
-          var list = clientContext.get_web().get_lists().getByTitle(list.title);
+          var list = clientContext.get_web().get_lists().getByTitle(that.title);
           var camlQuery = new SP.CamlQuery();
           camlQuery.set_viewXml(query);
           var items = list.getItems(camlQuery);
