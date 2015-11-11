@@ -41,7 +41,7 @@ angular
 				obj.concat = tag.nodeName;
 				obj.queries = [];
 				for (var i = 0; i < tag.childNodes.length; i++) {
-					parser.__parseWhere(tag.childNode[i], obj.queries);					
+					parser.__parseWhere(tag.childNodes[i], obj.queries);					
 				}
 			}
 			if (Array.isArray(parentObject)) {
