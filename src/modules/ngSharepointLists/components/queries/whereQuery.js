@@ -3,8 +3,8 @@ angular
 	.factory('WhereQuery', function() {
         var WhereQuery = function(query, field) {
             this.__query = query;
-            this.__value = "";
-            this.__operator = "";
+            this.__value = '';
+            this.__operator = '';
             //this.__query.__queries.where.push(this);
             this.__operators = {
                 BEGINS_WITH: ['<BeginsWith>', '</BeginsWith>'],
@@ -20,15 +20,15 @@ angular
                 NOT_EQUALS: ['<Neq>', '</Neq>'],
                 NOT_INCLUDES: ['<NotIncludes>', '</NotIncludes>']
             };
-            if (typeof field === "string") {
+            if (typeof field === 'string') {
                 this.__field = field;
             }else {
                 this.__fields = field;
-                this.__operator = "equals";
+                this.__operator = 'equals';
             }
         };
         WhereQuery.prototype.equals = function(value) {
-            this.__operator = "equals";
+            this.__operator = 'equals';
             this.__value = value;
             return this.__query;
         };
@@ -40,7 +40,7 @@ angular
             if (angular.isUndefined(query.__fields)) {
                 var op;
                 switch (query.__operator) {
-                    case "equals":
+                    case 'equals':
                         op = caml.push('Eq');
                         break;
                 }
