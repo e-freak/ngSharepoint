@@ -1,5 +1,5 @@
 angular
-	.module('ngSharepoint.List')
+	.module('ngSharepoint.Lists')
 	.factory('RestSPList', ['$q', '$sp', '$http', function($q, $sp, $http) {
 		var RestSPList = function(title) {
 			this.title = title;

@@ -1,5 +1,5 @@
 angular
-    .module('ngSharepoint.List')
+    .module('ngSharepoint.Lists')
     .factory('JsomSPList', ['$q', '$sp', function($q, $sp) {
         var JsomSPList = function(title) {
             this.title = title;
