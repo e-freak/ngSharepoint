@@ -5,19 +5,19 @@ angular
 			this.title = title;
 		};
 		RestSPList.prototype.select = function(query) {
-		var endpoint = "_api/web/Lists/GetByTitle('" + this.title + "')/GetItems";
+		var endpoint = '_api/web/Lists/GetByTitle(\'' + this.title + '\')/GetItems';
 		var body = {
 			query: {
 				__metadata: {
-					type: "SP.CamlQuery"
+					type: 'SP.CamlQuery'
 				},
 				ViewXml: query
 			}
 		};
 		var headers = {
-			"X-RequestDigest": $("#__REQUESTDIGEST").val(),
-			"Accept": "application/json; odata=verbose",
-			"Content-Type": "application/json; odata=verbose"
+			'X-RequestDigest': $('#__REQUESTDIGEST').val(),
+			'Accept': 'application/json; odata=verbose',
+			'Content-Type': 'application/json; odata=verbose'
 		};
 		return $q(function(resolve, reject) {
 			$http({
@@ -31,16 +31,16 @@ angular
 		});
 		};
 		RestSPList.prototype.insert = function(data) {
-		var endpoint = "_api/web/Lists/GetByTitle('" + this.title + "')/items";
+		var endpoint = '_api/web/Lists/GetByTitle(\'' + this.title + '\')/items';
 		var body = {
 			__metadata: {
 				type: 'SP.Data.TestListItem'
 			}
 		};
 		var headers = {
-			"X-RequestDigest": $("#__REQUESTDIGEST").val(),
-			"Accept": "application/json; odata=verbose",
-			"Content-Type": "application/json; odata=verbose"
+			'X-RequestDigest': $('#__REQUESTDIGEST').val(),
+			'Accept': 'application/json; odata=verbose',
+			'Content-Type': 'application/json; odata=verbose'
 		};
 		Object.getOwnPropertyNames(data).forEach(function(key) {
 			var value = data[key];

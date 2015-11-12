@@ -13,7 +13,7 @@ angular
        */
       var SPList = function(title) {
         this.title = title;
-        if ($sp.getConnectionMode() === "JSOM") {
+        if ($sp.getConnectionMode() === 'JSOM') {
           this.__list = new JsomSPList(title);
         }else {
           this.__list = new RestSPList(title);
