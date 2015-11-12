@@ -6,9 +6,9 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-karma');
 	grunt.loadNpmTasks('grunt-ng-annotate');
 
-	grunt.registerTask('default', ['jshint', 'concat:dev', 'karma:dist']);
-	grunt.registerTask('dist', ['jshint', 'concat:dist', 'ngAnnotate:dist', 'karma:dist', 'uglify:dist', 'clean']);
-	grunt.registerTask('test', ['jshint', 'concat:dev', 'karma:dev']);
+	grunt.registerTask('default', ['jshint', 'concat:dev', 'clean:coverage', 'karma:dist']);
+	grunt.registerTask('dist', ['jshint', 'concat:dist', 'ngAnnotate:dist', 'clean:coverage', 'karma:dist', 'uglify:dist', 'clean:build']);
+	grunt.registerTask('test', ['jshint', 'concat:dev', 'clean:coverage', 'karma:dev']);
 
 	grunt.initConfig({
 		concat: {
@@ -59,17 +59,16 @@ module.exports = function(grunt) {
 				files: [
 					'bower_components/angular/angular.min.js',
 					'bower_components/angular-mocks/angular-mocks.js',
-					'dist/angular-sharepoint-full.js',
-					'src/**/*.spec.js'
+					'src/**/*.js'
 				],
 				singleRun: true,
 				preprocessors: {
-					'src/*.js': 'coverage'
+					'src/**/*.js': 'coverage'
 				},
 				reporters: ['progress', 'coverage'],
 				coverageReporter: {
-					type : 'lcovonly',
-					dir : 'coverage/'
+					type : 'lcov',
+					subdir : '.'
 				}
 			},
 			dev: {
@@ -79,8 +78,13 @@ module.exports = function(grunt) {
 				browsers: ['PhantomJS']
 			}
 		},
-		clean: [
-			'tmp/'
-		]
+		clean: {
+			build: [
+				'tmp/'
+			],
+			coverage: [
+				'coverage/'
+			]
+		}
 	});
 };
