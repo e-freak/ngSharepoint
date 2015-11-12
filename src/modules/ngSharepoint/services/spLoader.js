@@ -36,7 +36,7 @@ angular
 				}else {
 					return $q(function(resolve, reject) {
 						query.data = queryObject.data;
-						query.headers.Authorization = 'Bearer ' + $sp.getAccessToken;
+						query.headers.Authorization = 'Bearer ' + $sp.getAccessToken();
 						$http(query).then(resolve, reject);
 					});
 				}
