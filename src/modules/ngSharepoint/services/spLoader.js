@@ -1,16 +1,22 @@
 angular
 	.module('ngSharepoint')
 	.factory('$spLoader', ['$q', '$http', '$sp', function($q, $http, $sp) {
+		var scripts = {};
 		return ({
-			loadScript: function(url) {
-				return $q(function(resolve, reject) {
+			loadScript: function(lib) {
+				var query = $q(function(resolve, reject) {
 					var loaded = false;
 					var element = document.createElement('script');
 					element.type = 'text/javascript';
-					element.src = url;
+					element.src = '_layouts/15/' + lib;
 					element.onload = resolve;
 					element.onerror = reject;
 				});
+				scripts[lib] = query;
+				return query;
+			},
+			waitUntil: function(lib) {
+				return query[url];
 			},
 			query: function(queryObject) {
 				var query = {
