@@ -18,7 +18,7 @@ before_install:
 - npm install -g bower
 - bower install
 after_script:
-  - codeclimate-test-reporter < coverage/*/lcov.info
+  - codeclimate-test-reporter < coverage/lcov.info
 addons:
     code_climate:
         repo_token: 2363a951f4b303fb71efda36cd30ebc31512034e1b9bdbc57097177620df77a5
