@@ -15,7 +15,7 @@ angular
 				return query;
 			},
 			waitUntil: function(lib) {
-				return query[url];
+				return query[lib];
 			},
 			query: function(queryObject) {
 				var query = {
