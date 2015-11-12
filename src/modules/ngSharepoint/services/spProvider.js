@@ -3,7 +3,7 @@ angular
 	.provider('$sp', function() {
 		var siteUrl = '';
 		var connMode = 'JSOM'; //possible values: JSOM, REST
-		var token = '';
+		var token = false;
 		var autoload = true;
 
 		return {
