@@ -1,90 +1,15 @@
 angular
-	.module('ngSharepoint', []);
-angular
-	.module('ngSharepoint')
-	.factory('$spCamlParser', function() {
-		var CamlParser = function(query) {
-			var parser = this;
-			parser.viewFields = []; //['', '',...]
-			parser.query = query; //[]
-			parser.where = {}; //{concat: 'and', queries: [{comparator: '', column: '', value: ''}, {concat: 'or', queries: []}]}
-			parser.orderBy = []; //[{col: '', asc: true}]
-			parser.limit = -1;
-			parser.doc = new DOMParser().parseFromString(query, 'text/xml');
-			var viewFieldsTags = parser.doc.getElementsByTagName('ViewFields');
-			if (viewFieldsTags.length === 1) {
-				var fieldTags = viewFieldsTags[0].getElementsByTagName('FieldRef');
-				for (var i = 0; i < fieldTags.length; i++) {
-					var field = fieldTags[i];
-					parser.viewFields.push(field.attributes.Name.value);
-				}
-			}
-			var queryTags = parser.doc.getElementsByTagName('Query');
-			if (queryTags.length === 1) {
-				var queryTag = queryTags[0];
-				for (var j = 0; j < queryTag.childNodes.length; j++) {
-					var queryNode = queryTag.childNodes[j];
-					if (queryNode.nodeName === 'Where' || queryNode.nodeName === 'And' || queryNode.nodeName === 'Or') {
-						parser.__parseWhere(queryNode, parser.where);
-					}
-				}
-			}
-			var rowLimitTags = parser.doc.getElementsByTagName('RowLimit');
-			if (rowLimitTags.length === 1) {
-				parser.limit = parseInt(rowLimitTags[0].childNodes[0].nodeValue);
-			}
-			return parser;
-		};
-		CamlParser.prototype.__parseWhere = function(tag, parentObject) {
-			var parser = this;
-			var obj = {};
-			if (tag.nodeName === 'Where') {
-				var node = tag.childNodes[0];
-				obj.operator = node.nodeName;
-				obj.column = node.getElementsByTagName('FieldRef')[0].attributes.Name.value;
-				obj.value = node.getElementsByTagName('Value')[0].childNodes[0].nodeValue;
-			}else if (tag.nodeName === 'And' || tag.nodeName === 'Or') {
-				obj.concat = tag.nodeName;
-				obj.queries = [];
-				for (var i = 0; i < tag.childNodes.length; i++) {
-					parser.__parseWhere(tag.childNodes[i], obj.queries);					
-				}
-			}
-			if (Array.isArray(parentObject)) {
-				parentObject.push(obj);
-			}else {
-				Object.getOwnPropertyNames(obj).forEach(function(param) {
-					parentObject[param] = obj[param];
-				});
-			}
-		};
-		CamlParser.prototype.getViewFields = function() {
-			return this.viewFields;
-		};
-		CamlParser.prototype.hasViewFields = function() {
-			return this.viewFields.length > 0;
-		};
-		CamlParser.prototype.getWhere = function() {
-			return this.where;
-		};
-		CamlParser.prototype.hasWhere = function() {
-			return (this.where !== null && this.where !== undefined && Object.getOwnPropertyNames(this.where) > 0);
-		};
-		CamlParser.prototype.getLimit = function() {
-			return this.limit;
-		};
-		CamlParser.prototype.hasLimit = function() {
-			return (this.limit !== null && this.limit !== undefined && !isNaN(this.limit) && this.limit >= 0);
-		};
-		CamlParser.prototype.getQuery = function() {
-			return this.query;
-		};
-		return ({
-			parse: function(query) {
-				return new CamlParser(query);
-			}
-		});
-	});
+    .module('ngSharepoint', [])
+    .run(['$sp', '$spLoader', function($sp, $spLoader) {
+        if ($sp.getAutoload()) {
+            if ($sp.getConnectionMode() === 'JSOM') {
+                $spLoader.loadScript('SP.Runtime.js');
+                $spLoader.loadScript('SP.js');
+            }else if ($sp.getConnectionMode() === 'REST' && !$sp.getAccessToken) {
+            	$spLoader.loadScript('SP.RequestExecutor.js');
+            }
+        }
+    }]);
 angular
 	.module('ngSharepoint')
 	.factory('CamlBuilder', ['CamlTag', function(CamlTag) {
@@ -175,6 +100,91 @@ angular
 		return (CamlTag);
 	});
 angular
+	.module('ngSharepoint')
+	.factory('$spCamlParser', function() {
+		var CamlParser = function(query) {
+			var parser = this;
+			parser.viewFields = []; //['', '',...]
+			parser.query = query; //[]
+			parser.where = {}; //{concat: 'and', queries: [{comparator: '', column: '', value: ''}, {concat: 'or', queries: []}]}
+			parser.orderBy = []; //[{col: '', asc: true}]
+			parser.limit = -1;
+			parser.doc = new DOMParser().parseFromString(query, 'text/xml');
+			var viewFieldsTags = parser.doc.getElementsByTagName('ViewFields');
+			if (viewFieldsTags.length === 1) {
+				var fieldTags = viewFieldsTags[0].getElementsByTagName('FieldRef');
+				for (var i = 0; i < fieldTags.length; i++) {
+					var field = fieldTags[i];
+					parser.viewFields.push(field.attributes.Name.value);
+				}
+			}
+			var queryTags = parser.doc.getElementsByTagName('Query');
+			if (queryTags.length === 1) {
+				var queryTag = queryTags[0];
+				for (var j = 0; j < queryTag.childNodes.length; j++) {
+					var queryNode = queryTag.childNodes[j];
+					if (queryNode.nodeName === 'Where' || queryNode.nodeName === 'And' || queryNode.nodeName === 'Or') {
+						parser.__parseWhere(queryNode, parser.where);
+					}
+				}
+			}
+			var rowLimitTags = parser.doc.getElementsByTagName('RowLimit');
+			if (rowLimitTags.length === 1) {
+				parser.limit = parseInt(rowLimitTags[0].childNodes[0].nodeValue);
+			}
+			return parser;
+		};
+		CamlParser.prototype.__parseWhere = function(tag, parentObject) {
+			var parser = this;
+			var obj = {};
+			if (tag.nodeName === 'Where') {
+				var node = tag.childNodes[0];
+				obj.operator = node.nodeName;
+				obj.column = node.getElementsByTagName('FieldRef')[0].attributes.Name.value;
+				obj.value = node.getElementsByTagName('Value')[0].childNodes[0].nodeValue;
+			}else if (tag.nodeName === 'And' || tag.nodeName === 'Or') {
+				obj.concat = tag.nodeName;
+				obj.queries = [];
+				for (var i = 0; i < tag.childNodes.length; i++) {
+					parser.__parseWhere(tag.childNodes[i], obj.queries);					
+				}
+			}
+			if (Array.isArray(parentObject)) {
+				parentObject.push(obj);
+			}else {
+				Object.getOwnPropertyNames(obj).forEach(function(param) {
+					parentObject[param] = obj[param];
+				});
+			}
+		};
+		CamlParser.prototype.getViewFields = function() {
+			return this.viewFields;
+		};
+		CamlParser.prototype.hasViewFields = function() {
+			return this.viewFields.length > 0;
+		};
+		CamlParser.prototype.getWhere = function() {
+			return this.where;
+		};
+		CamlParser.prototype.hasWhere = function() {
+			return (this.where !== null && this.where !== undefined && Object.getOwnPropertyNames(this.where) > 0);
+		};
+		CamlParser.prototype.getLimit = function() {
+			return this.limit;
+		};
+		CamlParser.prototype.hasLimit = function() {
+			return (this.limit !== null && this.limit !== undefined && !isNaN(this.limit) && this.limit >= 0);
+		};
+		CamlParser.prototype.getQuery = function() {
+			return this.query;
+		};
+		return ({
+			parse: function(query) {
+				return new CamlParser(query);
+			}
+		});
+	});
+angular
   .module('ngSharepoint')
   .factory('SPContext', ['$q', '$sp', function($q, $sp) {
     var SPContext = function() {
@@ -200,12 +210,58 @@ angular
 
 angular
 	.module('ngSharepoint')
+	.factory('$spLoader', ['$q', '$http', '$sp', function($q, $http, $sp) {
+		var scripts = {};
+		return ({
+			loadScript: function(lib) {
+				var query = $q(function(resolve, reject) {
+					var loaded = false;
+					var element = document.createElement('script');
+					element.type = 'text/javascript';
+					element.src = '_layouts/15/' + lib;
+					element.onload = resolve;
+					element.onerror = reject;
+				});
+				scripts[lib] = query;
+				return query;
+			},
+			waitUntil: function(lib) {
+				return query[url];
+			},
+			query: function(queryObject) {
+				var query = {
+					url: $sp.getSiteUrl() + queryObject.url,
+					method: queryObject.method,
+					headers: {
+						'Accept': 'application/json; odata=verbose',
+						'Content-Type': 'application/json; odata=verbose'						
+					}
+				};
+				if ($sp.getConnectionMode() === 'REST' && !$sp.getAccessToken()) {
+					return $q(function(resolve, reject) {
+						query.body = queryObject.data;
+						query.success = resolve;
+						query.error = reject;
+						new SP.RequestExecutor($sp.getSiteUrl()).executeAsync(query);
+					});
+				}else {
+					return $q(function(resolve, reject) {
+						query.data = queryObject.data;
+						query.headers.Authorization = 'Bearer ' + $sp.getAccessToken;
+						$http(query).then(resolve, reject);
+					});
+				}
+			}
+		});
+	}]);
+angular
+	.module('ngSharepoint')
 	.provider('$spLog', function() {
-		var prefix = "[ngSharepoint] ";
+		var prefix = '[ngSharepoint] ';
 		var enabled = true;
 		return {
 			setPrefix: function(prefix) {
-				this.prefix = "[" + prefix + "] ";
+				this.prefix = '[' + prefix + '] ';
 			},
 			setEnabled: function(enabled) {
 				this.enabled = enabled;
@@ -214,8 +270,8 @@ angular
 				return ({
 					error: function(msg) {
 						if (enabled) {
-							if (typeof msg === "object") {
-								console.error(prefix + "Object: %O", msg);
+							if (typeof msg === 'object') {
+								console.error(prefix + 'Object: %O', msg);
 							}else {
 								console.error(prefix + msg);
 							}
@@ -223,8 +279,8 @@ angular
 					},
 					warn: function(msg) {
 						if (enabled) {
-							if (typeof msg === "object") {
-								console.warn(prefix + "Object: %O", msg);
+							if (typeof msg === 'object') {
+								console.warn(prefix + 'Object: %O', msg);
 							}else {
 								console.warn(prefix + msg);
 							}
@@ -232,8 +288,8 @@ angular
 					},
 					log: function(msg) {
 						if (enabled) {
-							if (typeof msg === "object") {
-								console.log(prefix + "Object: %O", msg);
+							if (typeof msg === 'object') {
+								console.log(prefix + 'Object: %O', msg);
 							}else {
 								console.log(prefix + msg);
 							}
@@ -246,16 +302,25 @@ angular
 angular
 	.module('ngSharepoint')
 	.provider('$sp', function() {
-		var siteUrl = "";
-		var connMode = "JSOM"; //possible values: JSOM, REST
+		var siteUrl = '';
+		var connMode = 'JSOM'; //possible values: JSOM, REST
+		var token = false;
+		var autoload = true;
+
 		return {
 			setSiteUrl: function (newUrl) {
 				siteUrl = newUrl;
 			},
 			setConnectionMode: function(connMode) { //Only JSOM Supported for now
-				if (connMode === "JSOM" || connMode === "REST") {
+				if (connMode === 'JSOM' || connMode === 'REST') {
 					this.connMode = connMode;
 				}
+			},
+			setAccessToken: function(token) {
+				this.token = token;
+			},
+			setAutoload: function(autoload) {
+				this.autoload = autoload;
 			},
 			$get: function() {
 				return ({
@@ -265,8 +330,14 @@ angular
 					getConnectionMode: function() {
 						return connMode;
 					},
+					getAccessToken: function(token) {
+						return token;
+					},
 					getContext: function() {
 						return new SP.ClientContext(siteUrl);
+					},
+					getAutoload: function() {
+						return autoload;
 					}
 				});
 			}
@@ -338,45 +409,16 @@ angular
 		return (JoinQuery);
 	}]);
 angular
-	.module('ngSharepoint.Lists')
-	.factory('Query', function() {
-		var Query = function() {
-			//this.__queries = {};
-		};
-        Query.prototype.unpackItem = function(item) {
-            var query = this;
-            var obj = {};
-            if (Array.isArray(query.__values)) {
-                query.__values.forEach(function(key) {
-                    var value = item.get_item(key);
-                    obj[key] = query.__trim(value);
-                });                
-            }else {
-                Object.getOwnPropertyNames(query.__values).forEach(function(key) {
-                    var value = item.get_item(key);
-                    obj[key] = query.__trim(value);
-                });
-            }
-            return obj;
-        };
-        Query.prototype.packItem = function(item) {
-            var query = this;
-            Object.getOwnPropertyNames(query.__values).forEach(function(key) {
-                item.set_item(key, query.__trim(query.__values[key]));
-            });
+    .module('ngSharepoint.Lists')
+    .factory('Query', function() {
+        var Query = function() {
+            //this.__queries = {};
         };
         Query.prototype.then = function(success, reject) {
-        	return this.__execute().then(success, reject);
+            return this.__execute().then(success, reject);
         };
-        Query.prototype.__trim = function(value) {
-            if (value !== null && value !== undefined && typeof value === 'string') {
-                return value.trim();
-            }else {
-                return value;
-            }
-        };
-		return (Query);
-	});
+        return (Query);
+    });
 angular
 	.module('ngSharepoint.Lists')
 	.factory('SelectQuery', ['$spList', 'CamlBuilder', 'Query', 'WhereQuery', function($spList, CamlBuilder, Query, WhereQuery) {
@@ -413,30 +455,30 @@ angular
         SelectQuery.prototype.__execute = function() {
             var camlBuilder = new CamlBuilder();
             var camlView = camlBuilder.push('View');
-            if (query.__where.length > 0 || query.__order.length > 0) {
+            if (this.__where.length > 0 || this.__order.length > 0) {
                 var queryTag = camlView.push('Query');
-                if (query.__where.length === 1) {
+                if (this.__where.length === 1) {
                     var camlWhere = queryTag.push('Where');
-                    query.__where[0].push(camlWhere);
-                }else if (query.__where.length > 1) {
+                    this.__where[0].push(camlWhere);
+                }else if (this.__where.length > 1) {
                     var camlAnd = queryTag.push('Where').push('And');
-                    query.__where.forEach(function(where) {
+                    this.__where.forEach(function(where) {
                         where.push(camlAnd);
                     });
                 }
-                if (query.__order.length > 0) {
+                if (this.__order.length > 0) {
                     var camlOrder = queryTag.push('OrderBy');
-                    query.__order.forEach(function(order) {
+                    this.__order.forEach(function(order) {
                         camlOrder.push('FieldRef', {Name: order.field, Ascending: order.asc});
                     });
                 }
             }
             var viewFields = camlView.push('ViewFields');
-            query.__values.forEach(function(field) {
+            this.__values.forEach(function(field) {
                 viewFields.push('FieldRef', {Name: field});
             });
-            if (query.__limit !== null) {
-                camlView.push('RowLimit', {}, query.__limit);
+            if (this.__limit !== null) {
+                camlView.push('RowLimit', {}, this.__limit);
             }
             return $spList.getList(this.__list).select(camlBuilder.build());
         };
@@ -465,13 +507,13 @@ angular
             var camlBuilder = new CamlBuilder();
             var camlView = camlBuilder.push('View');
             var queryTag;
-            if (query.__where.length === 1) {
+            if (this.__where.length === 1) {
                 queryTag = camlView.push('Query');
-                query.__where[0].push(queryTag.push('Where'));
-            }else if (query.__where.length > 1) {
+                this.__where[0].push(queryTag.push('Where'));
+            }else if (this.__where.length > 1) {
                 queryTag = camlView.push('Query');
                 var andTag = queryTag.push('Where').push('And');
-                query.__where.forEach(function(where) {
+                this.__where.forEach(function(where) {
                     where.push(andTag);
                 });
             }
@@ -484,8 +526,8 @@ angular
 	.factory('WhereQuery', function() {
         var WhereQuery = function(query, field) {
             this.__query = query;
-            this.__value = "";
-            this.__operator = "";
+            this.__value = '';
+            this.__operator = '';
             //this.__query.__queries.where.push(this);
             this.__operators = {
                 BEGINS_WITH: ['<BeginsWith>', '</BeginsWith>'],
@@ -501,15 +543,15 @@ angular
                 NOT_EQUALS: ['<Neq>', '</Neq>'],
                 NOT_INCLUDES: ['<NotIncludes>', '</NotIncludes>']
             };
-            if (typeof field === "string") {
+            if (typeof field === 'string') {
                 this.__field = field;
             }else {
                 this.__fields = field;
-                this.__operator = "equals";
+                this.__operator = 'equals';
             }
         };
         WhereQuery.prototype.equals = function(value) {
-            this.__operator = "equals";
+            this.__operator = 'equals';
             this.__value = value;
             return this.__query;
         };
@@ -521,7 +563,7 @@ angular
             if (angular.isUndefined(query.__fields)) {
                 var op;
                 switch (query.__operator) {
-                    case "equals":
+                    case 'equals':
                         op = caml.push('Eq');
                         break;
                 }
@@ -540,104 +582,112 @@ angular
 	});
 angular
     .module('ngSharepoint.Lists')
-    .factory('JsomSPList', ['$q', '$sp', function($q, $sp) {
+    .factory('JsomSPList', ['$q', '$sp', '$spLoader', '$spCamlParser', function($q, $sp, $spLoader, $spCamlParser) {
         var JsomSPList = function(title) {
             this.title = title;
         };
         JsomSPList.prototype.select = function(query) {
             var that = this;
             return $q(function(resolve, reject) {
-                var context = $sp.getContext();
-                var list = context.get_web().get_lists().getByTitle(that.title);
-                var camlQuery = new SP.CamlQuery();
-                camlQuery.set_viewXml(query);
-                var items = list.getItems(camlQuery);
-                context.load(items);
-                context.executeQueryAsync(function() {
-                    var result = [];
-                    var itemIterator = items.getEnumerator();
-                    while (itemIterator.moveNext()) {
-                        var item = itemIterator.get_current();
-                        result.push(list.__unpack(item, $spCamlParser.parse(query).getViewFields()));
-                    }
-                    resolve(result);
-                }, function(sender, args) {
-                    reject(args);
+                $spLoader.waitUntil('SP.js').then(function() {
+                    var context = $sp.getContext();
+                    var list = context.get_web().get_lists().getByTitle(that.title);
+                    var camlQuery = new SP.CamlQuery();
+                    camlQuery.set_viewXml(query);
+                    var items = list.getItems(camlQuery);
+                    context.load(items);
+                    context.executeQueryAsync(function() {
+                        var result = [];
+                        var itemIterator = items.getEnumerator();
+                        while (itemIterator.moveNext()) {
+                            var item = itemIterator.get_current();
+                            result.push(list.__unpack(item, $spCamlParser.parse(query).getViewFields()));
+                        }
+                        resolve(result);
+                    }, function(sender, args) {
+                        reject(args);
+                    });
                 });
             });
         };
         JsomSPList.prototype.insert = function(data) {
             var that = this;
             return $q(function(resolve, reject) {
-                var clientContext = $sp.getContext();
-                var list = clientContext.get_web().get_lists().getByTitle(that.title);
-                var itemInfo = new SP.ListItemCreationInformation();
-                var item = list.addItem(itemInfo);
-                list.__pack(item, data);
-                item.update();
-                clientContext.load(item);
-                clientContext.executeQueryAsync(function(sender, args) {
-                    resolve(data);
-                }, function(sender, args) {
-                    reject(args);
+                $spLoader.waitUntil('SP.js').then(function() {                    
+                    var clientContext = $sp.getContext();
+                    var list = clientContext.get_web().get_lists().getByTitle(that.title);
+                    var itemInfo = new SP.ListItemCreationInformation();
+                    var item = list.addItem(itemInfo);
+                    list.__pack(item, data);
+                    item.update();
+                    clientContext.load(item);
+                    clientContext.executeQueryAsync(function(sender, args) {
+                        resolve(data);
+                    }, function(sender, args) {
+                        reject(args);
+                    });
                 });
             });
         };
         JsomSPList.prototype.delete = function(query) {
             var that = this;
             return $q(function(resolve, reject) {
-                var clientContext = $sp.getContext();
-                var list = clientContext.get_web().get_lists().getByTitle(that.title);
-                var camlQuery = new SP.CamlQuery();
-                camlQuery.set_viewXml(query);
-                var items = list.getItems(camlQuery);
-                clientContext.load(items);
-                clientContext.executeQueryAsync(
-                    function(sender, args) {
-                        var itemIterator = items.getEnumerator();
-                        var a = [];
-                        while (itemIterator.moveNext()) {
-                            var item = itemIterator.get_current();
-                            a.push(item);
-                        }
-                        a.forEach(function(item) {
-                            item.deleteObject();
-                        });
-                        clientContext.executeQueryAsync(function(sender, args) {
-                            resolve(args);
-                        }, function(sender, args) {
+                $spLoader.waitUntil('SP.js').then(function() {
+                    var clientContext = $sp.getContext();
+                    var list = clientContext.get_web().get_lists().getByTitle(that.title);
+                    var camlQuery = new SP.CamlQuery();
+                    camlQuery.set_viewXml(query);
+                    var items = list.getItems(camlQuery);
+                    clientContext.load(items);
+                    clientContext.executeQueryAsync(
+                        function(sender, args) {
+                            var itemIterator = items.getEnumerator();
+                            var a = [];
+                            while (itemIterator.moveNext()) {
+                                var item = itemIterator.get_current();
+                                a.push(item);
+                            }
+                            a.forEach(function(item) {
+                                item.deleteObject();
+                            });
+                            clientContext.executeQueryAsync(function(sender, args) {
+                                resolve(args);
+                            }, function(sender, args) {
+                                reject(args);
+                            });
+                        },
+                        function(sender, args) {
                             reject(args);
-                        });
-                    },
-                    function(sender, args) {
-                        reject(args);
-                    }
-                );
+                        }
+                    );
+                });
             });
         };
         JsomSPList.prototype.update = function(query, data) {
             var list = this;
             return $q(function(resolve, reject) {
-                var clientContext = $sp.getContext();
-                var list = clientContext.get_web().get_lists().getByTitle(query.__list);
-                var camlQuery = new SP.CamlQuery();
-                camlQuery.set_viewXml(query);
-                var items = list.getItems(camlQuery);
-                clientContext.load(items);
-                clientContext.executeQueryAsync(function(sender, args) {
-                    var itemIterator = items.getEnumerator();
-                    while (itemIterator.moveNext()) {
-                        var item = itemIterator.get_current();
-                        list.__pack(item, data);
-                        item.update();
-                    }
+                $spLoader.waitUntil('SP.js').then(function() {
+                    var clientContext = $sp.getContext();
+                    var list = clientContext.get_web().get_lists().getByTitle(query.__list);
+                    var camlQuery = new SP.CamlQuery();
+                    camlQuery.set_viewXml(query);
+                    var items = list.getItems(camlQuery);
+                    clientContext.load(items);
                     clientContext.executeQueryAsync(function(sender, args) {
-                            resolve(args);
+                        var itemIterator = items.getEnumerator();
+                        while (itemIterator.moveNext()) {
+                            var item = itemIterator.get_current();
+                            list.__pack(item, data);
+                            item.update();
+                        }
+                        clientContext.executeQueryAsync(function(sender, args) {
+                                resolve(args);
+                        }, function(sender, args) {
+                                reject(args);
+                        });
                     }, function(sender, args) {
                             reject(args);
                     });
-                }, function(sender, args) {
-                        reject(args);
                 });
             });
         };
@@ -670,65 +720,53 @@ angular
     }]);
 angular
 	.module('ngSharepoint.Lists')
-	.factory('RestSPList', ['$q', '$sp', '$http', function($q, $sp, $http) {
+	.factory('RestSPList', ['$q', '$sp', '$spLoader', function($q, $sp, $spLoader) {
 		var RestSPList = function(title) {
 			this.title = title;
 		};
 		RestSPList.prototype.select = function(query) {
-		var endpoint = "_api/web/Lists/GetByTitle('" + this.title + "')/GetItems";
-		var body = {
-			query: {
-				__metadata: {
-					type: "SP.CamlQuery"
-				},
-				ViewXml: query
-			}
-		};
-		var headers = {
-			"X-RequestDigest": $("#__REQUESTDIGEST").val(),
-			"Accept": "application/json; odata=verbose",
-			"Content-Type": "application/json; odata=verbose"
-		};
-		return $q(function(resolve, reject) {
-			$http({
-				method: 'POST',
-				url: $sp.getSiteUrl() + endpoint,
-				data: body,
-				headers: headers
-			}).then(function(data) {
-				//TODO: Parse Result
-			}, reject);
-		});
+			var endpoint = '_api/web/Lists/GetByTitle(\'' + this.title + '\')/GetItems';
+			var body = {
+				query: {
+					__metadata: {
+						type: 'SP.CamlQuery'
+					},
+					ViewXml: query
+				}
+			};
+			return $q(function(resolve, reject) {
+				$spLoader.query({
+					method: 'POST',
+					url: endpoint,
+					data: body
+				}).then(function(data) {
+					//TODO: Parse Result
+				}, reject);
+			});
 		};
 		RestSPList.prototype.insert = function(data) {
-		var endpoint = "_api/web/Lists/GetByTitle('" + this.title + "')/items";
-		var body = {
-			__metadata: {
-				type: 'SP.Data.TestListItem'
-			}
-		};
-		var headers = {
-			"X-RequestDigest": $("#__REQUESTDIGEST").val(),
-			"Accept": "application/json; odata=verbose",
-			"Content-Type": "application/json; odata=verbose"
-		};
-		Object.getOwnPropertyNames(data).forEach(function(key) {
-			var value = data[key];
-			if (value !== null && value !== undefined && typeof value === 'string') {
-				value = value.trim();
-			}
-			body[key] = value;
-		});
-		return $q(function(resolve, reject) {
-			$http({
-				method: 'POST',
-				url: $sp.getSiteUrl() + endpoint,
-				data: body,
-				headers: headers
-			}).then(function(data) {
-				//TODO: Parse Result
-			}, reject);
-		});
+			var endpoint = '_api/web/Lists/GetByTitle(\'' + this.title + '\')/items';
+			var body = {
+				__metadata: {
+					type: 'SP.Data.TestListItem'
+				}
+			};
+			Object.getOwnPropertyNames(data).forEach(function(key) {
+				var value = data[key];
+				if (value !== null && value !== undefined && typeof value === 'string') {
+					value = value.trim();
+				}
+				body[key] = value;
+			});
+			return $q(function(resolve, reject) {
+				$spLoader.query({
+					method: 'POST',
+					url: endpoint,
+					data: body
+				}).then(function(data) {
+					//TODO: Parse Result
+				}, reject);
+			});
 		};
 		RestSPList.prototype.delete = function(query) {
 			//TODO: Implement
@@ -753,7 +791,7 @@ angular
        */
       var SPList = function(title) {
         this.title = title;
-        if ($sp.getConnectionMode() === "JSOM") {
+        if ($sp.getConnectionMode() === 'JSOM') {
           this.__list = new JsomSPList(title);
         }else {
           this.__list = new RestSPList(title);
@@ -854,8 +892,14 @@ angular
         });
     }]);
 angular
-  .module('ngSharepoint.Users', ['ngSharepoint']);
-
+    .module('ngSharepoint.Users', ['ngSharepoint'])
+    .run(['$sp', '$spLoader', function($sp, $spLoader) {
+        if ($sp.getAutoload()) {
+            if ($sp.getConnectionMode() === 'JSOM') {
+                $spLoader.loadScript('SP.Userprofiles.js');
+            }
+        }
+    }]);
 angular
 	.module('ngSharepoint.Users')
 	.directive('spUser', ['$spUser', function($spUser) {
@@ -876,89 +920,85 @@ angular
 		};
 	}]);
 angular
-	.module('ngSharepoint.Users')
-	.factory('SPUser', ['$q', '$http', '$sp', function($q, $http, $sp) {
-		var SPUser = function(accountName, load) {
-			var user = this;
-			if (angular.isUndefined(load)) {
-				load = true;
-			}
-			user.accountName = accountName;
-			if ($sp.getConnectionMode() === "JSOM") {
-				user.__list = new JsomSPUser(accountName);
-			}else {
-				user.__list = new RestSPUser(accountName);
-			}
-			if (load) {
-				return $q(function(resolve, reject) {
-					user.load().then(function(data) {
-						user.displayName = data.displayName;
-						user.email = data.email;
-						user.picture = data.picture;
-						user.title = data.title;
-						user.personalUrl = data.personalUrl;
-						user.userUrl = data.userUrl;
-						user.properties = data.properties;
-					}).then(resolve, reject);
-				});
-			}else {
-				return user;
-			}
-		};
-		SPUser.prototype.load = function() {
-			return this.__list.load();
-		};
-		var JsomSPUser = function(accountName) {
-			this.accountName = accountName;
-		};
-		JsomSPUser.prototype.load = function() {
-			var user = this;
-			return $q(function(resolve, reject) {
-				var context = $sp.getContext();
-				var peopleManager = new SP.UserProfiles.PeopleManager(context);
-				var properties = peopleManager.getPropertiesFor(user.accountName);
-				context.load(properties);
-				context.executeQueryAsync(function() {
-					var data = {};
-					data.displayName = properties.get_displayName();
-					data.email = properties.get_email();
-					data.picture = properties.get_pictureUrl();
-					data.title = properties.get_title();
-					data.personalUrl = properties.get_personalUrl();
-					data.userUrl = properties.get_userUrl();
-					resolve(data);
-				}, reject);
-			});
-		};
-		var RestSPUser = function(accountName) {
-			this.accountName = accountName;
-		};
-		RestSPUser.prototype.load = function() {
-			var user = this;
-			var endpoint = "_api/SP.UserProfiles.PeopleManager/getPropertiesFor(@account)?@account='" + user.accountName + "'";
-			var headers = {
-				"X-RequestDigest": $("#__REQUESTDIGEST").val(),
-          		"Accept": "application/json; odata=verbose",
-          		"Content-Type": "application/json; odata=verbose"
-			};
-			return $q(function(resolve, reject) {
-				$http({
-					method: 'GET',
-					url: $sp.getSiteUrl() + endpoint,
-					headers: headers
-				}).then(function(response) {
-					var data = {};
-					data.displayName = response.d.DisplayName;
-					data.email = response.d.Email;
-					data.picture = response.d.PictureUrl;
-					data.title = response.d.Title;
-					data.personalUrl = response.d.PersonalUrl;
-					data.userUrl = response.d.UserUrl;
-					resolve(data);
-				}, reject);
-			});
-		};
-	}]);
+    .module('ngSharepoint.Users')
+    .factory('SPUser', ['$q', '$spLoader', '$sp', function($q, $spLoader, $sp) {
+        var SPUser = function(accountName, load) {
+            var user = this;
+            if (angular.isUndefined(load)) {
+                load = true;
+            }
+            user.accountName = accountName;
+            if ($sp.getConnectionMode() === 'JSOM') {
+                user.__list = new JsomSPUser(accountName);
+            }else {
+                user.__list = new RestSPUser(accountName);
+            }
+            if (load) {
+                return $q(function(resolve, reject) {
+                    user.load().then(function(data) {
+                        user.displayName = data.displayName;
+                        user.email = data.email;
+                        user.picture = data.picture;
+                        user.title = data.title;
+                        user.personalUrl = data.personalUrl;
+                        user.userUrl = data.userUrl;
+                        user.properties = data.properties;
+                    }).then(resolve, reject);
+                });
+            }else {
+                return user;
+            }
+        };
+        SPUser.prototype.load = function() {
+            return this.__list.load();
+        };
+        var JsomSPUser = function(accountName) {
+            this.accountName = accountName;
+        };
+        JsomSPUser.prototype.load = function() {
+            var user = this;
+            return $q(function(resolve, reject) {
+                $spLoader.waitUntil('SP.Userprofiles.js').then(function() {
+                    var context = $sp.getContext();
+                    var peopleManager = new SP.UserProfiles.PeopleManager(context);
+                    var properties = peopleManager.getPropertiesFor(user.accountName);
+                    context.load(properties);
+                    context.executeQueryAsync(function() {
+                        var data = {};
+                        data.displayName = properties.get_displayName();
+                        data.email = properties.get_email();
+                        data.picture = properties.get_pictureUrl();
+                        data.title = properties.get_title();
+                        data.personalUrl = properties.get_personalUrl();
+                        data.userUrl = properties.get_userUrl();
+                        resolve(data);
+                    }, reject);
+                });
+            });
+        };
+        var RestSPUser = function(accountName) {
+            this.accountName = accountName;
+        };
+        RestSPUser.prototype.load = function() {
+            var user = this;
+            var endpoint = '_api/SP.UserProfiles.PeopleManager/getPropertiesFor(@account)?@account=\'' + user.accountName + '\'';
+            return $q(function(resolve, reject) {
+                $spLoader({
+                    method: 'GET',
+                    url: endpoint
+                }).then(function(response) {
+                    var data = {};
+                    data.displayName = response.d.DisplayName;
+                    data.email = response.d.Email;
+                    data.picture = response.d.PictureUrl;
+                    data.title = response.d.Title;
+                    data.personalUrl = response.d.PersonalUrl;
+                    data.userUrl = response.d.UserUrl;
+                    resolve(data);
+                }, reject);
+            });
+        };
+    }]);
 angular
     .module('ngSharepoint.Users')
     .provider('$spUser', ['$q', '$sp', 'SPUser', function ($q, $sp, SPUser) {
