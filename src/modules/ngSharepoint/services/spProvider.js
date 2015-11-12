@@ -3,6 +3,9 @@ angular
 	.provider('$sp', function() {
 		var siteUrl = '';
 		var connMode = 'JSOM'; //possible values: JSOM, REST
+		var token = '';
+		var autoload = true;
+
 		return {
 			setSiteUrl: function (newUrl) {
 				siteUrl = newUrl;
@@ -12,6 +15,12 @@ angular
 					this.connMode = connMode;
 				}
 			},
+			setAccessToken: function(token) {
+				this.token = token;
+			},
+			setAutoload: function(autoload) {
+				this.autoload = autoload;
+			},
 			$get: function() {
 				return ({
 					getSiteUrl: function() {
@@ -20,8 +29,14 @@ angular
 					getConnectionMode: function() {
 						return connMode;
 					},
+					getAccessToken: function(token) {
+						return token;
+					},
 					getContext: function() {
 						return new SP.ClientContext(siteUrl);
+					},
+					getAutoload: function() {
+						return autoload;
 					}
 				});
 			}
