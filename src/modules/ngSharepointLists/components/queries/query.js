@@ -1,9 +1,9 @@
 angular
-	.module('ngSharepoint.Lists')
-	.factory('Query', function() {
-		var Query = function() {
-			//this.__queries = {};
-		};
+    .module('ngSharepoint.Lists')
+    .factory('Query', function() {
+        var Query = function() {
+            //this.__queries = {};
+        };
         Query.prototype.unpackItem = function(item) {
             var query = this;
             var obj = {};
@@ -27,7 +27,7 @@ angular
             });
         };
         Query.prototype.then = function(success, reject) {
-        	return this.__execute().then(success, reject);
+            return this.__execute().then(success, reject);
         };
         Query.prototype.__trim = function(value) {
             if (value !== null && value !== undefined && typeof value === 'string') {
@@ -36,5 +36,5 @@ angular
                 return value;
             }
         };
-		return (Query);
-	});
+        return (Query);
+    });
