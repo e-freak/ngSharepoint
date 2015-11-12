@@ -1,6 +1,6 @@
 angular
     .module('ngSharepoint.Users')
-    .factory('SPUser', ['$q', '$http', '$sp', function($q, $http, $sp) {
+    .factory('SPUser', ['$q', '$spLoader', '$sp', function($q, $spLoader, $sp) {
         var SPUser = function(accountName, load) {
             var user = this;
             if (angular.isUndefined(load)) {
@@ -59,16 +59,10 @@ angular
         RestSPUser.prototype.load = function() {
             var user = this;
             var endpoint = '_api/SP.UserProfiles.PeopleManager/getPropertiesFor(@account)?@account=\'' + user.accountName + '\'';
-            var headers = {
-                'X-RequestDigest': $('#__REQUESTDIGEST').val(),
-                'Accept': 'application/json; odata=verbose',
-                'Content-Type': 'application/json; odata=verbose'
-            };
             return $q(function(resolve, reject) {
-                $http({
+                $spLoader({
                     method: 'GET',
-                    url: $sp.getSiteUrl() + endpoint,
-                    headers: headers
+                    url: endpoint
                 }).then(function(response) {
                     var data = {};
                     data.displayName = response.d.DisplayName;
