@@ -5,7 +5,6 @@ angular
 		return ({
 			loadScript: function(lib) {
 				var query = $q(function(resolve, reject) {
-					var loaded = false;
 					var element = document.createElement('script');
 					element.type = 'text/javascript';
 					element.src = '_layouts/15/' + lib;
