@@ -34,30 +34,30 @@ angular
         SelectQuery.prototype.__execute = function() {
             var camlBuilder = new CamlBuilder();
             var camlView = camlBuilder.push('View');
-            if (query.__where.length > 0 || query.__order.length > 0) {
+            if (this.__where.length > 0 || this.__order.length > 0) {
                 var queryTag = camlView.push('Query');
-                if (query.__where.length === 1) {
+                if (this.__where.length === 1) {
                     var camlWhere = queryTag.push('Where');
-                    query.__where[0].push(camlWhere);
-                }else if (query.__where.length > 1) {
+                    this.__where[0].push(camlWhere);
+                }else if (this.__where.length > 1) {
                     var camlAnd = queryTag.push('Where').push('And');
-                    query.__where.forEach(function(where) {
+                    this.__where.forEach(function(where) {
                         where.push(camlAnd);
                     });
                 }
-                if (query.__order.length > 0) {
+                if (this.__order.length > 0) {
                     var camlOrder = queryTag.push('OrderBy');
-                    query.__order.forEach(function(order) {
+                    this.__order.forEach(function(order) {
                         camlOrder.push('FieldRef', {Name: order.field, Ascending: order.asc});
                     });
                 }
             }
             var viewFields = camlView.push('ViewFields');
-            query.__values.forEach(function(field) {
+            this.__values.forEach(function(field) {
                 viewFields.push('FieldRef', {Name: field});
             });
-            if (query.__limit !== null) {
-                camlView.push('RowLimit', {}, query.__limit);
+            if (this.__limit !== null) {
+                camlView.push('RowLimit', {}, this.__limit);
             }
             return $spList.getList(this.__list).select(camlBuilder.build());
         };
