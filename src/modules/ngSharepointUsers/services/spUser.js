@@ -7,7 +7,7 @@ angular
 				load = true;
 			}
 			user.accountName = accountName;
-			if ($sp.getConnectionMode() === "JSOM") {
+			if ($sp.getConnectionMode() === 'JSOM') {
 				user.__list = new JsomSPUser(accountName);
 			}else {
 				user.__list = new RestSPUser(accountName);
@@ -58,11 +58,11 @@ angular
 		};
 		RestSPUser.prototype.load = function() {
 			var user = this;
-			var endpoint = "_api/SP.UserProfiles.PeopleManager/getPropertiesFor(@account)?@account='" + user.accountName + "'";
+			var endpoint = '_api/SP.UserProfiles.PeopleManager/getPropertiesFor(@account)?@account=\'' + user.accountName + '\'';
 			var headers = {
-				"X-RequestDigest": $("#__REQUESTDIGEST").val(),
-          		"Accept": "application/json; odata=verbose",
-          		"Content-Type": "application/json; odata=verbose"
+				'X-RequestDigest': $('#__REQUESTDIGEST').val(),
+          		'Accept': 'application/json; odata=verbose',
+          		'Content-Type': 'application/json; odata=verbose'
 			};
 			return $q(function(resolve, reject) {
 				$http({
