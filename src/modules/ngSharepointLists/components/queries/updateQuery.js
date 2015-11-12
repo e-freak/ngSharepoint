@@ -21,13 +21,13 @@ angular
             var camlBuilder = new CamlBuilder();
             var camlView = camlBuilder.push('View');
             var queryTag;
-            if (query.__where.length === 1) {
+            if (this.__where.length === 1) {
                 queryTag = camlView.push('Query');
-                query.__where[0].push(queryTag.push('Where'));
-            }else if (query.__where.length > 1) {
+                this.__where[0].push(queryTag.push('Where'));
+            }else if (this.__where.length > 1) {
                 queryTag = camlView.push('Query');
                 var andTag = queryTag.push('Where').push('And');
-                query.__where.forEach(function(where) {
+                this.__where.forEach(function(where) {
                     where.push(andTag);
                 });
             }
