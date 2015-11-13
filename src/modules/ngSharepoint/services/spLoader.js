@@ -40,34 +40,45 @@ angular
 			});
 		};
 		SPLoader.query = function(queryObject) {
-			var query = {
-				url: $sp.getSiteUrl() + queryObject.url,
-				method: queryObject.method,
-				headers: {
-					'Accept': 'application/json; odata=verbose',
-					'Content-Type': 'application/json; odata=verbose'						
-				}
-			};
-			if ($sp.getConnectionMode() === 'REST' && !$sp.getAccessToken()) {
-				return $q(function(resolve, reject) {
-					SPLoader.waitUntil('SP.RequestExecutor.js').then(function() {
-						if (queryObject.hasOwnProperty('data') && queryObject.data !== undefined && queryObject !== null) {
-							query.body = queryObject.data;							
-						}
-						query.success = resolve;
-						query.error = reject;
-						new SP.RequestExecutor($sp.getSiteUrl()).executeAsync(query);						
-					});
-				});
-			}else {
-				return $q(function(resolve, reject) {
-					if (queryObject.hasOwnProperty('data') && queryObject.data !== undefined && queryObject !== null) {
-						query.data = queryObject.data;							
+			//TODO: Request the Request Digest in SPContext
+			return $q(function(resolve, reject) {
+				$http({
+					method: 'POST',
+					url: $sp.getSiteUrl() + '_api/contextInfo',
+					headers: {
+						'X-FORMS_BASED_AUTH_ACCEPTED': 'f',
+						'Accept': 'application/json; odata=verbose',
+						'Content-Type': 'application/json; odata=verbose'						
 					}
-					query.headers.Authorization = 'Bearer ' + $sp.getAccessToken();
-					$http(query).then(resolve, reject);
+				}).then(function(data) {
+					var query = {
+						url: $sp.getSiteUrl() + queryObject.url,
+						method: queryObject.method,
+						headers: {
+							//'X-FORMS_BASED_AUTH_ACCEPTED': 'f',
+							'X-RequestDigest': data.d.GetContextWebInformation.FormDigestValue,
+							'Accept': 'application/json; odata=verbose',
+							'Content-Type': 'application/json; odata=verbose'						
+						}
+					};
+					if ($sp.getConnectionMode() === 'REST' && !$sp.getAccessToken()) {
+						SPLoader.waitUntil('SP.RequestExecutor.js').then(function() {
+							if (queryObject.hasOwnProperty('data') && queryObject.data !== undefined && queryObject !== null) {
+								query.body = queryObject.data;							
+							}
+							query.success = resolve;
+							query.error = reject;
+							new SP.RequestExecutor($sp.getSiteUrl()).executeAsync(query);						
+						});
+					}else {
+						if (queryObject.hasOwnProperty('data') && queryObject.data !== undefined && queryObject !== null) {
+							query.data = queryObject.data;							
+						}
+						query.headers.Authorization = 'Bearer ' + $sp.getAccessToken();
+						$http(query).then(resolve, reject);
+					}
 				});
-			}
+			}).catch($spLog.error);
 		};
 		return (SPLoader);
 	}]);
