@@ -77,4 +77,5 @@ angular
                 }, reject);
             });
         };
+        return (SPUser);
     }]);
