@@ -1,6 +1,6 @@
 angular
 	.module('ngSharepoint.Lists')
-	.factory('SelectQuery', ['$spList', 'CamlBuilder', 'Query', 'WhereQuery', function($spList, CamlBuilder, Query, WhereQuery) {
+	.factory('SelectQuery', ['SPList', 'CamlBuilder', 'Query', 'WhereQuery', function(SPList, CamlBuilder, Query, WhereQuery) {
         var SelectQuery = function(fields) {
             this.__values = fields;
             this.__where = [];
@@ -59,7 +59,7 @@ angular
             if (this.__limit !== null) {
                 camlView.push('RowLimit', {}, this.__limit);
             }
-            return $spList.getList(this.__list).select(camlBuilder.build());
+            return new SPList(this.__list).select(camlBuilder.build());
         };
 		return (SelectQuery);
 	}]);

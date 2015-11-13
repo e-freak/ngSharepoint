@@ -1,6 +1,6 @@
 angular
 	.module('ngSharepoint.Lists')
-	.factory('UpdateQuery', ['$spList', 'CamlBuilder', 'WhereQuery', 'Query', function($spList, CamlBuilder, WhereQuery, Query) {
+	.factory('UpdateQuery', ['SPList', 'CamlBuilder', 'WhereQuery', 'Query', function(SPList, CamlBuilder, WhereQuery, Query) {
 		var UpdateQuery = function(list) {
 			this.__list = list;
 			this.__values = {};
@@ -31,7 +31,7 @@ angular
                     where.push(andTag);
                 });
             }
-            return $spList.getList(this.__list).update(camlBuilder.build(), this.__values);
+            return new SPList(this.__list).update(camlBuilder.build(), this.__values);
         };
         return (UpdateQuery);
 	}]);

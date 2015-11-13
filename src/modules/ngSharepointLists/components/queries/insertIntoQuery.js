@@ -1,6 +1,6 @@
 angular
 	.module('ngSharepoint.Lists')
-	.factory('InsertIntoQuery', ['$spList', 'Query', function($spList, Query) {
+	.factory('InsertIntoQuery', ['SPList', 'Query', function(SPList, Query) {
 		var InsertIntoQuery = function(list) {
 			this.__list = list;
 			this.__values = {};
@@ -12,7 +12,7 @@ angular
 			return this;
 		};
 		InsertIntoQuery.prototype.__execute = function() {
-            return $spList.getList(this.__list).insert(this.__values);
+            return new SPList(this.__list).insert(this.__values);
         };
         return (InsertIntoQuery);
 	}]);
