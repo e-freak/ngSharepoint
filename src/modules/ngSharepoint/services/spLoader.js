@@ -7,7 +7,11 @@ angular
 			var query = $q(function(resolve, reject) {
 				var element = document.createElement('script');
 				element.type = 'text/javascript';
-				element.src = $sp.getSiteUrl() + '_layouts/15/' + lib;
+				if (lib.startsWith('//')) {
+					element.src = lib;
+				}else {
+					element.src = $sp.getSiteUrl() + '_layouts/15/' + lib;					
+				}
 				element.onload = resolve;
 				element.onerror = reject;
 				document.head.appendChild(element);
@@ -36,7 +40,9 @@ angular
 			if ($sp.getConnectionMode() === 'REST' && !$sp.getAccessToken()) {
 				return $q(function(resolve, reject) {
 					SPLoader.waitUntil('SP.RequestExecutor.js').then(function() {
-						query.body = queryObject.data;
+						if (queryObject.hasOwnProperty('data') && queryObject.data !== undefined && queryObject !== null) {
+							query.body = queryObject.data;							
+						}
 						query.success = resolve;
 						query.error = reject;
 						new SP.RequestExecutor($sp.getSiteUrl()).executeAsync(query);						
@@ -44,7 +50,9 @@ angular
 				});
 			}else {
 				return $q(function(resolve, reject) {
-					query.data = queryObject.data;
+					if (queryObject.hasOwnProperty('data') && queryObject.data !== undefined && queryObject !== null) {
+						query.data = queryObject.data;							
+					}
 					query.headers.Authorization = 'Bearer ' + $sp.getAccessToken();
 					$http(query).then(resolve, reject);
 				});
