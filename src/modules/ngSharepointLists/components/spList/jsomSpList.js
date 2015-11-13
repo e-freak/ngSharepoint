@@ -7,7 +7,7 @@ angular
         JsomSPList.prototype.select = function(query) {
             var that = this;
             return $q(function(resolve, reject) {
-                $spLoader.waitUntil('SP.js').then(function() {
+                $spLoader.waitUntil('SP.Core').then(function() {
                     var context = $sp.getContext();
                     var list = context.get_web().get_lists().getByTitle(that.title);
                     var camlQuery = new SP.CamlQuery();
@@ -31,7 +31,7 @@ angular
         JsomSPList.prototype.insert = function(data) {
             var that = this;
             return $q(function(resolve, reject) {
-                $spLoader.waitUntil('SP.js').then(function() {                    
+                $spLoader.waitUntil('SP.Core').then(function() {                    
                     var clientContext = $sp.getContext();
                     var list = clientContext.get_web().get_lists().getByTitle(that.title);
                     var itemInfo = new SP.ListItemCreationInformation();
@@ -50,7 +50,7 @@ angular
         JsomSPList.prototype.delete = function(query) {
             var that = this;
             return $q(function(resolve, reject) {
-                $spLoader.waitUntil('SP.js').then(function() {
+                $spLoader.waitUntil('SP.Core').then(function() {
                     var clientContext = $sp.getContext();
                     var list = clientContext.get_web().get_lists().getByTitle(that.title);
                     var camlQuery = new SP.CamlQuery();
@@ -84,7 +84,7 @@ angular
         JsomSPList.prototype.update = function(query, data) {
             var list = this;
             return $q(function(resolve, reject) {
-                $spLoader.waitUntil('SP.js').then(function() {
+                $spLoader.waitUntil('SP.Core').then(function() {
                     var clientContext = $sp.getContext();
                     var list = clientContext.get_web().get_lists().getByTitle(query.__list);
                     var camlQuery = new SP.CamlQuery();
