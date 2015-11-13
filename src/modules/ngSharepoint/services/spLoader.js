@@ -20,13 +20,15 @@ angular
 			return query;
 		};
 		SPLoader.waitUntil = function(lib) {
-			if (scripts.hasOwnProperty(lib)) {
-				return scripts[lib];
-			}else {
-				return $q(function(resolve) {
+			return $q(function(resolve, reject) {
+				if (scripts.hasOwnProperty(lib)) {
+					scripts[lib].then(resolve, reject);
+				}else if ($sp.getAutoload()) {
+					reject("Library was not requested");
+				}else {
 					resolve();
-				});
-			}
+				}
+			});
 		};
 		SPLoader.query = function(queryObject) {
 			var query = {
