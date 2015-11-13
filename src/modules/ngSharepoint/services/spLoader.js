@@ -19,6 +19,15 @@ angular
 			scripts[lib] = query;
 			return query;
 		};
+		SPLoader.loadScripts = function(label, libs) {
+			var queries = [];
+			libs.forEach(function(lib) {
+				queries.push(SPLoader.loadScript(lib));
+			});
+			var query = $q.all(queries);
+			scripts[label] = query;
+			return query;
+		};
 		SPLoader.waitUntil = function(lib) {
 			return $q(function(resolve, reject) {
 				if (scripts.hasOwnProperty(lib)) {
