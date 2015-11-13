@@ -10,16 +10,16 @@ angular
 			setSiteUrl: function (newUrl) {
 				siteUrl = newUrl;
 			},
-			setConnectionMode: function(connMode) { //Only JSOM Supported for now
-				if (connMode === 'JSOM' || connMode === 'REST') {
-					this.connMode = connMode;
+			setConnectionMode: function(newConnMode) { //Only JSOM Supported for now
+				if (newConnMode === 'JSOM' || newConnMode === 'REST') {
+					connMode = newConnMode;
 				}
 			},
-			setAccessToken: function(token) {
-				this.token = token;
+			setAccessToken: function(newToken) {
+				token = newToken;
 			},
-			setAutoload: function(autoload) {
-				this.autoload = autoload;
+			setAutoload: function(newAutoload) {
+				autoload = newAutoload;
 			},
 			$get: function() {
 				return ({
