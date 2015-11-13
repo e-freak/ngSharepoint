@@ -19,7 +19,7 @@ angular
                         var itemIterator = items.getEnumerator();
                         while (itemIterator.moveNext()) {
                             var item = itemIterator.get_current();
-                            result.push(list.__unpack(item, $spCamlParser.parse(query).getViewFields()));
+                            result.push(that.__unpack(item, $spCamlParser.parse(query).getViewFields()));
                         }
                         resolve(result);
                     }, function(sender, args) {
@@ -36,7 +36,7 @@ angular
                     var list = clientContext.get_web().get_lists().getByTitle(that.title);
                     var itemInfo = new SP.ListItemCreationInformation();
                     var item = list.addItem(itemInfo);
-                    list.__pack(item, data);
+                    that.__pack(item, data);
                     item.update();
                     clientContext.load(item);
                     clientContext.executeQueryAsync(function(sender, args) {
@@ -95,7 +95,7 @@ angular
                         var itemIterator = items.getEnumerator();
                         while (itemIterator.moveNext()) {
                             var item = itemIterator.get_current();
-                            list.__pack(item, data);
+                            that.__pack(item, data);
                             item.update();
                         }
                         clientContext.executeQueryAsync(function(sender, args) {
