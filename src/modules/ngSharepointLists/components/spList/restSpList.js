@@ -33,7 +33,7 @@ angular
 			};
 			Object.getOwnPropertyNames(data).forEach(function(key) {
 				var value = data[key];
-				if (value !== null && value !== undefined && typeof value === 'string') {
+				if (angular.isDefined(value) && value !== null && angular.isString(value)) {
 					value = value.trim();
 				}
 				body[key] = value;
