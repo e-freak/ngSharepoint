@@ -16,9 +16,9 @@ angular
 		};
 		CamlBuilder.prototype.findByName = function(name) {
 			var result = [];
-			this.caml.forEach(function(caml) {
-				if (caml.name === name) {
-					result.push(caml);
+			this.caml.forEach(function(tag) {
+				if (tag.name === name) {
+					result.push(tag);
 				}
 			});
 			return result;
