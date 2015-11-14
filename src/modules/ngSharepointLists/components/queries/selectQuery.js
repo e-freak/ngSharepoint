@@ -1,19 +1,16 @@
 angular
-	.module('ngSharepoint.Lists')
-	.factory('SelectQuery', ['SPList', 'CamlBuilder', 'Query', 'WhereQuery', function(SPList, CamlBuilder, Query, WhereQuery) {
+    .module('ngSharepoint.Lists')
+    .factory('SelectQuery', ['SPList', 'CamlBuilder', 'Query', 'WhereQuery', function(SPList, CamlBuilder, Query, WhereQuery) {
         var SelectQuery = function(fields) {
             this.__values = fields;
             this.__where = [];
-            this.__limit = null;
             this.__order = [];
-            //this.__queries.where = [];
-            //this.__queries.limit = [];
             return this;
         };
         SelectQuery.prototype = new Query();
         SelectQuery.prototype.from = function(list) {
-        	this.__list = list;
-        	return this;
+            this.__list = list;
+            return this;
         };
         SelectQuery.prototype.where = function(field) {
             var query = new WhereQuery(this, field);
@@ -28,8 +25,23 @@ angular
             if (angular.isUndefined(asc)) {
                 asc = true;
             }
-            this.__order.push({field: field, asc: asc});
+            this.__order.push({column: field, asc: asc});
             return this;
+        };
+        SelectQuery.prototype.exec = function() {
+            var builder = new CamlBuilder();
+            var query = {};
+            if (typeof this.__values === 'object') {
+                query.columns = this.__values;
+            }
+            if (angular.isDefined(this.__limit)) {
+                query.limit = this.__limit;
+            }
+            if (angular.isDefined(this.__order)) {
+                query.order = this.__order;
+            }
+            builder.buildFromJson(query);
+            return new SPList(this.__list).read(builder.build());
         };
         SelectQuery.prototype.__execute = function() {
             var camlBuilder = new CamlBuilder();
@@ -61,5 +73,5 @@ angular
             }
             return new SPList(this.__list).select(camlBuilder.build());
         };
-		return (SelectQuery);
-	}]);
+        return (SelectQuery);
+    }]);
