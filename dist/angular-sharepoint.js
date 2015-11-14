@@ -4,8 +4,8 @@ angular
         if ($sp.getAutoload()) {
             if ($sp.getConnectionMode() === 'JSOM') {
                 $spLoader.loadScripts('SP.Core', ['//ajax.aspnetcdn.com/ajax/4.0/1/MicrosoftAjax.js', 'SP.Runtime.js', 'SP.js']);                    
-            }else if ($sp.getConnectionMode() === 'REST' && !$sp.getAccessToken) {
-            	$spLoader.loadScript('SP.RequestExecutor.js');
+            }else if ($sp.getConnectionMode() === 'REST' && !$sp.getAccessToken()) {
+                $spLoader.loadScript('SP.RequestExecutor.js');
             }
         }
     }]);
@@ -40,6 +40,140 @@ angular
 			}
 			return this.caml.join('');
 		};
+		CamlBuilder.prototype.buildFromJson = function(json) {
+			var root = this.findByName('View');
+			if (root.length === 0) {
+				root = this.push('View');
+			}else {
+				root = root[0];
+			}
+			if (angular.isDefined(json.columns)) {
+				this.__buildViewFields(json.columns);
+			}
+			if (angular.isDefined(json.query)) {
+				this.__buildQuery(json.query);
+			}
+			if (angular.isDefined(json.limit)) {
+				this.__buildLimit(json.limit);
+			}
+			if (angular.isDefined(json.order)) {
+				this.__buildOrder(json.order);
+			}
+		};
+		CamlBuilder.prototype.__buildViewFields = function(columns, root) {
+			var viewFields = root.push('ViewFields');
+			columns.forEach(function(col) {
+				viewFields.push('FieldRef', {Name: col});
+			});
+		};
+		CamlBuilder.prototype.__buildQuery = function(query, root) {
+			var builder = this;
+			if (root.name === 'View') {
+				root = root.push('Query').push('Where');
+			}
+			if (angular.isDefined(query.concat)) {
+				var concatenator;
+				if (query.concat === 'and') {
+					concatenator = root.push('And');
+				}else if (query.concat === 'or') {
+					concatenator = root.push('Or');
+				}else {
+					throw "Invalid Query";
+				}
+				query.queries.forEach(function(sub) {
+					builder.__buildQuery(sub, concatenator);
+				});
+			}else if (angular.isDefined(query.comparator)) {
+				query.comparator = query.comparator.toLowerCase();
+				var comparator;
+				switch (query.comparator) {
+					case 'beginswith':
+						comparator = root.push('BeginsWith');
+						break;
+					case 'contains':
+						comparator = root.push('Contains');
+						break;
+					case 'daterangesoverlap':
+						comparator = root.push('DateRangesOverlap');
+						break;
+					case '==':
+					case 'eq':
+					case 'equals':
+						comparator = root.push('Eq');
+						break;
+					case '>=':
+					case 'geq':
+					case 'greaterequals':
+						comparator = root.push('Geq');
+						break;
+					case '>':
+					case 'gt':
+					case 'greater':
+						comparator = root.push('Gt');
+						break;
+					case 'in':
+						comparator = root.push('In');
+						break;
+					case 'includes':
+						comparator = root.push('Includes');
+						break;
+					case 'isnotnull':
+						comparator = root.push('IsNotNull');
+						break;
+					case 'isnull':
+						comparator = root.push('IsNull');
+						break;
+					case '<=':
+					case 'leq':
+					case 'lessequals':
+						comparator = root.push('Leq');
+						break;
+					case '<':
+					case 'lt':
+					case 'less':
+						comparator = root.push('Lt');
+						break;
+					case '!=':
+					case 'neq':
+					case 'notequals':
+						comparator = root.push('Neq');
+						break;
+					case 'notincludes':
+						comparator = root.push('NotIncludes');
+						break;
+				}
+				comparator.push('FieldRef', {Name: query.column});
+				if (angular.isDefined(query.value)) {
+					comparator.push('Value', {}, query.value);
+				}
+			}else {
+				throw "Invalid Query";
+			}
+		};
+		CamlBuilder.prototype.__buildLimit = function(limit, root) {
+			root.push('RowLimit', {}, limit);
+		};
+		CamlBuilder.prototype.__buildOrder = function(order, root) {
+			var query = root.findByName('Query');
+			if (query.length === 0) {
+				query = root.push('Query');
+			}else {
+				query = query[0];
+			}
+			var orderTag = query.push('OrderBy');
+			order.forEach(function(o) {
+				if (angular.isDefined(o.column)) {
+					var asc = true;
+					if (angular.isDefined(o.asc)) {
+						asc = o.asc;
+					}
+					asc = asc.toString().toUpperCase();
+					orderTag.push('FieldRef', {Name: o.column, Ascending: asc});
+				}else {
+					throw "Invalid Order Query";
+				}
+			});
+		};
 		return (CamlBuilder);
 	}]);
 angular
@@ -72,6 +206,15 @@ angular
 				}
 			}
 			return xml;
+		};
+		CamlTag.prototype.findByName = function(name) {
+			var result = [];
+			this.caml.forEach(function(tag) {
+				if (tag.name === name) {
+					result.push(tag);
+				}
+			});
+			return result;
 		};
 		CamlTag.prototype.push = function(tag, attr, value) {
 			var camlTag;
@@ -148,7 +291,7 @@ angular
 					parser.__parseWhere(tag.childNodes[i], obj.queries);					
 				}
 			}
-			if (Array.isArray(parentObject)) {
+			if (angular.isArray(parentObject)) {
 				parentObject.push(obj);
 			}else {
 				Object.getOwnPropertyNames(obj).forEach(function(param) {
@@ -166,13 +309,13 @@ angular
 			return this.where;
 		};
 		CamlParser.prototype.hasWhere = function() {
-			return (this.where !== null && this.where !== undefined && Object.getOwnPropertyNames(this.where) > 0);
+			return (angular.isDefined(this.where) && this.where !== null && Object.getOwnPropertyNames(this.where) > 0);
 		};
 		CamlParser.prototype.getLimit = function() {
 			return this.limit;
 		};
 		CamlParser.prototype.hasLimit = function() {
-			return (this.limit !== null && this.limit !== undefined && !isNaN(this.limit) && this.limit >= 0);
+			return (angular.isDefined(this.where) && this.limit !== null && !isNaN(this.limit) && this.limit >= 0);
 		};
 		CamlParser.prototype.getQuery = function() {
 			return this.query;
@@ -183,30 +326,6 @@ angular
 			}
 		});
 	});
-angular
-  .module('ngSharepoint')
-  .factory('SPContext', ['$q', '$sp', function($q, $sp) {
-    var SPContext = function() {
-      this.context = $sp.getContext();
-    };
-    SPContext.prototype.getLists = function () {
-      var sp = this;
-      return $q(function(resolve, reject) {
-        var lists = sp.context.get_web().get_lists();
-        sp.context.load(lists);
-        sp.context.executeQueryAsync(function(sender, args) {
-          var result = [];
-          var listEnumerator = lists.getEnumerator();
-          while (listEnumerator.moveNext()) {
-            var list = lists.get_current();
-            
-          }
-        });
-      });
-    };
-    return (SPContext);
-  }]);
-
 angular
 	.module('ngSharepoint')
 	.factory('$spLoader', ['$q', '$http', '$sp', '$spLog', function($q, $http, $sp, $spLog) {
@@ -272,7 +391,7 @@ angular
 					};
 					if ($sp.getConnectionMode() === 'REST' && !$sp.getAccessToken()) {
 						SPLoader.waitUntil('SP.RequestExecutor.js').then(function() {
-							if (queryObject.hasOwnProperty('data') && queryObject.data !== undefined && queryObject !== null) {
+							if (queryObject.hasOwnProperty('data') && angular.isDefined(queryObject.data) && queryObject !== null) {
 								query.body = queryObject.data;							
 							}
 							query.success = resolve;
@@ -280,7 +399,7 @@ angular
 							new SP.RequestExecutor($sp.getSiteUrl()).executeAsync(query);						
 						});
 					}else {
-						if (queryObject.hasOwnProperty('data') && queryObject.data !== undefined && queryObject !== null) {
+						if (queryObject.hasOwnProperty('data') && angular.isDefined(queryObject.data) && queryObject !== null) {
 							query.data = queryObject.data;							
 						}
 						query.headers.Authorization = 'Bearer ' + $sp.getAccessToken();
@@ -307,7 +426,7 @@ angular
 				return ({
 					error: function(msg) {
 						if (enabled) {
-							if (typeof msg === 'object') {
+							if (angular.isObject(msg)) {
 								console.error(prefix + 'Object: %O', msg);
 							}else {
 								console.error(prefix + msg);
@@ -316,7 +435,7 @@ angular
 					},
 					warn: function(msg) {
 						if (enabled) {
-							if (typeof msg === 'object') {
+							if (angular.isObject(msg)) {
 								console.warn(prefix + 'Object: %O', msg);
 							}else {
 								console.warn(prefix + msg);
@@ -325,7 +444,7 @@ angular
 					},
 					log: function(msg) {
 						if (enabled) {
-							if (typeof msg === 'object') {
+							if (angular.isObject(msg)) {
 								console.log(prefix + 'Object: %O', msg);
 							}else {
 								console.log(prefix + msg);

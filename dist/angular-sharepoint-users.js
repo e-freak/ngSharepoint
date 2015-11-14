@@ -8,57 +8,29 @@ angular
         }
     }]);
 angular
-	.module('ngSharepoint.Users')
-	.directive('spUser', ['$spUser', function($spUser) {
-		return {
-			restrict: 'E',
-			scope: {
-				'name': '@'
-			},
-			transclude: true,
-			template: '<div ng-transclude></div>',
-			link: function(scope, element, attrs) {
-				scope.$watch(attrs.name, function(value) {
-					$spUser.getUser(value).then(function(user) {
-						scope.user = user;
-					});
-				});
-			}
-		};
-	}]);
+    .module('ngSharepoint.Users')
+    .factory('$spUser', ['$q', '$sp', 'SPUser', function($q, $sp, SPUser) {
+        return({
+            getCurrentUser: function() {
+                //TODO: Abstract with SPUser
+                return $q(function(resolve, reject) {
+                    var context = $sp.getContext();
+                    var peopleManager = new SP.UserProfiles.PeopleManager(context);
+                    var properties = peopleManager.getMyProperties();
+                    context.load(properties);
+                    context.executeQueryAsync(function() {
+                        resolve(properties);
+                    }, reject);
+                });
+            },
+            getUser: function(accountName) {
+                return new SPUser(accountName);
+            }
+        });
+    }]);
 angular
     .module('ngSharepoint.Users')
-    .factory('SPUser', ['$q', '$spLoader', '$sp', function($q, $spLoader, $sp) {
-        var SPUser = function(accountName, load) {
-            var user = this;
-            if (angular.isUndefined(load)) {
-                load = true;
-            }
-            user.accountName = accountName;
-            if ($sp.getConnectionMode() === 'JSOM') {
-                user.__list = new JsomSPUser(accountName);
-            }else {
-                user.__list = new RestSPUser(accountName);
-            }
-            if (load) {
-                return $q(function(resolve, reject) {
-                    user.load().then(function(data) {
-                        user.displayName = data.displayName;
-                        user.email = data.email;
-                        user.picture = data.picture;
-                        user.title = data.title;
-                        user.personalUrl = data.personalUrl;
-                        user.userUrl = data.userUrl;
-                        user.properties = data.properties;
-                    }).then(resolve, reject);
-                });
-            }else {
-                return user;
-            }
-        };
-        SPUser.prototype.load = function() {
-            return this.__list.load();
-        };
+    .factory('JsomSPUser', ['$q', '$sp', '$spLoader', function($q, $sp, $spLoader) {
         var JsomSPUser = function(accountName) {
             this.accountName = accountName;
         };
@@ -83,6 +55,11 @@ angular
                 });
             });
         };
+        return (JsomSPUser);
+    }]);
+angular
+    .module('ngSharepoint.Users')
+    .factory('RestSPUser', ['$q', '$spLoader', function($q, $spLoader) {
         var RestSPUser = function(accountName) {
             this.accountName = accountName;
         };
@@ -105,30 +82,41 @@ angular
                 }, reject);
             });
         };
-        return (SPUser);
+        return (RestSPUser);
     }]);
 angular
-    .module('ngSharepoint.Users')
-    .provider('$spUser', function() {
-        return {
-            $get: ['$q', '$sp', 'SPUser', function($q, $sp, SPUser) {
-                return({
-                    getCurrentUser: function() {
-                        //TODO: Abstract with SPUser
-                        return $q(function(resolve, reject) {
-                            var context = $sp.getContext();
-                            var peopleManager = new SP.UserProfiles.PeopleManager(context);
-                            var properties = peopleManager.getMyProperties();
-                            context.load(properties);
-                            context.executeQueryAsync(function() {
-                                resolve(properties);
-                            }, reject);
-                        });
-                    },
-                    getUser: function(accountName) {
-                        return new SPUser(accountName);
-                    }
+	.module('ngSharepoint.Users')
+    .factory('SPUser', ['$q', '$spLoader', '$sp', 'JsomSPUser', 'RestSPUser', function($q, $spLoader, $sp, JsomSPUser, RestSPUser) {
+        var SPUser = function(accountName, load) {
+            var user = this;
+            if (angular.isUndefined(load)) {
+                load = true;
+            }
+            user.accountName = accountName;
+            if ($sp.getConnectionMode() === 'JSOM') {
+                user.__user = new JsomSPUser(accountName);
+            }else {
+                user.__user = new RestSPUser(accountName);
+            }
+            if (load) {
+                return user.load().then(function(data) {
+                    user.from(data);
                 });
-            }]
+            }else {
+                return user;
+            }
         };
-    });
+        SPUser.prototype.from = function(data) {
+            this.displayName = data.displayName;
+            this.email = data.email;
+            this.picture = data.picture;
+            this.title = data.title;
+            this.personalUrl = data.personalUrl;
+            this.userUrl = data.userUrl;
+            this.properties = data.properties;
+        };
+        SPUser.prototype.load = function() {
+            return this.__user.load();
+        };
+        return (SPUser);
+    }]);
