@@ -67,7 +67,7 @@ angular
 				}else if (query.concat === 'or') {
 					concatenator = root.push('Or');
 				}else {
-					throw "Invalid Query";
+					throw 'Invalid Query';
 				}
 				query.queries.forEach(function(sub) {
 					builder.__buildQuery(sub, concatenator);
@@ -136,7 +136,7 @@ angular
 					comparator.push('Value', {}, query.value);
 				}
 			}else {
-				throw "Invalid Query";
+				throw 'Invalid Query';
 			}
 		};
 		CamlBuilder.prototype.__buildLimit = function(limit, root) {
@@ -159,7 +159,7 @@ angular
 					asc = asc.toString().toUpperCase();
 					orderTag.push('FieldRef', {Name: o.column, Ascending: asc});
 				}else {
-					throw "Invalid Order Query";
+					throw 'Invalid Order Query';
 				}
 			});
 		};
