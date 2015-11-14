@@ -1,6 +1,7 @@
 module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.loadNpmTasks('grunt-eslint');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-karma');
@@ -30,7 +31,16 @@ module.exports = function(grunt) {
 		jshint: {
 			default: ['src/*.js', 'src/**/*.js', '!src/**/*.spec.js']
 		},
+		eslint: {
+			options: {
+				configFile: '.eslintrc'
+			},
+			default: ['src/**/*.js', '!src/**/*.spec.js']
+		},
 		ngAnnotate: {
+			options: {
+				singleQuotes: true
+			},
 			dist: {
 				files: {
 					'dist/angular-sharepoint.js': ['tmp/angular-sharepoint.js'],
