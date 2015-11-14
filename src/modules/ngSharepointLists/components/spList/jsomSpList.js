@@ -112,7 +112,7 @@ angular
         JsomSPList.prototype.__pack = function(item, data) {
             Object.getOwnPropertyNames(data).forEach(function(key) {
                 var value = data[key];
-                if (value !== null && value !== undefined && typeof value === 'string') {
+                if (angular.isDefined(value) && value !== null && angular.isString(value)) {
                     value = value.trim();
                 }
                 item.set_item(key, value);
@@ -122,12 +122,12 @@ angular
             var query = this;
             var obj = {};
             var cols = fields;
-            if (!Array.isArray(fields)) {
+            if (!angular.isArray(fields)) {
                 cols = Object.getOwnPropertyNames(fields);
             }
             cols.forEach(function(key) {
                     var value = item.get_item(key);
-                    if (value !== null && value !== undefined && typeof value === 'string') {
+                    if (angular.isDefined(value) && value !== null && angular.isString(value)) {
                         value = value.trim();
                     }
                     obj[key] = value;
