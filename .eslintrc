@@ -5,8 +5,8 @@
         "jasmine":true
     },
     "globals": {
-        "angular":true,
-        "SP":true
+        "angular":false,
+        "SP":false
     },
     "plugins": [
         "angular"
