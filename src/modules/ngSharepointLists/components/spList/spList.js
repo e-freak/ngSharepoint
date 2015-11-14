@@ -1,6 +1,6 @@
 angular
     .module('ngSharepoint.Lists')
-    .factory('SPList', ['$sp', '$spLog', 'RestSPList', 'JsomSPList', function($sp, $spLog, RestSPList, JsomSPList) {
+    .factory('SPList', ['$sp', '$spLog', 'CamlBuilder', 'RestSPList', 'JsomSPList', function($sp, $spLog, CamlBuilder, RestSPList, JsomSPList) {
         /**
         * @ngdoc object
         * @name  SPList
@@ -53,6 +53,44 @@ angular
         */
         SPList.prototype.delete = function(query) {
             return this.__list.delete(query).catch($spLog.error);
+        };
+        /**
+         * @ngdoc function
+         * @param  {[type]} query [description]
+         * @return {Promise}       [description]
+         */
+        SPList.prototype.query = function(query) {
+            if (typeof query === 'object') {
+                return this.__jsonQuery(query);
+            }
+        };
+        SPList.prototype.__jsonQuery = function(query) {
+            if (angular.isDefined(query.type)) {
+                var builder = new CamlBuilder();
+                builder.buildFromJson(query);
+                switch (query.type) {
+                    case 'create':
+                        if (angular.isDefined(query.data)) {
+                            return this.create(data);
+                        }else {
+                            throw "Query Data is not defined";
+                        }
+                        break;
+                    case 'read':
+                        return this.read(builder.build());
+                    case 'update':
+                        if (angular.isDefined(query.data)) {
+                            return this.update(builder.build(), query.data);
+                        }else {
+                            throw "Query Data is not defined";
+                        }
+                        break;
+                    case 'delete':
+                        return this.delete(builder.build());
+                }
+            }else {
+                throw "Query Type is not defined";
+            }
         };
         return (SPList);
     }]);
