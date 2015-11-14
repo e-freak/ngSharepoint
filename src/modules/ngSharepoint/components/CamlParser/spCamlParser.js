@@ -48,7 +48,7 @@ angular
 					parser.__parseWhere(tag.childNodes[i], obj.queries);					
 				}
 			}
-			if (Array.isArray(parentObject)) {
+			if (angular.isArray(parentObject)) {
 				parentObject.push(obj);
 			}else {
 				Object.getOwnPropertyNames(obj).forEach(function(param) {
@@ -66,13 +66,13 @@ angular
 			return this.where;
 		};
 		CamlParser.prototype.hasWhere = function() {
-			return (this.where !== null && this.where !== undefined && Object.getOwnPropertyNames(this.where) > 0);
+			return (angular.isDefined(this.where) && this.where !== null && Object.getOwnPropertyNames(this.where) > 0);
 		};
 		CamlParser.prototype.getLimit = function() {
 			return this.limit;
 		};
 		CamlParser.prototype.hasLimit = function() {
-			return (this.limit !== null && this.limit !== undefined && !isNaN(this.limit) && this.limit >= 0);
+			return (angular.isDefined(this.where) && this.limit !== null && !isNaN(this.limit) && this.limit >= 0);
 		};
 		CamlParser.prototype.getQuery = function() {
 			return this.query;
