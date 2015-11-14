@@ -82,11 +82,11 @@ angular
             });
         };
         JsomSPList.prototype.update = function(query, data) {
-            var list = this;
+            var that = this;
             return $q(function(resolve, reject) {
                 $spLoader.waitUntil('SP.Core').then(function() {
                     var clientContext = $sp.getContext();
-                    var list = clientContext.get_web().get_lists().getByTitle(query.__list);
+                    var list = clientContext.get_web().get_lists().getByTitle(that.__list);
                     var camlQuery = new SP.CamlQuery();
                     camlQuery.set_viewXml(query);
                     var items = list.getItems(camlQuery);
@@ -99,9 +99,9 @@ angular
                             item.update();
                         }
                         clientContext.executeQueryAsync(function(sender, args) {
-                                resolve(args);
+                            resolve(args);
                         }, function(sender, args) {
-                                reject(args);
+                            reject(args);
                         });
                     }, function(sender, args) {
                             reject(args);
