@@ -33,7 +33,7 @@ angular
 				if (scripts.hasOwnProperty(lib)) {
 					scripts[lib].then(resolve, reject);
 				}else if ($sp.getAutoload()) {
-					reject("Library was not requested");
+					reject('Library was not requested');
 				}else {
 					resolve();
 				}
