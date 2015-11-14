@@ -3,7 +3,12 @@ angular
     .run(['$sp', '$spLoader', function($sp, $spLoader) {
         if ($sp.getAutoload()) {
             if ($sp.getConnectionMode() === 'JSOM') {
-                $spLoader.loadScripts('SP.Core', ['//ajax.aspnetcdn.com/ajax/4.0/1/MicrosoftAjax.js', 'SP.Runtime.js', 'SP.js']);                    
+                var scripts = [
+                    '//ajax.aspnetcdn.com/ajax/4.0/1/MicrosoftAjax.js',
+                    'SP.Runtime.js',
+                    'SP.js'
+                ];
+                $spLoader.loadScripts('SP.Core', scripts);                    
             }else if ($sp.getConnectionMode() === 'REST' && !$sp.getAccessToken()) {
                 $spLoader.loadScript('SP.RequestExecutor.js');
             }
@@ -78,7 +83,7 @@ angular
 				}else if (query.concat === 'or') {
 					concatenator = root.push('Or');
 				}else {
-					throw "Invalid Query";
+					throw 'Invalid Query';
 				}
 				query.queries.forEach(function(sub) {
 					builder.__buildQuery(sub, concatenator);
@@ -147,7 +152,7 @@ angular
 					comparator.push('Value', {}, query.value);
 				}
 			}else {
-				throw "Invalid Query";
+				throw 'Invalid Query';
 			}
 		};
 		CamlBuilder.prototype.__buildLimit = function(limit, root) {
@@ -170,7 +175,7 @@ angular
 					asc = asc.toString().toUpperCase();
 					orderTag.push('FieldRef', {Name: o.column, Ascending: asc});
 				}else {
-					throw "Invalid Order Query";
+					throw 'Invalid Order Query';
 				}
 			});
 		};
@@ -246,10 +251,10 @@ angular
 	.factory('$spCamlParser', function() {
 		var CamlParser = function(query) {
 			var parser = this;
-			parser.viewFields = []; //['', '',...]
-			parser.query = query; //[]
-			parser.where = {}; //{concat: 'and', queries: [{comparator: '', column: '', value: ''}, {concat: 'or', queries: []}]}
-			parser.orderBy = []; //[{col: '', asc: true}]
+			parser.viewFields = [];
+			parser.query = query;
+			parser.where = {};
+			parser.orderBy = [];
 			parser.limit = -1;
 			parser.doc = new DOMParser().parseFromString(query, 'text/xml');
 			var viewFieldsTags = parser.doc.getElementsByTagName('ViewFields');
@@ -361,7 +366,7 @@ angular
 				if (scripts.hasOwnProperty(lib)) {
 					scripts[lib].then(resolve, reject);
 				}else if ($sp.getAutoload()) {
-					reject("Library was not requested");
+					reject('Library was not requested');
 				}else {
 					resolve();
 				}
@@ -391,7 +396,9 @@ angular
 					};
 					if ($sp.getConnectionMode() === 'REST' && !$sp.getAccessToken()) {
 						SPLoader.waitUntil('SP.RequestExecutor.js').then(function() {
-							if (queryObject.hasOwnProperty('data') && angular.isDefined(queryObject.data) && queryObject !== null) {
+							if (queryObject.hasOwnProperty('data') &&
+								angular.isDefined(queryObject.data) &&
+								queryObject !== null) {
 								query.body = queryObject.data;							
 							}
 							query.success = resolve;
@@ -399,7 +406,9 @@ angular
 							new SP.RequestExecutor($sp.getSiteUrl()).executeAsync(query);						
 						});
 					}else {
-						if (queryObject.hasOwnProperty('data') && angular.isDefined(queryObject.data) && queryObject !== null) {
+						if (queryObject.hasOwnProperty('data') &&
+							angular.isDefined(queryObject.data) &&
+							queryObject !== null) {
 							query.data = queryObject.data;							
 						}
 						query.headers.Authorization = 'Bearer ' + $sp.getAccessToken();
@@ -1052,7 +1061,7 @@ angular
                         if (angular.isDefined(query.data)) {
                             return this.create(query.data);
                         }else {
-                            throw "Query Data is not defined";
+                            throw 'Query Data is not defined';
                         }
                         break;
                     case 'read':
@@ -1061,54 +1070,50 @@ angular
                         if (angular.isDefined(query.data)) {
                             return this.update(builder.build(), query.data);
                         }else {
-                            throw "Query Data is not defined";
+                            throw 'Query Data is not defined';
                         }
                         break;
                     case 'delete':
                         return this.delete(builder.build());
                 }
             }else {
-                throw "Query Type is not defined";
+                throw 'Query Type is not defined';
             }
         };
         return (SPList);
     }]);
 angular
     .module('ngSharepoint.Lists')
-    .factory('$spList', ['$sp', 'SPList', 'JSOMConnector', 'RESTConnector', 'SelectQuery', 'UpdateQuery', 'InsertIntoQuery', 'DeleteQuery', function ($sp, SPList, JSOMConnector, RESTConnector, SelectQuery, UpdateQuery, InsertIntoQuery, DeleteQuery) {
-        return ({
-            getList: function(title) {
-                return new SPList(title);
-            },
-            getLists: function() {
-                var promise;
-                if ($sp.getConnectionMode() === 'JSOM') {
-                    promise = JSOMConnector.getLists();
-                }else {
-                    promise = RESTConnector.getLists();
-                }
-                return promise.then(function(listNames) {
-                    var lists = [];
-                    listNames.forEach(function(name) {
-                        lists.push(new SPList(name));
-                    });
-                    return lists;
-                });
-            },
-            select: function(fields) {
-                return new SelectQuery(fields);
-            },
-            update: function(list) {
-                return new UpdateQuery(list);
-            },
-            insertInto: function(list) {
-                return new InsertIntoQuery(list);
-            },
-            delete: function() {
-                return new DeleteQuery();
-            }
+    .factory('$spList', $spList);
+
+function $spList ($sp, SPList, JSOMConnector, RESTConnector) {
+    var service = {
+        getList: getList,
+        getLists: getLists
+    };
+
+    return service;
+
+    function getList(title) {
+        return new SPList(title);
+    }
+    function getLists() {
+        var promise;
+        if ($sp.getConnectionMode() === 'JSOM') {
+            promise = JSOMConnector.getLists();
+        }else {
+            promise = RESTConnector.getLists();
+        }
+        return promise.then(function(listNames) {
+            var lists = [];
+            listNames.forEach(function(name) {
+                lists.push(new SPList(name));
+            });
+            return lists;
         });
-    }]);
+    }
+}
+$spList.$inject = ['$sp', 'SPList', 'JSOMConnector', 'RESTConnector'];
 angular
     .module('ngSharepoint.Users', ['ngSharepoint'])
     .run(['$sp', '$spLoader', function($sp, $spLoader) {
@@ -1176,7 +1181,8 @@ angular
         };
         RestSPUser.prototype.load = function() {
             var user = this;
-            var endpoint = '_api/SP.UserProfiles.PeopleManager/getPropertiesFor(@account)?@account=\'' + user.accountName + '\'';
+            var endpoint = '_api/SP.UserProfiles.PeopleManager/getPropertiesFor(@account)' +
+                '?@account=\'' + user.accountName + '\'';
             return $q(function(resolve, reject) {
                 $spLoader({
                     method: 'GET',
