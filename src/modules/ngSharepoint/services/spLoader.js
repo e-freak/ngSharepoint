@@ -63,7 +63,7 @@ angular
 					};
 					if ($sp.getConnectionMode() === 'REST' && !$sp.getAccessToken()) {
 						SPLoader.waitUntil('SP.RequestExecutor.js').then(function() {
-							if (queryObject.hasOwnProperty('data') && queryObject.data !== undefined && queryObject !== null) {
+							if (queryObject.hasOwnProperty('data') && angular.isDefined(queryObject.data) && queryObject !== null) {
 								query.body = queryObject.data;							
 							}
 							query.success = resolve;
@@ -71,7 +71,7 @@ angular
 							new SP.RequestExecutor($sp.getSiteUrl()).executeAsync(query);						
 						});
 					}else {
-						if (queryObject.hasOwnProperty('data') && queryObject.data !== undefined && queryObject !== null) {
+						if (queryObject.hasOwnProperty('data') && angular.isDefined(queryObject.data) && queryObject !== null) {
 							query.data = queryObject.data;							
 						}
 						query.headers.Authorization = 'Bearer ' + $sp.getAccessToken();
