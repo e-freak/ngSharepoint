@@ -105,12 +105,13 @@ angular
                 }, reject);
             });
         };
+        return (SPUser);
     }]);
 angular
     .module('ngSharepoint.Users')
-    .provider('$spUser', ['$q', '$sp', 'SPUser', function ($q, $sp, SPUser) {
+    .provider('$spUser', function() {
         return {
-            $get: ['$q', '$sp', function($q, $sp) {
+            $get: ['$q', '$sp', 'SPUser', function($q, $sp, SPUser) {
                 return({
                     getCurrentUser: function() {
                         //TODO: Abstract with SPUser
@@ -130,4 +131,4 @@ angular
                 });
             }]
         };
-    }]);
+    });
