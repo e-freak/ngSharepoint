@@ -7,10 +7,11 @@ angular
             }
         }
     }]);
+
 angular
     .module('ngSharepoint.Users')
     .factory('$spUser', ['$q', '$sp', 'SPUser', function($q, $sp, SPUser) {
-        return({
+        return ({
             getCurrentUser: function() {
                 //TODO: Abstract with SPUser
                 return $q(function(resolve, reject) {
@@ -28,6 +29,7 @@ angular
             }
         });
     }]);
+
 angular
     .module('ngSharepoint.Users')
     .factory('JsomSPUser', ['$q', '$sp', '$spLoader', function($q, $sp, $spLoader) {
@@ -57,6 +59,7 @@ angular
         };
         return (JsomSPUser);
     }]);
+
 angular
     .module('ngSharepoint.Users')
     .factory('RestSPUser', ['$q', '$spLoader', function($q, $spLoader) {
@@ -85,8 +88,9 @@ angular
         };
         return (RestSPUser);
     }]);
+
 angular
-	.module('ngSharepoint.Users')
+    .module('ngSharepoint.Users')
     .factory('SPUser', ['$q', '$spLoader', '$sp', 'JsomSPUser', 'RestSPUser', function($q, $spLoader, $sp, JsomSPUser, RestSPUser) {
         var SPUser = function(accountName, load) {
             var user = this;

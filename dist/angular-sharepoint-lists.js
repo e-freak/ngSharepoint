@@ -1,5 +1,6 @@
 angular
-	.module('ngSharepoint.Lists', ['ngSharepoint']);
+    .module('ngSharepoint.Lists', ['ngSharepoint']);
+
 angular
     .module('ngSharepoint.Lists')
     .factory('JSOMConnector', ['$q', '$sp', function($q, $sp) {
@@ -22,6 +23,7 @@ angular
             }
         });
     }]);
+
 angular
     .module('ngSharepoint.Lists')
     .factory('RESTConnector', ['$q', '$sp', '$spLoader', function($q, $sp, $spLoader) {
@@ -33,14 +35,15 @@ angular
             }
         });
     }]);
+
 angular
-	.module('ngSharepoint.Lists')
-	.factory('DeleteQuery', ['SPList', 'CamlBuilder', 'WhereQuery', 'Query', function(SPList, CamlBuilder, WhereQuery, Query) {
-		var DeleteQuery = function() {
+    .module('ngSharepoint.Lists')
+    .factory('DeleteQuery', ['SPList', 'CamlBuilder', 'WhereQuery', 'Query', function(SPList, CamlBuilder, WhereQuery, Query) {
+        var DeleteQuery = function() {
             this.__where = [];
             this.__list = null;
-			return this;
-		};
+            return this;
+        };
         DeleteQuery.prototype = new Query();
         DeleteQuery.prototype.from = function(list) {
             this.__list = list;
@@ -51,7 +54,7 @@ angular
             this.__where.push(query);
             return query;
         };
-		DeleteQuery.prototype.__execute = function() {
+        DeleteQuery.prototype.__execute = function() {
             var camlBuilder = new CamlBuilder();
             var camlView = camlBuilder.push('View');
             var queryTag;
@@ -68,33 +71,36 @@ angular
             return new SPList(this.__list).delete(camlBuilder.build());
         };
         return (DeleteQuery);
-	}]);
+    }]);
+
 angular
-	.module('ngSharepoint.Lists')
-	.factory('InsertIntoQuery', ['SPList', 'Query', function(SPList, Query) {
-		var InsertIntoQuery = function(list) {
-			this.__list = list;
-			this.__values = {};
-			return this;
-		};
-		InsertIntoQuery.prototype = new Query();
-		InsertIntoQuery.prototype.value = function(key, value) {
-			this.__values[key] = value;
-			return this;
-		};
-		InsertIntoQuery.prototype.__execute = function() {
+    .module('ngSharepoint.Lists')
+    .factory('InsertIntoQuery', ['SPList', 'Query', function(SPList, Query) {
+        var InsertIntoQuery = function(list) {
+            this.__list = list;
+            this.__values = {};
+            return this;
+        };
+        InsertIntoQuery.prototype = new Query();
+        InsertIntoQuery.prototype.value = function(key, value) {
+            this.__values[key] = value;
+            return this;
+        };
+        InsertIntoQuery.prototype.__execute = function() {
             return new SPList(this.__list).insert(this.__values);
         };
         return (InsertIntoQuery);
-	}]);
-angular
-	.module('ngSharepoint.Lists')
-	.factory('JoinQuery', ['$q', '$sp', function ($q, $sp) {
-		var JoinQuery = function() {
+    }]);
 
-		};
-		return (JoinQuery);
-	}]);
+angular
+    .module('ngSharepoint.Lists')
+    .factory('JoinQuery', ['$q', '$sp', function ($q, $sp) {
+        var JoinQuery = function() {
+
+        };
+        return (JoinQuery);
+    }]);
+
 angular
     .module('ngSharepoint.Lists')
     .factory('Query', function() {
@@ -106,6 +112,7 @@ angular
         };
         return (Query);
     });
+
 angular
     .module('ngSharepoint.Lists')
     .factory('SelectQuery', ['SPList', 'CamlBuilder', 'Query', 'WhereQuery', function(SPList, CamlBuilder, Query, WhereQuery) {
@@ -183,26 +190,27 @@ angular
         };
         return (SelectQuery);
     }]);
+
 angular
-	.module('ngSharepoint.Lists')
-	.factory('UpdateQuery', ['SPList', 'CamlBuilder', 'WhereQuery', 'Query', function(SPList, CamlBuilder, WhereQuery, Query) {
-		var UpdateQuery = function(list) {
-			this.__list = list;
-			this.__values = {};
-			this.__where = [];
-			return this;
-		};
-		UpdateQuery.prototype = new Query();
-		UpdateQuery.prototype.set = function(key, value) {
-			this.__values[key] = value;
-			return this;
-		};
-		UpdateQuery.prototype.where = function(key) {
+    .module('ngSharepoint.Lists')
+    .factory('UpdateQuery', ['SPList', 'CamlBuilder', 'WhereQuery', 'Query', function(SPList, CamlBuilder, WhereQuery, Query) {
+        var UpdateQuery = function(list) {
+            this.__list = list;
+            this.__values = {};
+            this.__where = [];
+            return this;
+        };
+        UpdateQuery.prototype = new Query();
+        UpdateQuery.prototype.set = function(key, value) {
+            this.__values[key] = value;
+            return this;
+        };
+        UpdateQuery.prototype.where = function(key) {
             var query = new WhereQuery(this, key);
             this.__where.push(query);
             return query;
-		};
-		UpdateQuery.prototype.__execute = function() {
+        };
+        UpdateQuery.prototype.__execute = function() {
             var camlBuilder = new CamlBuilder();
             var camlView = camlBuilder.push('View');
             var queryTag;
@@ -219,10 +227,11 @@ angular
             return new SPList(this.__list).update(camlBuilder.build(), this.__values);
         };
         return (UpdateQuery);
-	}]);
+    }]);
+
 angular
-	.module('ngSharepoint.Lists')
-	.factory('WhereQuery', function() {
+    .module('ngSharepoint.Lists')
+    .factory('WhereQuery', function() {
         var WhereQuery = function(query, field) {
             this.__query = query;
             this.__value = '';
@@ -278,7 +287,8 @@ angular
             }
         };
         return (WhereQuery);
-	});
+    });
+
 angular
     .module('ngSharepoint.Lists')
     .factory('JsomSPList', ['$q', '$sp', '$spLoader', '$spCamlParser', function($q, $sp, $spLoader, $spCamlParser) {
@@ -312,7 +322,7 @@ angular
         JsomSPList.prototype.create = function(data) {
             var that = this;
             return $q(function(resolve, reject) {
-                $spLoader.waitUntil('SP.Core').then(function() {                    
+                $spLoader.waitUntil('SP.Core').then(function() {
                     var clientContext = $sp.getContext();
                     var list = clientContext.get_web().get_lists().getByTitle(that.title);
                     var itemInfo = new SP.ListItemCreationInformation();
@@ -385,7 +395,7 @@ angular
                             reject(args);
                         });
                     }, function(sender, args) {
-                            reject(args);
+                        reject(args);
                     });
                 });
             });
@@ -407,74 +417,76 @@ angular
                 cols = Object.getOwnPropertyNames(fields);
             }
             cols.forEach(function(key) {
-                    var value = item.get_item(key);
-                    if (angular.isDefined(value) && value !== null && angular.isString(value)) {
-                        value = value.trim();
-                    }
-                    obj[key] = value;
-            });                
+                var value = item.get_item(key);
+                if (angular.isDefined(value) && value !== null && angular.isString(value)) {
+                    value = value.trim();
+                }
+                obj[key] = value;
+            });
             return obj;
         };
         return (JsomSPList);
     }]);
+
 angular
-	.module('ngSharepoint.Lists')
-	.factory('RestSPList', ['$q', '$sp', '$spLoader', function($q, $sp, $spLoader) {
-		var RestSPList = function(title) {
-			this.title = title;
-		};
-		RestSPList.prototype.read = function(query) {
-			var endpoint = '_api/web/Lists/GetByTitle(\'' + this.title + '\')/GetItems';
-			var body = {
-				query: {
-					__metadata: {
-						type: 'SP.CamlQuery'
-					},
-					ViewXml: query
-				}
-			};
-			return $q(function(resolve, reject) {
-				$spLoader.query({
-					method: 'POST',
-					url: endpoint,
-					data: body
-				}).then(function(data) {
-					//TODO: Parse Result
-				}, reject);
-			});
-		};
-		RestSPList.prototype.create = function(data) {
-			var endpoint = '_api/web/Lists/GetByTitle(\'' + this.title + '\')/items';
-			var body = {
-				__metadata: {
-					type: 'SP.Data.TestListItem'
-				}
-			};
-			Object.getOwnPropertyNames(data).forEach(function(key) {
-				var value = data[key];
-				if (angular.isDefined(value) && value !== null && angular.isString(value)) {
-					value = value.trim();
-				}
-				body[key] = value;
-			});
-			return $q(function(resolve, reject) {
-				$spLoader.query({
-					method: 'POST',
-					url: endpoint,
-					data: body
-				}).then(function(data) {
-					//TODO: Parse Result
-				}, reject);
-			});
-		};
-		RestSPList.prototype.delete = function(query) {
-			//TODO: Implement
-		};
-		RestSPList.prototype.update = function(query, data) {
-			//TODO: Implement
-		};
-		return (RestSPList);
-	}]);
+    .module('ngSharepoint.Lists')
+    .factory('RestSPList', ['$q', '$sp', '$spLoader', function($q, $sp, $spLoader) {
+        var RestSPList = function(title) {
+            this.title = title;
+        };
+        RestSPList.prototype.read = function(query) {
+            var endpoint = '_api/web/Lists/GetByTitle(\'' + this.title + '\')/GetItems';
+            var body = {
+                query: {
+                    __metadata: {
+                        type: 'SP.CamlQuery'
+                    },
+                    ViewXml: query
+                }
+            };
+            return $q(function(resolve, reject) {
+                $spLoader.query({
+                    method: 'POST',
+                    url: endpoint,
+                    data: body
+                }).then(function(data) {
+                    //TODO: Parse Result
+                }, reject);
+            });
+        };
+        RestSPList.prototype.create = function(data) {
+            var endpoint = '_api/web/Lists/GetByTitle(\'' + this.title + '\')/items';
+            var body = {
+                __metadata: {
+                    type: 'SP.Data.TestListItem'
+                }
+            };
+            Object.getOwnPropertyNames(data).forEach(function(key) {
+                var value = data[key];
+                if (angular.isDefined(value) && value !== null && angular.isString(value)) {
+                    value = value.trim();
+                }
+                body[key] = value;
+            });
+            return $q(function(resolve, reject) {
+                $spLoader.query({
+                    method: 'POST',
+                    url: endpoint,
+                    data: body
+                }).then(function(data) {
+                    //TODO: Parse Result
+                }, reject);
+            });
+        };
+        RestSPList.prototype.delete = function(query) {
+            //TODO: Implement
+        };
+        RestSPList.prototype.update = function(query, data) {
+            //TODO: Implement
+        };
+        return (RestSPList);
+    }]);
+
 angular
     .module('ngSharepoint.Lists')
     .factory('SPList', ['$sp', '$spLog', 'CamlBuilder', 'RestSPList', 'JsomSPList', function($sp, $spLog, CamlBuilder, RestSPList, JsomSPList) {
@@ -482,7 +494,7 @@ angular
         * @ngdoc object
         * @name  SPList
         * @param {string} title The List Title
-        * 
+        *
         * @module  ngSharepoint.Lists
         *
         * @description
@@ -498,14 +510,14 @@ angular
         };
         /**
         * @ngdoc function
-        * @name  SPList#create  
+        * @name  SPList#create
         * @param  {object} data The Data you wanna create
         * @return {Promise}      A Promise which resolves when the insertion was sucessful
         */
         SPList.prototype.create = function(data) {
             return this.__list.create(data).catch($spLog.error);
         };
-        /** 
+        /**
         * @ngdoc function
         * @name  SPList#read
         * @param {string} query A CamlQuery to filter for
@@ -517,7 +529,7 @@ angular
         /**
         * @ngdoc function
         * @param  {string} query  A CamlQuery which selects the rows to update
-        * @param  {object} data The Data you wanna update 
+        * @param  {object} data The Data you wanna update
         * @return {Promise}        A Promise which resolves when the update was sucessfull
         */
         SPList.prototype.update = function(query, data) {
@@ -571,6 +583,7 @@ angular
         };
         return (SPList);
     }]);
+
 angular
     .module('ngSharepoint.Lists')
     .factory('$spList', $spList);
