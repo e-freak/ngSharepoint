@@ -63,7 +63,7 @@ module.exports = function(grunt) {
 				],
 				singleRun: true,
 				preprocessors: {
-					'src/**/*.js': 'coverage'
+					'src/**/!(*.spec).js': 'coverage'
 				},
 				reporters: ['progress', 'coverage'],
 				coverageReporter: {
