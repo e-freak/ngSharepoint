@@ -1,6 +1,6 @@
 angular
     .module('ngSharepoint.Lists')
-    .factory('$spList', ['$sp', 'SPList', 'JSOMConnector', 'RESTConnector', 'SelectQuery', 'UpdateQuery', 'InsertIntoQuery', 'DeleteQuery', function ($sp, SPList, JSOMConnector, RESTConnector, SelectQuery, UpdateQuery, InsertIntoQuery, DeleteQuery) {
+    .factory('$spList', function ($sp, SPList, JSOMConnector, RESTConnector, SelectQuery, UpdateQuery, InsertIntoQuery, DeleteQuery) {
         return ({
             getList: function(title) {
                 return new SPList(title);
@@ -33,4 +33,4 @@ angular
                 return new DeleteQuery();
             }
         });
-    }]);
+    });

@@ -1,6 +1,6 @@
 angular
 	.module('ngSharepoint.Lists')
-	.factory('DeleteQuery', ['SPList', 'CamlBuilder', 'WhereQuery', 'Query', function(SPList, CamlBuilder, WhereQuery, Query) {
+	.factory('DeleteQuery', function(SPList, CamlBuilder, WhereQuery, Query) {
 		var DeleteQuery = function() {
             this.__where = [];
             this.__list = null;
@@ -33,4 +33,4 @@ angular
             return new SPList(this.__list).delete(camlBuilder.build());
         };
         return (DeleteQuery);
-	}]);
+	});

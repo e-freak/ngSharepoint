@@ -1,6 +1,6 @@
 angular
     .module('ngSharepoint.Users')
-    .factory('$spUser', ['$q', '$sp', 'SPUser', function($q, $sp, SPUser) {
+    .factory('$spUser', function($q, $sp, SPUser) {
         return({
             getCurrentUser: function() {
                 //TODO: Abstract with SPUser
@@ -18,4 +18,4 @@ angular
                 return new SPUser(accountName);
             }
         });
-    }]);
+    });

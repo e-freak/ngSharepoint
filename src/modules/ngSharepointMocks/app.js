@@ -1,5 +1,5 @@
 angular
 	.module('ngSharepoint.Mocks', ['ngSharepoint'])
-	.config(['$spProvider', function($spProvider) {
+	.config(function($spProvider) {
 		$spProvider.setSiteUrl('localhost');
-	}]);
+	});

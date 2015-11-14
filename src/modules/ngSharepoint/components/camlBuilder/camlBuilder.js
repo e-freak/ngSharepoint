@@ -1,6 +1,6 @@
 angular
 	.module('ngSharepoint')
-	.factory('CamlBuilder', ['CamlTag', function(CamlTag) {
+	.factory('CamlBuilder', function(CamlTag) {
 		var CamlBuilder = function() {
 			this.caml = [];
 		};
@@ -164,4 +164,4 @@ angular
 			});
 		};
 		return (CamlBuilder);
-	}]);
+	});

@@ -1,6 +1,6 @@
 angular
     .module('ngSharepoint.Lists')
-    .factory('SelectQuery', ['SPList', 'CamlBuilder', 'Query', 'WhereQuery', function(SPList, CamlBuilder, Query, WhereQuery) {
+    .factory('SelectQuery', function(SPList, CamlBuilder, Query, WhereQuery) {
         var SelectQuery = function(fields) {
             this.__values = fields;
             this.__where = [];
@@ -74,4 +74,4 @@ angular
             return new SPList(this.__list).select(camlBuilder.build());
         };
         return (SelectQuery);
-    }]);
+    });

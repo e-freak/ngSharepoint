@@ -1,6 +1,6 @@
 angular
 	.module('ngSharepoint.Mocks')
-	.factory('SPList', ['$q', '$spCamlParser', 'lists', function($q, $spCamlParser, lists) {
+	.factory('SPList', function($q, $spCamlParser, lists) {
 		var SPList = function(title) {
 			this.title = title;
 			this.list = lists[title]; //{cols: [], data:[[]]}
@@ -120,4 +120,4 @@ angular
 					data = list.list.data;
 				}*/
 		};
-	}]);
+	});

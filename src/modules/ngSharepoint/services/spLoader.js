@@ -1,6 +1,6 @@
 angular
 	.module('ngSharepoint')
-	.factory('$spLoader', ['$q', '$http', '$sp', '$spLog', function($q, $http, $sp, $spLog) {
+	.factory('$spLoader', function($q, $http, $sp, $spLog) {
 		var scripts = {};
 		var SPLoader = {};
 		SPLoader.loadScript = function(lib) {
@@ -81,4 +81,4 @@ angular
 			}).catch($spLog.error);
 		};
 		return (SPLoader);
-	}]);
+	});

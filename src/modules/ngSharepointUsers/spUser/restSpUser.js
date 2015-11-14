@@ -1,6 +1,6 @@
 angular
     .module('ngSharepoint.Users')
-    .factory('RestSPUser', ['$q', '$spLoader', function($q, $spLoader) {
+    .factory('RestSPUser', function($q, $spLoader) {
         var RestSPUser = function(accountName) {
             this.accountName = accountName;
         };
@@ -24,4 +24,4 @@ angular
             });
         };
         return (RestSPUser);
-    }]);
+    });

@@ -1,6 +1,6 @@
 angular
     .module('ngSharepoint.Lists')
-    .factory('JSOMConnector', ['$q', '$sp', function($q, $sp) {
+    .factory('JSOMConnector', function($q, $sp) {
         return ({
             getLists: function() {
                 return $q(function(resolve, reject) {
@@ -19,4 +19,4 @@ angular
                 });
             }
         });
-    }]);
+    });

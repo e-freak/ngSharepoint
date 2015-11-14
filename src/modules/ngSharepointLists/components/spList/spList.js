@@ -1,6 +1,6 @@
 angular
     .module('ngSharepoint.Lists')
-    .factory('SPList', ['$sp', '$spLog', 'CamlBuilder', 'RestSPList', 'JsomSPList', function($sp, $spLog, CamlBuilder, RestSPList, JsomSPList) {
+    .factory('SPList', function($sp, $spLog, CamlBuilder, RestSPList, JsomSPList) {
         /**
         * @ngdoc object
         * @name  SPList
@@ -93,4 +93,4 @@ angular
             }
         };
         return (SPList);
-    }]);
+    });

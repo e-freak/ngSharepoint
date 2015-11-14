@@ -1,6 +1,6 @@
 angular
 	.module('ngSharepoint.Users')
-    .factory('SPUser', ['$q', '$spLoader', '$sp', 'JsomSPUser', 'RestSPUser', function($q, $spLoader, $sp, JsomSPUser, RestSPUser) {
+    .factory('SPUser', function($q, $spLoader, $sp, JsomSPUser, RestSPUser) {
         var SPUser = function(accountName, load) {
             var user = this;
             if (angular.isUndefined(load)) {
@@ -33,4 +33,4 @@ angular
             return this.__user.load();
         };
         return (SPUser);
-    }]);
+    });

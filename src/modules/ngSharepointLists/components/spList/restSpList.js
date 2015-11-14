@@ -1,6 +1,6 @@
 angular
 	.module('ngSharepoint.Lists')
-	.factory('RestSPList', ['$q', '$sp', '$spLoader', function($q, $sp, $spLoader) {
+	.factory('RestSPList', function($q, $sp, $spLoader) {
 		var RestSPList = function(title) {
 			this.title = title;
 		};
@@ -55,4 +55,4 @@ angular
 			//TODO: Implement
 		};
 		return (RestSPList);
-	}]);
+	});

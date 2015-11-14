@@ -1,6 +1,6 @@
 angular
     .module('ngSharepoint.Users')
-    .factory('JsomSPUser', ['$q', '$sp', '$spLoader', function($q, $sp, $spLoader) {
+    .factory('JsomSPUser', function($q, $sp, $spLoader) {
         var JsomSPUser = function(accountName) {
             this.accountName = accountName;
         };
@@ -26,4 +26,4 @@ angular
             });
         };
         return (JsomSPUser);
-    }]);
+    });

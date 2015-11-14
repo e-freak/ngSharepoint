@@ -1,6 +1,6 @@
 angular
     .module('ngSharepoint.Lists')
-    .factory('JsomSPList', ['$q', '$sp', '$spLoader', '$spCamlParser', function($q, $sp, $spLoader, $spCamlParser) {
+    .factory('JsomSPList', function($q, $sp, $spLoader, $spCamlParser) {
         var JsomSPList = function(title) {
             this.title = title;
         };
@@ -135,4 +135,4 @@ angular
             return obj;
         };
         return (JsomSPList);
-    }]);
+    });
