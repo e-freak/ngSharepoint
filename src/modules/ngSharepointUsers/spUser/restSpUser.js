@@ -1,7 +1,7 @@
 angular
-	.module('ngSharepoint.Users')
-	.factory('RestSPUser', ['$q', '$sp', '$spLoader', function($q, $sp, $spLoader) {
-	    var RestSPUser = function(accountName) {
+    .module('ngSharepoint.Users')
+    .factory('RestSPUser', ['$q', '$sp', '$spLoader', function($q, $sp, $spLoader) {
+        var RestSPUser = function(accountName) {
             this.accountName = accountName;
         };
         RestSPUser.prototype.load = function() {

@@ -1,7 +1,7 @@
 angular
-	.module('ngSharepoint.Users')
-	.factory('JsomSPUser', ['$q', '$sp', function($q, $sp) {
-	    var JsomSPUser = function(accountName) {
+    .module('ngSharepoint.Users')
+    .factory('JsomSPUser', ['$q', '$sp', function($q, $sp) {
+        var JsomSPUser = function(accountName) {
             this.accountName = accountName;
         };
         JsomSPUser.prototype.load = function() {
@@ -26,4 +26,4 @@ angular
             });
         };
         return (JsomSPUser);
-	}]);
+    }]);
