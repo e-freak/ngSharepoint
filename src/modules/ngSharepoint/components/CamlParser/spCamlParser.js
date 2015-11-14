@@ -3,10 +3,10 @@ angular
 	.factory('$spCamlParser', function() {
 		var CamlParser = function(query) {
 			var parser = this;
-			parser.viewFields = []; //['', '',...]
-			parser.query = query; //[]
-			parser.where = {}; //{concat: 'and', queries: [{comparator: '', column: '', value: ''}, {concat: 'or', queries: []}]}
-			parser.orderBy = []; //[{col: '', asc: true}]
+			parser.viewFields = [];
+			parser.query = query;
+			parser.where = {};
+			parser.orderBy = [];
 			parser.limit = -1;
 			parser.doc = new DOMParser().parseFromString(query, 'text/xml');
 			var viewFieldsTags = parser.doc.getElementsByTagName('ViewFields');
