@@ -28,6 +28,9 @@ module.exports = function(grunt) {
 			}
 		},
 		jshint: {
+			options: {
+				jshintrc: true
+			},
 			default: ['src/*.js', 'src/**/*.js', '!src/**/*.spec.js']
 		},
 		eslint: {
