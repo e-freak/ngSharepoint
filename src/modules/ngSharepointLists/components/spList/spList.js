@@ -71,7 +71,7 @@ angular
                 switch (query.type) {
                     case 'create':
                         if (angular.isDefined(query.data)) {
-                            return this.create(data);
+                            return this.create(query.data);
                         }else {
                             throw "Query Data is not defined";
                         }
