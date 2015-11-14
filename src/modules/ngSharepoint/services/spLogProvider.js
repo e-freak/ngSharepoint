@@ -1,6 +1,6 @@
 angular
 	.module('ngSharepoint')
-	.provider('$spLog', function() {
+	.provider('$spLog', function($log) {
 		var prefix = '[ngSharepoint] ';
 		var enabled = true;
 		return {
@@ -14,28 +14,28 @@ angular
 				return ({
 					error: function(msg) {
 						if (enabled) {
-							if (typeof msg === 'object') {
-								console.error(prefix + 'Object: %O', msg);
+							if (angular.isObject(msg)) {
+								$log.error(prefix + 'Object: %O', msg);
 							}else {
-								console.error(prefix + msg);
+								$log.error(prefix + msg);
 							}
 						}
 					},
 					warn: function(msg) {
 						if (enabled) {
-							if (typeof msg === 'object') {
-								console.warn(prefix + 'Object: %O', msg);
+							if (angular.isObject(msg)) {
+								$log.warn(prefix + 'Object: %O', msg);
 							}else {
-								console.warn(prefix + msg);
+								$log.warn(prefix + msg);
 							}
 						}
 					},
 					log: function(msg) {
 						if (enabled) {
-							if (typeof msg === 'object') {
-								console.log(prefix + 'Object: %O', msg);
+							if (angular.isObject(msg)) {
+								$log.log(prefix + 'Object: %O', msg);
 							}else {
-								console.log(prefix + msg);
+								$log.log(prefix + msg);
 							}
 						}
 					}
