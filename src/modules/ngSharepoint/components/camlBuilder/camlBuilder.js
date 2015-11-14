@@ -70,7 +70,7 @@ angular
 					throw "Invalid Query";
 				}
 				query.queries.forEach(function(sub) {
-					builder.__buildQuery(sub, root);
+					builder.__buildQuery(sub, concatenator);
 				});
 			}else if (angular.isDefined(query.comparator)) {
 				query.comparator = query.comparator.toLowerCase();
