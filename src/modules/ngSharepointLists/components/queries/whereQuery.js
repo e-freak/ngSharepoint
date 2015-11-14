@@ -20,7 +20,7 @@ angular
                 NOT_EQUALS: ['<Neq>', '</Neq>'],
                 NOT_INCLUDES: ['<NotIncludes>', '</NotIncludes>']
             };
-            if (typeof field === 'string') {
+            if (angular.isString(field)) {
                 this.__field = field;
             }else {
                 this.__fields = field;
