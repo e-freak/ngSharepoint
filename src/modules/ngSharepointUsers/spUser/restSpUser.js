@@ -6,7 +6,8 @@ angular
         };
         RestSPUser.prototype.load = function() {
             var user = this;
-            var endpoint = '_api/SP.UserProfiles.PeopleManager/getPropertiesFor(@account)?@account=\'' + user.accountName + '\'';
+            var endpoint = '_api/SP.UserProfiles.PeopleManager/getPropertiesFor(@account)' +
+                '?@account=\'' + user.accountName + '\'';
             return $q(function(resolve, reject) {
                 $spLoader({
                     method: 'GET',
