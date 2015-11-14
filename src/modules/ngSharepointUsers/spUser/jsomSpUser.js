@@ -1,6 +1,6 @@
 angular
     .module('ngSharepoint.Users')
-    .factory('JsomSPUser', ['$q', '$sp', function($q, $sp) {
+    .factory('JsomSPUser', ['$q', '$sp', '$spLoader', function($q, $sp, $spLoader) {
         var JsomSPUser = function(accountName) {
             this.accountName = accountName;
         };
