@@ -4,7 +4,7 @@ angular
         var JsomSPList = function(title) {
             this.title = title;
         };
-        JsomSPList.prototype.select = function(query) {
+        JsomSPList.prototype.read = function(query) {
             var that = this;
             return $q(function(resolve, reject) {
                 $spLoader.waitUntil('SP.Core').then(function() {
@@ -28,7 +28,7 @@ angular
                 });
             });
         };
-        JsomSPList.prototype.insert = function(data) {
+        JsomSPList.prototype.create = function(data) {
             var that = this;
             return $q(function(resolve, reject) {
                 $spLoader.waitUntil('SP.Core').then(function() {                    

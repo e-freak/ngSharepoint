@@ -4,7 +4,7 @@ angular
 		var RestSPList = function(title) {
 			this.title = title;
 		};
-		RestSPList.prototype.select = function(query) {
+		RestSPList.prototype.read = function(query) {
 			var endpoint = '_api/web/Lists/GetByTitle(\'' + this.title + '\')/GetItems';
 			var body = {
 				query: {
@@ -24,7 +24,7 @@ angular
 				}, reject);
 			});
 		};
-		RestSPList.prototype.insert = function(data) {
+		RestSPList.prototype.create = function(data) {
 			var endpoint = '_api/web/Lists/GetByTitle(\'' + this.title + '\')/items';
 			var body = {
 				__metadata: {
