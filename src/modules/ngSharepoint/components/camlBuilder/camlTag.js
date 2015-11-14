@@ -29,6 +29,15 @@ angular
 			}
 			return xml;
 		};
+		CamlTag.prototype.findByName = function(name) {
+			var result = [];
+			this.caml.forEach(function(tag) {
+				if (tag.name === name) {
+					result.push(tag);
+				}
+			});
+			return result;
+		};
 		CamlTag.prototype.push = function(tag, attr, value) {
 			var camlTag;
 			if (tag instanceof CamlTag) {
