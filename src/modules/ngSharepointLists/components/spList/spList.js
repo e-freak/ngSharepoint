@@ -14,9 +14,9 @@ angular
         var SPList = function(title) {
             this.title = title;
             if ($sp.getConnectionMode() === 'JSOM') {
-              this.__list = new JsomSPList(title);
+                this.__list = new JsomSPList(title);
             }else {
-              this.__list = new RestSPList(title);
+                this.__list = new RestSPList(title);
             }
         };
         /**
@@ -60,7 +60,7 @@ angular
          * @return {Promise}       [description]
          */
         SPList.prototype.query = function(query) {
-            if (typeof query === 'object') {
+            if (angular.isObject(query)) {
                 return this.__jsonQuery(query);
             }
         };
