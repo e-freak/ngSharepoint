@@ -31,7 +31,7 @@ angular
         SelectQuery.prototype.exec = function() {
             var builder = new CamlBuilder();
             var query = {};
-            if (typeof this.__values === 'object') {
+            if (angular.isObject(this.__values)) {
                 query.columns = this.__values;
             }
             if (angular.isDefined(this.__limit)) {
