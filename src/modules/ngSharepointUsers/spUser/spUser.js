@@ -1,5 +1,5 @@
 angular
-	.module('ngSharepoint.Users')
+    .module('ngSharepoint.Users')
     .factory('SPUser', function($q, $spLoader, $sp, JsomSPUser, RestSPUser) {
         var SPUser = function(accountName, load) {
             var user = this;

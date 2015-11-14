@@ -8,7 +8,7 @@ angular
                     'SP.Runtime.js',
                     'SP.js'
                 ];
-                $spLoader.loadScripts('SP.Core', scripts);                    
+                $spLoader.loadScripts('SP.Core', scripts);
             }else if ($sp.getConnectionMode() === 'REST' && !$sp.getAccessToken()) {
                 $spLoader.loadScript('SP.RequestExecutor.js');
             }

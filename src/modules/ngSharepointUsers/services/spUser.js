@@ -1,7 +1,7 @@
 angular
     .module('ngSharepoint.Users')
     .factory('$spUser', function($q, $sp, SPUser) {
-        return({
+        return ({
             getCurrentUser: function() {
                 //TODO: Abstract with SPUser
                 return $q(function(resolve, reject) {

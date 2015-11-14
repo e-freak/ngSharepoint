@@ -31,7 +31,7 @@ angular
         JsomSPList.prototype.create = function(data) {
             var that = this;
             return $q(function(resolve, reject) {
-                $spLoader.waitUntil('SP.Core').then(function() {                    
+                $spLoader.waitUntil('SP.Core').then(function() {
                     var clientContext = $sp.getContext();
                     var list = clientContext.get_web().get_lists().getByTitle(that.title);
                     var itemInfo = new SP.ListItemCreationInformation();
@@ -104,7 +104,7 @@ angular
                             reject(args);
                         });
                     }, function(sender, args) {
-                            reject(args);
+                        reject(args);
                     });
                 });
             });
@@ -126,12 +126,12 @@ angular
                 cols = Object.getOwnPropertyNames(fields);
             }
             cols.forEach(function(key) {
-                    var value = item.get_item(key);
-                    if (angular.isDefined(value) && value !== null && angular.isString(value)) {
-                        value = value.trim();
-                    }
-                    obj[key] = value;
-            });                
+                var value = item.get_item(key);
+                if (angular.isDefined(value) && value !== null && angular.isString(value)) {
+                    value = value.trim();
+                }
+                obj[key] = value;
+            });
             return obj;
         };
         return (JsomSPList);

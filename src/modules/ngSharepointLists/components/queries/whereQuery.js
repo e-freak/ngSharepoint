@@ -1,6 +1,6 @@
 angular
-	.module('ngSharepoint.Lists')
-	.factory('WhereQuery', function() {
+    .module('ngSharepoint.Lists')
+    .factory('WhereQuery', function() {
         var WhereQuery = function(query, field) {
             this.__query = query;
             this.__value = '';
@@ -56,4 +56,4 @@ angular
             }
         };
         return (WhereQuery);
-	});
+    });

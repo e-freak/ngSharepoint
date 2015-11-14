@@ -1,23 +1,23 @@
 angular
-	.module('ngSharepoint.Lists')
-	.factory('UpdateQuery', function(SPList, CamlBuilder, WhereQuery, Query) {
-		var UpdateQuery = function(list) {
-			this.__list = list;
-			this.__values = {};
-			this.__where = [];
-			return this;
-		};
-		UpdateQuery.prototype = new Query();
-		UpdateQuery.prototype.set = function(key, value) {
-			this.__values[key] = value;
-			return this;
-		};
-		UpdateQuery.prototype.where = function(key) {
+    .module('ngSharepoint.Lists')
+    .factory('UpdateQuery', function(SPList, CamlBuilder, WhereQuery, Query) {
+        var UpdateQuery = function(list) {
+            this.__list = list;
+            this.__values = {};
+            this.__where = [];
+            return this;
+        };
+        UpdateQuery.prototype = new Query();
+        UpdateQuery.prototype.set = function(key, value) {
+            this.__values[key] = value;
+            return this;
+        };
+        UpdateQuery.prototype.where = function(key) {
             var query = new WhereQuery(this, key);
             this.__where.push(query);
             return query;
-		};
-		UpdateQuery.prototype.__execute = function() {
+        };
+        UpdateQuery.prototype.__execute = function() {
             var camlBuilder = new CamlBuilder();
             var camlView = camlBuilder.push('View');
             var queryTag;
@@ -34,4 +34,4 @@ angular
             return new SPList(this.__list).update(camlBuilder.build(), this.__values);
         };
         return (UpdateQuery);
-	});
+    });

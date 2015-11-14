@@ -5,7 +5,7 @@ angular
         * @ngdoc object
         * @name  SPList
         * @param {string} title The List Title
-        * 
+        *
         * @module  ngSharepoint.Lists
         *
         * @description
@@ -21,14 +21,14 @@ angular
         };
         /**
         * @ngdoc function
-        * @name  SPList#create  
+        * @name  SPList#create
         * @param  {object} data The Data you wanna create
         * @return {Promise}      A Promise which resolves when the insertion was sucessful
         */
         SPList.prototype.create = function(data) {
             return this.__list.create(data).catch($spLog.error);
         };
-        /** 
+        /**
         * @ngdoc function
         * @name  SPList#read
         * @param {string} query A CamlQuery to filter for
@@ -40,7 +40,7 @@ angular
         /**
         * @ngdoc function
         * @param  {string} query  A CamlQuery which selects the rows to update
-        * @param  {object} data The Data you wanna update 
+        * @param  {object} data The Data you wanna update
         * @return {Promise}        A Promise which resolves when the update was sucessfull
         */
         SPList.prototype.update = function(query, data) {
