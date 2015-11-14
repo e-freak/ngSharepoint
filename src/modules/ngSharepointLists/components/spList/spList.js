@@ -73,7 +73,7 @@ angular
                         if (angular.isDefined(query.data)) {
                             return this.create(query.data);
                         }else {
-                            throw "Query Data is not defined";
+                            throw 'Query Data is not defined';
                         }
                         break;
                     case 'read':
@@ -82,14 +82,14 @@ angular
                         if (angular.isDefined(query.data)) {
                             return this.update(builder.build(), query.data);
                         }else {
-                            throw "Query Data is not defined";
+                            throw 'Query Data is not defined';
                         }
                         break;
                     case 'delete':
                         return this.delete(builder.build());
                 }
             }else {
-                throw "Query Type is not defined";
+                throw 'Query Type is not defined';
             }
         };
         return (SPList);
