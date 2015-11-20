@@ -292,7 +292,7 @@ angular
         };
         /**
          * @ngdoc function
-         * @param  {[type]} query [description]
+         * @param  {object} query [description]
          * @return {Promise}       [description]
          */
         SPList.prototype.query = function(query) {
@@ -593,7 +593,8 @@ function $query($spList) {
         'columns': [],
         'list': undefined,
         'type': undefined,
-        'select': function(cols) {
+        'query': undefined,
+        'read': function(cols) {
             if (angular.isUndefined(this.type)) {
                 if (angular.isUndefined(cols)) {
                     cols = '*';
@@ -603,11 +604,13 @@ function $query($spList) {
             }else {
                 throw 'Cannot use select after another query type was selected';
             }
+            return this;
         },
         'from': function(list) {
             this.list = list;
+            return this;
         },
-        'insert': function(data) {
+        'create': function(data) {
             if (angular.isUndefined(this.type)) {
                 if (angular.isUndefined(data)) {
                     this.data = data;
@@ -616,11 +619,13 @@ function $query($spList) {
                     throw 'No Data';
                 }
             }else {
-                throw 'Cannot use insert after another query type was selected';
+                throw 'Cannot use create after another query type was selected';
             }
+            return this;
         },
         'into': function(list) {
             this.list = list;
+            return this;
         },
         'update': function() {
             if (angular.isUndefined(this.type)) {
@@ -628,14 +633,22 @@ function $query($spList) {
             }else {
                 throw 'Cannot use update after another query type was selected';
             }
+            return this;
         },
         'delete': function() {
             if (angular.isUndefined(this.type)) {
                 this.type = 'delete';
             }else {
                 throw 'Cannot use delete after another query type was selected';
-            }        },
-        'where': function() {},
+            }
+            return this;
+        },
+        'where': function(col) {
+            return this;
+        },
+        'equals': function() {
+            return this;
+        },
         'exec': function() {
             return $spList.getList(this.list).query(this);
         },
@@ -643,15 +656,7 @@ function $query($spList) {
             return this.exec().then(resolve, reject);
         }
     };
-
-    var query = new Query();
-    var service = {
-        'select': query.select,
-        'insert': query.insert,
-        'update': query.update,
-        'delete': query.delete
-    };
-    return service;
+    return Query;
 }
 $query.$inject = ['$spList'];
 
