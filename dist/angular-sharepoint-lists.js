@@ -607,10 +607,6 @@ function $query($spList) {
             }
             return this;
         };
-        this.from = function(list) {
-            this.list = list;
-            return this;
-        };
         this.create = function(data) {
             if (angular.isUndefined(this.type)) {
                 this.type = 'create';
@@ -622,7 +618,15 @@ function $query($spList) {
             }
             return this;
         };
+        this.from = function(list) {
+            this.list = list;
+            return this;
+        };
         this.into = function(list) {
+            this.list = list;
+            return this;
+        };
+        this.list = function(list) {
             this.list = list;
             return this;
         };
@@ -660,9 +664,11 @@ function $query($spList) {
         };
         this.set = function(column, value) {
             this.data[column] = value;
+            return this;
         };
         this.value = function(column, value) {
             this.data[column] = value;
+            return this;
         };
         this.exec = function() {
             return $spList.getList(this.list).query(this);
