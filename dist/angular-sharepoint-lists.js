@@ -622,7 +622,7 @@ function $query($spList) {
             this.list = list;
             return this;
         };
-        this.into = function(list) {
+        this.in = function(list) {
             this.list = list;
             return this;
         };
