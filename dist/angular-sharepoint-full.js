@@ -54,16 +54,16 @@ angular
                 root = root[0];
             }
             if (angular.isDefined(json.columns)) {
-                this.__buildViewFields(json.columns);
+                this.__buildViewFields(json.columns, root);
             }
             if (angular.isDefined(json.query)) {
-                this.__buildQuery(json.query);
+                this.__buildQuery(json.query, root);
             }
             if (angular.isDefined(json.limit)) {
-                this.__buildLimit(json.limit);
+                this.__buildLimit(json.limit, root);
             }
             if (angular.isDefined(json.order)) {
-                this.__buildOrder(json.order);
+                this.__buildOrder(json.order, root);
             }
         };
         CamlBuilder.prototype.__buildViewFields = function(columns, root) {
@@ -826,7 +826,7 @@ angular
         };
         /**
          * @ngdoc function
-         * @param  {[type]} query [description]
+         * @param  {object} query [description]
          * @return {Promise}       [description]
          */
         SPList.prototype.query = function(query) {
