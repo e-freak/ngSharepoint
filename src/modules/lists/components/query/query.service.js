@@ -16,7 +16,7 @@ function $query($spList) {
                 this.columns = cols;
                 this.type = 'read';
             }else {
-                throw 'Cannot use select after another query type was selected';
+                throw 'Cannot use read after another query type was selected';
             }
             return this;
         },
