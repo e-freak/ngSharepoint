@@ -8,6 +8,7 @@ function $query($spList) {
         this.list = undefined;
         this.type = undefined;
         this.query = undefined;
+        this.serializer = undefined;
         this.data = {};
         this.read = function(cols) {
             if (angular.isUndefined(this.type)) {
@@ -82,6 +83,10 @@ function $query($spList) {
         };
         this.value = function(column, value) {
             this.data[column] = value;
+            return this;
+        };
+        this.class = function(serializer) {
+            this.serializer = serializer;
             return this;
         };
         this.exec = function() {
