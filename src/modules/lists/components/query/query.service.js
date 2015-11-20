@@ -65,14 +65,30 @@ function $query($spList) {
             return this;
         };
         this.where = function(col) {
-            var Where = function(col, obj) {
+            var Where = function(col, instance) {
                 this.equals = function(value) {
-                    obj.query = {
+                    instance.query = {
                         comparator: 'equals',
                         column: col,
                         value: value
                     };
-                    return obj;
+                    return instance;
+                };
+                this.greater = function(value) {
+                    instance.query = {
+                        comparator: 'greater',
+                        column: col,
+                        value: value
+                    };
+                    return instance;
+                };
+                this.smaller = function(value) {
+                    instance.query = {
+                        comparator: 'smaller',
+                        column: col,
+                        value: value
+                    };
+                    return instance;
                 };
             };
             return new Where(col, this);
