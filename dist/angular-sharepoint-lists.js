@@ -644,10 +644,17 @@ function $query($spList) {
             return this;
         };
         this.where = function(col) {
-            return this;
-        };
-        this.equals = function() {
-            return this;
+            var Where = function(col, obj) {
+                this.equals = function(value) {
+                    obj.query = {
+                        comparator: 'equals',
+                        column: col,
+                        value: value
+                    };
+                    return obj;
+                };
+            };
+            return new Where(col, this);
         };
         this.exec = function() {
             return $spList.getList(this.list).query(this);
