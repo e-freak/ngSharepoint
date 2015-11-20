@@ -98,8 +98,8 @@ function $query($spList) {
         'read': function(cols) {
             return new Query().read(cols);
         },
-        'update': function() {
-            return new Query().update();
+        'update': function(data) {
+            return new Query().update(data);
         },
         'delete': function() {
             return new Query().delete();
