@@ -4,7 +4,7 @@ angular
         var JsomSPList = function(title) {
             this.title = title;
         };
-        JsomSPList.prototype.read = function(query) {
+        JsomSPList.prototype.read = function(query, serializer) {
             var that = this;
             return $q(function(resolve, reject) {
                 $spLoader.waitUntil('SP.Core').then(function() {
@@ -19,7 +19,7 @@ angular
                         var itemIterator = items.getEnumerator();
                         while (itemIterator.moveNext()) {
                             var item = itemIterator.get_current();
-                            result.push(that.__unpack(item, $spCamlParser.parse(query).getViewFields()));
+                            result.push(that.__unpack(item, $spCamlParser.parse(query).getViewFields(), serializer));
                         }
                         resolve(result);
                     }, function(sender, args) {
@@ -28,7 +28,7 @@ angular
                 });
             });
         };
-        JsomSPList.prototype.create = function(data) {
+        JsomSPList.prototype.create = function(data, serializer) {
             var that = this;
             return $q(function(resolve, reject) {
                 $spLoader.waitUntil('SP.Core').then(function() {
@@ -36,10 +36,10 @@ angular
                     var list = clientContext.get_web().get_lists().getByTitle(that.title);
                     var itemInfo = new SP.ListItemCreationInformation();
                     var item = list.addItem(itemInfo);
-                    that.__pack(item, data);
+                    that.__pack(item, data, serializer);
                     item.update();
                     clientContext.load(item);
-                    clientContext.executeQueryAsync(function(sender, args) {
+                    clientContext.executeQueryAsync(function() {
                         resolve(data);
                     }, function(sender, args) {
                         reject(args);
@@ -57,31 +57,29 @@ angular
                     camlQuery.set_viewXml(query);
                     var items = list.getItems(camlQuery);
                     clientContext.load(items);
-                    clientContext.executeQueryAsync(
-                        function(sender, args) {
-                            var itemIterator = items.getEnumerator();
-                            var a = [];
-                            while (itemIterator.moveNext()) {
-                                var item = itemIterator.get_current();
-                                a.push(item);
-                            }
-                            a.forEach(function(item) {
-                                item.deleteObject();
-                            });
-                            clientContext.executeQueryAsync(function(sender, args) {
-                                resolve(args);
-                            }, function(sender, args) {
-                                reject(args);
-                            });
-                        },
-                        function(sender, args) {
-                            reject(args);
+                    clientContext.executeQueryAsync(function() {
+                        var itemIterator = items.getEnumerator();
+                        var a = [];
+                        while (itemIterator.moveNext()) {
+                            var item = itemIterator.get_current();
+                            a.push(item);
                         }
-                    );
+                        a.forEach(function(item) {
+                            item.deleteObject();
+                        });
+                        clientContext.executeQueryAsync(function(sender, args) {
+                            resolve(args);
+                        }, function(sender, args) {
+                            reject(args);
+                        });
+                    },
+                    function(sender, args) {
+                        reject(args);
+                    });
                 });
             });
         };
-        JsomSPList.prototype.update = function(query, data) {
+        JsomSPList.prototype.update = function(query, data, serializer) {
             var that = this;
             return $q(function(resolve, reject) {
                 $spLoader.waitUntil('SP.Core').then(function() {
@@ -91,11 +89,11 @@ angular
                     camlQuery.set_viewXml(query);
                     var items = list.getItems(camlQuery);
                     clientContext.load(items);
-                    clientContext.executeQueryAsync(function(sender, args) {
+                    clientContext.executeQueryAsync(function() {
                         var itemIterator = items.getEnumerator();
                         while (itemIterator.moveNext()) {
                             var item = itemIterator.get_current();
-                            that.__pack(item, data);
+                            that.__pack(item, data, serializer);
                             item.update();
                         }
                         clientContext.executeQueryAsync(function(sender, args) {
@@ -109,7 +107,10 @@ angular
                 });
             });
         };
-        JsomSPList.prototype.__pack = function(item, data) {
+        JsomSPList.prototype.__pack = function(item, data, serializer) {
+            if (angular.isDefined(serializer)) {
+                data = serializer.__serialize();
+            }
             Object.getOwnPropertyNames(data).forEach(function(key) {
                 var value = data[key];
                 if (angular.isDefined(value) && value !== null && angular.isString(value)) {
@@ -118,8 +119,7 @@ angular
                 item.set_item(key, value);
             });
         };
-        JsomSPList.prototype.__unpack = function(item, fields) {
-            var query = this;
+        JsomSPList.prototype.__unpack = function(item, fields, serializer) {
             var obj = {};
             var cols = fields;
             if (!angular.isArray(fields)) {
@@ -132,6 +132,9 @@ angular
                 }
                 obj[key] = value;
             });
+            if (angular.isDefined(serializer)) {
+                return serializer.__deserialize(obj);
+            }
             return obj;
         };
         return (JsomSPList);
