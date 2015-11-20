@@ -25,8 +25,8 @@ angular
         * @param  {object} data The Data you wanna create
         * @return {Promise}      A Promise which resolves when the insertion was sucessful
         */
-        SPList.prototype.create = function(data) {
-            return this.__list.create(data).catch($spLog.error);
+        SPList.prototype.create = function(data, serializer) {
+            return this.__list.create(data, serializer).catch($spLog.error);
         };
         /**
         * @ngdoc function
@@ -34,8 +34,8 @@ angular
         * @param {string} query A CamlQuery to filter for
         * @return {Promise} A Promise which resolves to the selected data
         */
-        SPList.prototype.read = function(query) {
-            return this.__list.read(query).catch($spLog.error);
+        SPList.prototype.read = function(query, serializer) {
+            return this.__list.read(query, serializer).catch($spLog.error);
         };
         /**
         * @ngdoc function
@@ -43,8 +43,8 @@ angular
         * @param  {object} data The Data you wanna update
         * @return {Promise}        A Promise which resolves when the update was sucessfull
         */
-        SPList.prototype.update = function(query, data) {
-            return this.__list.update(query, data).catch($spLog.error);
+        SPList.prototype.update = function(query, data, serializer) {
+            return this.__list.update(query, data, serializer).catch($spLog.error);
         };
         /**
         * @ngdoc function
@@ -56,7 +56,7 @@ angular
         };
         /**
          * @ngdoc function
-         * @param  {[type]} query [description]
+         * @param  {object} query [description]
          * @return {Promise}       [description]
          */
         SPList.prototype.query = function(query) {
@@ -71,16 +71,16 @@ angular
                 switch (query.type) {
                     case 'create':
                         if (angular.isDefined(query.data)) {
-                            return this.create(query.data);
+                            return this.create(query.data, query.serializer);
                         }else {
                             throw 'Query Data is not defined';
                         }
                         break;
                     case 'read':
-                        return this.read(builder.build());
+                        return this.read(builder.build(), query.serializer);
                     case 'update':
                         if (angular.isDefined(query.data)) {
-                            return this.update(builder.build(), query.data);
+                            return this.update(builder.build(), query.data, query.serializer);
                         }else {
                             throw 'Query Data is not defined';
                         }
