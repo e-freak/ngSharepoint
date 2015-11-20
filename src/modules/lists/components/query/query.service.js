@@ -3,12 +3,12 @@ angular
     .factory('$query', $query);
 
 function $query($spList) {
-    var Query = {
-        'columns': [],
-        'list': undefined,
-        'type': undefined,
-        'query': undefined,
-        'read': function(cols) {
+    var Query = function() {
+        this.columns = [];
+        this.list = undefined;
+        this.type = undefined;
+        this.query = undefined;
+        this.read = function(cols) {
             if (angular.isUndefined(this.type)) {
                 if (angular.isUndefined(cols)) {
                     cols = '*';
@@ -19,12 +19,12 @@ function $query($spList) {
                 throw 'Cannot use read after another query type was selected';
             }
             return this;
-        },
-        'from': function(list) {
+        };
+        this.from = function(list) {
             this.list = list;
             return this;
-        },
-        'create': function(data) {
+        };
+        this.create = function(data) {
             if (angular.isUndefined(this.type)) {
                 if (angular.isUndefined(data)) {
                     this.data = data;
@@ -36,39 +36,39 @@ function $query($spList) {
                 throw 'Cannot use create after another query type was selected';
             }
             return this;
-        },
-        'into': function(list) {
+        };
+        this.into = function(list) {
             this.list = list;
             return this;
-        },
-        'update': function() {
+        };
+        this.update = function() {
             if (angular.isUndefined(this.type)) {
                 this.type = 'update';
             }else {
                 throw 'Cannot use update after another query type was selected';
             }
             return this;
-        },
-        'delete': function() {
+        };
+        this.delete = function() {
             if (angular.isUndefined(this.type)) {
                 this.type = 'delete';
             }else {
                 throw 'Cannot use delete after another query type was selected';
             }
             return this;
-        },
-        'where': function(col) {
+        };
+        this.where = function(col) {
             return this;
-        },
-        'equals': function() {
+        };
+        this.equals = function() {
             return this;
-        },
-        'exec': function() {
+        };
+        this.exec = function() {
             return $spList.getList(this.list).query(this);
-        },
-        'then': function(resolve, reject) {
+        };
+        this.then = function(resolve, reject) {
             return this.exec().then(resolve, reject);
-        }
+        };
     };
-    return Query;
+    return new Query();
 }
