@@ -7,7 +7,7 @@ angular
             var query = $q(function(resolve, reject) {
                 var element = document.createElement('script');
                 element.type = 'text/javascript';
-                if (lib[0] === lib[1] === '/') {
+                if (lib[0] === lib[1] && lib[0] === '/') {
                     element.src = lib;
                 }else {
                     element.src = $sp.getSiteUrl() + '_layouts/15/' + lib;
