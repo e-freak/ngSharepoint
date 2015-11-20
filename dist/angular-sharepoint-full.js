@@ -1197,7 +1197,20 @@ function $query($spList) {
             return this.exec().then(resolve, reject);
         };
     };
-    return new Query();
+    return ({ //TODO: Reimplement this nested return mess
+        'create': function(data) {
+            return new Query().create(data);
+        },
+        'read': function(cols) {
+            return new Query().read(cols);
+        },
+        'update': function() {
+            return new Query().update();
+        },
+        'delete': function() {
+            return new Query().delete();
+        }
+    });
 }
 $query.$inject = ['$spList'];
 
