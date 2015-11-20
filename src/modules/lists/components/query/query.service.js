@@ -8,6 +8,7 @@ function $query($spList) {
         this.list = undefined;
         this.type = undefined;
         this.query = undefined;
+        this.data = {};
         this.read = function(cols) {
             if (angular.isUndefined(this.type)) {
                 if (angular.isUndefined(cols)) {
@@ -26,11 +27,9 @@ function $query($spList) {
         };
         this.create = function(data) {
             if (angular.isUndefined(this.type)) {
-                if (angular.isUndefined(data)) {
+                this.type = 'create';
+                if (angular.isDefined(data)) {
                     this.data = data;
-                    this.type = 'create';
-                }else {
-                    throw 'No Data';
                 }
             }else {
                 throw 'Cannot use create after another query type was selected';
@@ -41,9 +40,12 @@ function $query($spList) {
             this.list = list;
             return this;
         };
-        this.update = function() {
+        this.update = function(data) {
             if (angular.isUndefined(this.type)) {
                 this.type = 'update';
+                if (angular.isDefined(data)) {
+                    this.data = data;
+                }
             }else {
                 throw 'Cannot use update after another query type was selected';
             }
@@ -69,6 +71,12 @@ function $query($spList) {
                 };
             };
             return new Where(col, this);
+        };
+        this.set = function(column, value) {
+            this.data[column] = value;
+        };
+        this.value = function(column, value) {
+            this.data[column] = value;
         };
         this.exec = function() {
             return $spList.getList(this.list).query(this);
