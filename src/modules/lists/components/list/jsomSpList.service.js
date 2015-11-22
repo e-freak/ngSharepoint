@@ -84,7 +84,7 @@ angular
             return $q(function(resolve, reject) {
                 $spLoader.waitUntil('SP.Core').then(function() {
                     var clientContext = $sp.getContext();
-                    var list = clientContext.get_web().get_lists().getByTitle(that.__list);
+                    var list = clientContext.get_web().get_lists().getByTitle(that.title);
                     var camlQuery = new SP.CamlQuery();
                     camlQuery.set_viewXml(query);
                     var items = list.getItems(camlQuery);
