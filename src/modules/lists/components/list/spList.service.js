@@ -68,6 +68,10 @@ angular
             if (angular.isDefined(query.type)) {
                 var builder = new CamlBuilder();
                 builder.buildFromJson(query);
+                var caml;
+                if (!builder.isEmpty()) {
+                    caml = builder.build();
+                }
                 switch (query.type) {
                     case 'create':
                         if (angular.isDefined(query.data)) {
@@ -77,16 +81,16 @@ angular
                         }
                         break;
                     case 'read':
-                        return this.read(builder.build(), query.serializer);
+                        return this.read(caml, query.serializer);
                     case 'update':
                         if (angular.isDefined(query.data)) {
-                            return this.update(builder.build(), query.data, query.serializer);
+                            return this.update(caml, query.data, query.serializer);
                         }else {
                             throw 'Query Data is not defined';
                         }
                         break;
                     case 'delete':
-                        return this.delete(builder.build());
+                        return this.delete(caml);
                 }
             }else {
                 throw 'Query Type is not defined';
