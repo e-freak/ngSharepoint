@@ -8,6 +8,7 @@ function $query($spList) {
         this.list = undefined;
         this.type = undefined;
         this.query = undefined;
+        this.limit = undefined;
         this.serializer = undefined;
         this.order = [];
         this.data = {};
@@ -111,6 +112,9 @@ function $query($spList) {
                 asc = true;
             }
             this.order.push({column: field, asc: asc});
+        };
+        this.limit = function(limit) {
+            this.limit = limit;
         };
         this.exec = function() {
             return $spList.getList(this.list).query(this);
