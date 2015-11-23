@@ -1,6 +1,7 @@
 angular
     .module('ngSharepoint.Lists')
     .factory('SPList', function($sp, $spLog, CamlBuilder, RestSPList, JsomSPList) {
+        //TODO: Add all List APIs
         /**
         * @ngdoc object
         * @name  SPList
@@ -18,6 +19,26 @@ angular
             }else {
                 this.__list = new RestSPList(title);
             }
+        };
+
+        SPList.prototype.getGUID = function() {
+            return this.__list.getGUID().catch($spLog.error);
+        };
+
+        SPList.prototype.getTitle = function() {
+            return this.__list.getTitle().catch($spLog.error);
+        };
+
+        SPList.prototype.setTitle = function(title) {
+            return this.__list.setTitle(title).catch($spLog.error);
+        };
+
+        SPList.prototype.getDescription = function() {
+            return this.__list.getDescription().catch($spLog.error);
+        };
+
+        SPList.prototype.setDescription = function(desc) {
+            return this.__list.setDescription(desc).catch($spLog.error);
         };
         /**
         * @ngdoc function
