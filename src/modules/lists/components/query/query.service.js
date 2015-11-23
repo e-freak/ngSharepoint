@@ -9,6 +9,7 @@ function $query($spList) {
         this.type = undefined;
         this.query = undefined;
         this.serializer = undefined;
+        this.order = [];
         this.data = {};
         this.read = function(cols) {
             if (angular.isUndefined(this.type)) {
@@ -104,6 +105,12 @@ function $query($spList) {
         this.class = function(serializer) {
             this.serializer = serializer;
             return this;
+        };
+        this.orderBy = function(field, asc) {
+            if (angular.isUndefined(asc)) {
+                asc = true;
+            }
+            this.order.push({column: field, asc: asc});
         };
         this.exec = function() {
             return $spList.getList(this.list).query(this);
