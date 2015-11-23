@@ -82,7 +82,7 @@ angular
         JsomSPList.prototype.read = function(query, serializer) {
             var that = this;
             return $q(function(resolve, reject) {
-                that.readColumns().then(function(columns) {
+                that.readColumns(query).then(function(columns) {
                     $spLoader.waitUntil('SP.Core').then(function() {
                         var context = $sp.getContext();
                         var list = context.get_web().get_lists().getByTitle(that.title);
