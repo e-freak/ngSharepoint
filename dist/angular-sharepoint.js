@@ -62,7 +62,7 @@ angular
             if (angular.isDefined(json.limit)) {
                 this.__buildLimit(json.limit, root);
             }
-            if (angular.isDefined(json.order)) {
+            if (angular.isDefined(json.order) && json.order.length > 0) {
                 this.__buildOrder(json.order, root);
             }
         };
