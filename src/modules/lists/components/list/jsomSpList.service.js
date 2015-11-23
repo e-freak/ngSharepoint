@@ -2,7 +2,7 @@ angular
     .module('ngSharepoint.Lists')
     .factory('JsomSPList', function($q, $sp, $spLoader, $spCamlParser) {
         var JsomSPList = function(title) {
-            this.title = title;
+            this.title = title; //TODO: Get by GUID
         };
         JsomSPList.prototype.getGUID = function() {
             var that = this;
@@ -16,6 +16,34 @@ angular
                     }, reject);
                 });
             });
+        };
+        JsomSPList.prototype.getTitle = function() {
+            var that = this;
+            return $q(function(resolve, reject) {
+                $spLoader.waitUntil('SP.Core').then(function() {
+                    var context = $sp.getContext();
+                    var list = context.get_web().get_lists().getByTitle(that.title);
+                    context.load(list);
+                    context.executeQueryAsync(function() {
+                        resolve(list.get_title());
+                    }, reject);
+                }, reject);
+            });
+        };
+        JsomSPList.prototype.setTitle = function(title) {
+            var that = this;
+            return $q(function(resolve, reject) {
+                $spLoader.waitUntil('SP.Core').then(function() {
+                    var context = $sp.getContext();
+                    var list = context.get_web().get_lists().getByTitle(that.list);
+                    list.set_title(title);
+                    list.update();
+                    context.executeQueryAsync(function() {
+                        that.title = title;
+                        resolve();
+                    }, reject);
+                }, reject);
+            })
         };
         JsomSPList.prototype.readColumns = function(query) {
             var that = this;
