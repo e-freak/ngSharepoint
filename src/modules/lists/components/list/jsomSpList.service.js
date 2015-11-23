@@ -31,7 +31,9 @@ angular
                             var itemIterator = fields.getEnumerator();
                             while (itemIterator.moveNext()) {
                                 var field = itemIterator.get_current();
-                                columns.push(field.get_title());
+                                if (field.get_title() !== 'BDC Identity') { //TODO: Make configurable
+                                    columns.push(field.get_title());
+                                }
                             }
                             resolve(columns);
                         }, reject);

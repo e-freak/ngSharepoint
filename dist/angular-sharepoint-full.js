@@ -548,7 +548,7 @@ angular
                         var result = [];
                         var listEnumerator = lists.getEnumerator();
                         while (listEnumerator.moveNext()) {
-                            var list = lists.get_current();
+                            var list = listEnumerator.get_current();
                             result.push(list);
                         }
                         resolve(result);
@@ -603,7 +603,9 @@ angular
                             var itemIterator = fields.getEnumerator();
                             while (itemIterator.moveNext()) {
                                 var field = itemIterator.get_current();
-                                columns.push(field.get_title());
+                                if (field.get_title() !== 'BDC Identity') { //TODO: Make configurable
+                                    columns.push(field.get_title());
+                                }
                             }
                             resolve(columns);
                         }, reject);
