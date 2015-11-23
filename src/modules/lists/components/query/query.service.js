@@ -14,9 +14,6 @@ function $query($spList) {
         this.data = {};
         this.read = function(cols) {
             if (angular.isUndefined(this.type)) {
-                if (angular.isUndefined(cols)) {
-                    cols = '*';
-                }
                 this.columns = cols;
                 this.type = 'read';
             }else {
