@@ -66,10 +66,7 @@ angular
                     var list = context.get_web().get_lists().getByTitle(that.list);
                     list.set_description(desc);
                     list.update();
-                    context.executeQueryAsync(function() {
-                        that.title = title;
-                        resolve();
-                    }, reject);
+                    context.executeQueryAsync(resolve, reject);
                 }, reject);
             });
         };
