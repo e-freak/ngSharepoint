@@ -43,7 +43,35 @@ angular
                         resolve();
                     }, reject);
                 }, reject);
-            })
+            });
+        };
+        JsomSPList.prototype.getDescription = function() {
+            var that = this;
+            return $q(function(resolve, reject) {
+                $spLoader.waitUntil('SP.Core').then(function() {
+                    var context = $sp.getContext();
+                    var list = context.get_web().get_lists().getByTitle(that.title);
+                    context.load(list);
+                    context.executeQueryAsync(function() {
+                        resolve(list.get_description());
+                    }, reject);
+                }, reject);
+            });
+        };
+        JsomSPList.prototype.setDescription = function(desc) {
+            var that = this;
+            return $q(function(resolve, reject) {
+                $spLoader.waitUntil('SP.Core').then(function() {
+                    var context = $sp.getContext();
+                    var list = context.get_web().get_lists().getByTitle(that.list);
+                    list.set_description(desc);
+                    list.update();
+                    context.executeQueryAsync(function() {
+                        that.title = title;
+                        resolve();
+                    }, reject);
+                }, reject);
+            });
         };
         JsomSPList.prototype.readColumns = function(query) {
             var that = this;
