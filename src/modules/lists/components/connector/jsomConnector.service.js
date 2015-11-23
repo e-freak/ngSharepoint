@@ -7,11 +7,11 @@ angular
                     var context = $sp.getContext();
                     var lists = context.get_web().get_lists();
                     context.load(lists);
-                    context.executeQueryAsync(function(sender, args) {
+                    context.executeQueryAsync(function() {
                         var result = [];
                         var listEnumerator = lists.getEnumerator();
                         while (listEnumerator.moveNext()) {
-                            var list = lists.get_current();
+                            var list = listEnumerator.get_current();
                             result.push(list);
                         }
                         resolve(result);
