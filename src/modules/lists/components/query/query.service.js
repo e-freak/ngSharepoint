@@ -117,6 +117,7 @@ function $query($spList) {
         };
         this.exec = function() {
             return $spList.getList(this.list).query({
+                columns: this.__columns,
                 type: this.__type,
                 query: this.__query,
                 limit: this.__limit,
