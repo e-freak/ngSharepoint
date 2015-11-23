@@ -4,27 +4,16 @@ angular
         var JsomSPList = function(title) {
             this.title = title;
         };
-        JsomSPList.prototype.read = function(query, serializer) {
+        JsomSPList.prototype.getGUID = function() {
             var that = this;
             return $q(function(resolve, reject) {
                 $spLoader.waitUntil('SP.Core').then(function() {
                     var context = $sp.getContext();
                     var list = context.get_web().get_lists().getByTitle(that.title);
-                    var camlQuery = new SP.CamlQuery();
-                    camlQuery.set_viewXml(query);
-                    var items = list.getItems(camlQuery);
-                    context.load(items);
+                    context.load(list);
                     context.executeQueryAsync(function() {
-                        var result = [];
-                        var itemIterator = items.getEnumerator();
-                        while (itemIterator.moveNext()) {
-                            var item = itemIterator.get_current();
-                            result.push(that.__unpack(item, $spCamlParser.parse(query).getViewFields(), serializer));
-                        }
-                        resolve(result);
-                    }, function(sender, args) {
-                        reject(args);
-                    });
+                        resolve(list.get_id().toString());
+                    }, reject);
                 });
             });
         };
@@ -75,7 +64,7 @@ angular
                             reject(args);
                         });
                     }, reject);
-                    });
+                });
             });
         };
         JsomSPList.prototype.create = function(data, serializer) {
