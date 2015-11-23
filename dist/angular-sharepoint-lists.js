@@ -401,8 +401,8 @@ angular
 
 function $query($spList) {
     var Query = function() {
-        this.columns = [];
         this.list = undefined;
+        this.__columns = [];
         this.__type = undefined;
         this.__query = undefined;
         this.__limit = undefined;
@@ -410,19 +410,19 @@ function $query($spList) {
         this.__order = [];
         this.__data = {};
         this.read = function(cols) {
-            if (angular.isUndefined(this.type)) {
-                this.columns = cols;
-                this.type = 'read';
+            if (angular.isUndefined(this.__type)) {
+                this.__columns = cols;
+                this.__type = 'read';
             }else {
                 throw 'Cannot use read after another query type was selected';
             }
             return this;
         };
         this.create = function(data) {
-            if (angular.isUndefined(this.type)) {
-                this.type = 'create';
+            if (angular.isUndefined(this.__type)) {
+                this.__type = 'create';
                 if (angular.isDefined(data)) {
-                    this.data = data;
+                    this.__data = data;
                 }
             }else {
                 throw 'Cannot use create after another query type was selected';
@@ -442,10 +442,10 @@ function $query($spList) {
             return this;
         };
         this.update = function(data) {
-            if (angular.isUndefined(this.type)) {
-                this.type = 'update';
+            if (angular.isUndefined(this.__type)) {
+                this.__type = 'update';
                 if (angular.isDefined(data)) {
-                    this.data = data;
+                    this.__data = data;
                 }
             }else {
                 throw 'Cannot use update after another query type was selected';
@@ -453,8 +453,8 @@ function $query($spList) {
             return this;
         };
         this.delete = function() {
-            if (angular.isUndefined(this.type)) {
-                this.type = 'delete';
+            if (angular.isUndefined(this.__type)) {
+                this.__type = 'delete';
             }else {
                 throw 'Cannot use delete after another query type was selected';
             }
@@ -463,7 +463,7 @@ function $query($spList) {
         this.where = function(col) {
             var Where = function(col, instance) {
                 this.equals = function(value) {
-                    instance.query = {
+                    instance.__query = {
                         comparator: 'equals',
                         column: col,
                         value: value
@@ -471,7 +471,7 @@ function $query($spList) {
                     return instance;
                 };
                 this.greater = function(value) {
-                    instance.query = {
+                    instance.__query = {
                         comparator: 'greater',
                         column: col,
                         value: value
@@ -479,7 +479,7 @@ function $query($spList) {
                     return instance;
                 };
                 this.smaller = function(value) {
-                    instance.query = {
+                    instance.__query = {
                         comparator: 'smaller',
                         column: col,
                         value: value
@@ -490,26 +490,26 @@ function $query($spList) {
             return new Where(col, this);
         };
         this.set = function(column, value) {
-            this.data[column] = value;
+            this.__data[column] = value;
             return this;
         };
         this.value = function(column, value) {
-            this.data[column] = value;
+            this.__data[column] = value;
             return this;
         };
         this.class = function(serializer) {
-            this.serializer = serializer;
+            this.__serializer = serializer;
             return this;
         };
         this.orderBy = function(field, asc) {
             if (angular.isUndefined(asc)) {
                 asc = true;
             }
-            this.order.push({column: field, asc: asc});
+            this.__order.push({column: field, asc: asc});
             return this;
         };
         this.limit = function(limit) {
-            this.limit = limit;
+            this.__limit = limit;
             return this;
         };
         this.exec = function() {
