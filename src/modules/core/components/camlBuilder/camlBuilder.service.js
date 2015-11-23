@@ -23,6 +23,29 @@ angular
             });
             return result;
         };
+        CamlBuilder.prototype.isEmpty = function() {
+            if (this.caml.length === 0) {
+                return true;
+            }else if (this.caml.length === 1) {
+                var tag = this.caml[0];
+                if (angular.isDefined(tag.value)) {
+                    return false;
+                }
+                if (angular.isDefined(tag.caml) &&
+                    angular.isArray(tag.caml) &&
+                    tag.caml.length > 0) {
+                    return false;
+                }
+                if (angular.isDefined(tag.attr) &&
+                    angular.isObject(tag.attr) &&
+                    Object.getOwnPropertyNames(tag.attr).length > 0) {
+                    return false;
+                }
+                return true;
+            }else {
+                return false;
+            }
+        };
         CamlBuilder.prototype.build = function() {
             for (var i = 0; i < this.caml.length; i++) {
                 this.caml[i] = this.caml[i].build();

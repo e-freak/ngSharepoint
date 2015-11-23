@@ -40,6 +40,29 @@ angular
             });
             return result;
         };
+        CamlBuilder.prototype.isEmpty = function() {
+            if (this.caml.length === 0) {
+                return true;
+            }else if (this.caml.length === 1) {
+                var tag = this.caml[0];
+                if (angular.isDefined(tag.value)) {
+                    return false;
+                }
+                if (angular.isDefined(tag.caml) &&
+                    angular.isArray(tag.caml) &&
+                    tag.caml.length > 0) {
+                    return false;
+                }
+                if (angular.isDefined(tag.attr) &&
+                    angular.isObject(tag.attr) &&
+                    Object.getOwnPropertyNames(tag.attr).length > 0) {
+                    return false;
+                }
+                return true;
+            }else {
+                return false;
+            }
+        };
         CamlBuilder.prototype.build = function() {
             for (var i = 0; i < this.caml.length; i++) {
                 this.caml[i] = this.caml[i].build();
@@ -902,6 +925,10 @@ angular
             if (angular.isDefined(query.type)) {
                 var builder = new CamlBuilder();
                 builder.buildFromJson(query);
+                var caml;
+                if (!builder.isEmpty()) {
+                    caml = builder.build();
+                }
                 switch (query.type) {
                     case 'create':
                         if (angular.isDefined(query.data)) {
@@ -911,16 +938,16 @@ angular
                         }
                         break;
                     case 'read':
-                        return this.read(builder.build(), query.serializer);
+                        return this.read(caml, query.serializer);
                     case 'update':
                         if (angular.isDefined(query.data)) {
-                            return this.update(builder.build(), query.data, query.serializer);
+                            return this.update(caml, query.data, query.serializer);
                         }else {
                             throw 'Query Data is not defined';
                         }
                         break;
                     case 'delete':
-                        return this.delete(builder.build());
+                        return this.delete(caml);
                 }
             }else {
                 throw 'Query Type is not defined';
