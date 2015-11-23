@@ -28,6 +28,56 @@ angular
                 });
             });
         };
+        JsomSPList.prototype.readColumns = function(query) {
+            var that = this;
+            return $q(function(resolve, reject) {
+                var columns = $spCamlParser.parse(query).getViewFields();
+                if (columns.length <= 0) {
+                    $spLoader.waitUntil('SP.Core').then(function() {
+                        var context = $sp.getContext();
+                        var list = context.get_web().get_lists().getByTitle(that.title);
+                        var fields = list.get_fields();
+                        context.load(fields, 'Include(Title)');
+                        context.executeQueryAsync(function() {
+                            var itemIterator = fields.getEnumerator();
+                            while (itemIterator.moveNext()) {
+                                var field = itemIterator.get_current();
+                                columns.push(field.get_title());
+                            }
+                            resolve(columns);
+                        }, reject);
+                    }, reject);
+                }else {
+                    resolve(columns);
+                }
+            });
+        };
+        JsomSPList.prototype.read = function(query, serializer) {
+            var that = this;
+            return $q(function(resolve, reject) {
+                that.readColumns().then(function(columns) {
+                    $spLoader.waitUntil('SP.Core').then(function() {
+                        var context = $sp.getContext();
+                        var list = context.get_web().get_lists().getByTitle(that.title);
+                        var camlQuery = new SP.CamlQuery();
+                        camlQuery.set_viewXml(query);
+                        var items = list.getItems(camlQuery);
+                        context.load(items);
+                        context.executeQueryAsync(function() {
+                            var result = [];
+                            var itemIterator = items.getEnumerator();
+                            while (itemIterator.moveNext()) {
+                                var item = itemIterator.get_current();
+                                result.push(that.__unpack(item, columns, serializer));
+                            }
+                            resolve(result);
+                        }, function(sender, args) {
+                            reject(args);
+                        });
+                    }, reject);
+                    });
+            });
+        };
         JsomSPList.prototype.create = function(data, serializer) {
             var that = this;
             return $q(function(resolve, reject) {
@@ -119,11 +169,10 @@ angular
                 item.set_item(key, value);
             });
         };
-        JsomSPList.prototype.__unpack = function(item, fields, serializer) {
+        JsomSPList.prototype.__unpack = function(item, cols, serializer) {
             var obj = {};
-            var cols = fields;
-            if (!angular.isArray(fields)) {
-                cols = Object.getOwnPropertyNames(fields);
+            if (!angular.isArray(cols)) {
+                cols = Object.getOwnPropertyNames(cols);
             }
             cols.forEach(function(key) {
                 var value = item.get_item(key);
