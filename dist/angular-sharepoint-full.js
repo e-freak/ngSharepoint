@@ -937,12 +937,12 @@ function $query($spList) {
     var Query = function() {
         this.columns = [];
         this.list = undefined;
-        this.type = undefined;
-        this.query = undefined;
-        this.limit = undefined;
-        this.serializer = undefined;
-        this.order = [];
-        this.data = {};
+        this.__type = undefined;
+        this.__query = undefined;
+        this.__limit = undefined;
+        this.__serializer = undefined;
+        this.__order = [];
+        this.__data = {};
         this.read = function(cols) {
             if (angular.isUndefined(this.type)) {
                 this.columns = cols;
@@ -1047,7 +1047,14 @@ function $query($spList) {
             return this;
         };
         this.exec = function() {
-            return $spList.getList(this.list).query(this);
+            return $spList.getList(this.list).query({
+                type: this.__type,
+                query: this.__query,
+                limit: this.__limit,
+                serializer: this.__serializer,
+                order: this.__order,
+                data: this.__data
+            });
         };
         this.then = function(resolve, reject) {
             return this.exec().then(resolve, reject);
