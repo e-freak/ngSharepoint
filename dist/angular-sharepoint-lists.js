@@ -10,7 +10,7 @@ angular
                     var context = $sp.getContext();
                     var lists = context.get_web().get_lists();
                     context.load(lists);
-                    context.executeQueryAsync(function(sender, args) {
+                    context.executeQueryAsync(function() {
                         var result = [];
                         var listEnumerator = lists.getEnumerator();
                         while (listEnumerator.moveNext()) {
@@ -42,7 +42,20 @@ angular
         var JsomSPList = function(title) {
             this.title = title;
         };
-        JsomSPList.prototype.read = function(query) {
+        JsomSPList.prototype.getGUID = function() {
+            var that = this;
+            return $q(function(resolve, reject) {
+                $spLoader.waitUntil('SP.Core').then(function() {
+                    var context = $sp.getContext();
+                    var list = context.get_web().get_lists().getByTitle(that.title);
+                    context.load(list);
+                    context.executeQueryAsync(function() {
+                        resolve(list.get_id().toString());
+                    }, reject);
+                });
+            });
+        };
+        JsomSPList.prototype.read = function(query, serializer) {
             var that = this;
             return $q(function(resolve, reject) {
                 $spLoader.waitUntil('SP.Core').then(function() {
@@ -57,7 +70,7 @@ angular
                         var itemIterator = items.getEnumerator();
                         while (itemIterator.moveNext()) {
                             var item = itemIterator.get_current();
-                            result.push(that.__unpack(item, $spCamlParser.parse(query).getViewFields()));
+                            result.push(that.__unpack(item, $spCamlParser.parse(query).getViewFields(), serializer));
                         }
                         resolve(result);
                     }, function(sender, args) {
@@ -66,7 +79,7 @@ angular
                 });
             });
         };
-        JsomSPList.prototype.create = function(data) {
+        JsomSPList.prototype.create = function(data, serializer) {
             var that = this;
             return $q(function(resolve, reject) {
                 $spLoader.waitUntil('SP.Core').then(function() {
@@ -74,10 +87,10 @@ angular
                     var list = clientContext.get_web().get_lists().getByTitle(that.title);
                     var itemInfo = new SP.ListItemCreationInformation();
                     var item = list.addItem(itemInfo);
-                    that.__pack(item, data);
+                    that.__pack(item, data, serializer);
                     item.update();
                     clientContext.load(item);
-                    clientContext.executeQueryAsync(function(sender, args) {
+                    clientContext.executeQueryAsync(function() {
                         resolve(data);
                     }, function(sender, args) {
                         reject(args);
@@ -95,45 +108,43 @@ angular
                     camlQuery.set_viewXml(query);
                     var items = list.getItems(camlQuery);
                     clientContext.load(items);
-                    clientContext.executeQueryAsync(
-                        function(sender, args) {
-                            var itemIterator = items.getEnumerator();
-                            var a = [];
-                            while (itemIterator.moveNext()) {
-                                var item = itemIterator.get_current();
-                                a.push(item);
-                            }
-                            a.forEach(function(item) {
-                                item.deleteObject();
-                            });
-                            clientContext.executeQueryAsync(function(sender, args) {
-                                resolve(args);
-                            }, function(sender, args) {
-                                reject(args);
-                            });
-                        },
-                        function(sender, args) {
-                            reject(args);
+                    clientContext.executeQueryAsync(function() {
+                        var itemIterator = items.getEnumerator();
+                        var a = [];
+                        while (itemIterator.moveNext()) {
+                            var item = itemIterator.get_current();
+                            a.push(item);
                         }
-                    );
+                        a.forEach(function(item) {
+                            item.deleteObject();
+                        });
+                        clientContext.executeQueryAsync(function(sender, args) {
+                            resolve(args);
+                        }, function(sender, args) {
+                            reject(args);
+                        });
+                    },
+                    function(sender, args) {
+                        reject(args);
+                    });
                 });
             });
         };
-        JsomSPList.prototype.update = function(query, data) {
+        JsomSPList.prototype.update = function(query, data, serializer) {
             var that = this;
             return $q(function(resolve, reject) {
                 $spLoader.waitUntil('SP.Core').then(function() {
                     var clientContext = $sp.getContext();
-                    var list = clientContext.get_web().get_lists().getByTitle(that.__list);
+                    var list = clientContext.get_web().get_lists().getByTitle(that.title);
                     var camlQuery = new SP.CamlQuery();
                     camlQuery.set_viewXml(query);
                     var items = list.getItems(camlQuery);
                     clientContext.load(items);
-                    clientContext.executeQueryAsync(function(sender, args) {
+                    clientContext.executeQueryAsync(function() {
                         var itemIterator = items.getEnumerator();
                         while (itemIterator.moveNext()) {
                             var item = itemIterator.get_current();
-                            that.__pack(item, data);
+                            that.__pack(item, data, serializer);
                             item.update();
                         }
                         clientContext.executeQueryAsync(function(sender, args) {
@@ -147,7 +158,10 @@ angular
                 });
             });
         };
-        JsomSPList.prototype.__pack = function(item, data) {
+        JsomSPList.prototype.__pack = function(item, data, serializer) {
+            if (angular.isDefined(serializer)) {
+                data = serializer.__serialize();
+            }
             Object.getOwnPropertyNames(data).forEach(function(key) {
                 var value = data[key];
                 if (angular.isDefined(value) && value !== null && angular.isString(value)) {
@@ -156,20 +170,27 @@ angular
                 item.set_item(key, value);
             });
         };
-        JsomSPList.prototype.__unpack = function(item, fields) {
-            var query = this;
+        JsomSPList.prototype.__unpack = function(item, fields, serializer) {
             var obj = {};
             var cols = fields;
-            if (!angular.isArray(fields)) {
-                cols = Object.getOwnPropertyNames(fields);
-            }
-            cols.forEach(function(key) {
-                var value = item.get_item(key);
-                if (angular.isDefined(value) && value !== null && angular.isString(value)) {
-                    value = value.trim();
+            if (fields === '*') {
+                var context = $sp.getContext();
+                var list = context.get_web().get_lists().getByTitle(this.title);
+            }else {
+                if (!angular.isArray(fields)) {
+                    cols = Object.getOwnPropertyNames(fields);
                 }
-                obj[key] = value;
-            });
+                cols.forEach(function(key) {
+                    var value = item.get_item(key);
+                    if (angular.isDefined(value) && value !== null && angular.isString(value)) {
+                        value = value.trim();
+                    }
+                    obj[key] = value;
+                });
+            }
+            if (angular.isDefined(serializer)) {
+                return serializer.__deserialize(obj);
+            }
             return obj;
         };
         return (JsomSPList);
@@ -237,6 +258,7 @@ angular
 angular
     .module('ngSharepoint.Lists')
     .factory('SPList', ['$sp', '$spLog', 'CamlBuilder', 'RestSPList', 'JsomSPList', function($sp, $spLog, CamlBuilder, RestSPList, JsomSPList) {
+        //TODO: Add all List APIs
         /**
         * @ngdoc object
         * @name  SPList
@@ -255,14 +277,34 @@ angular
                 this.__list = new RestSPList(title);
             }
         };
+
+        SPList.prototype.getGUID = function() {
+            return this.__list.getGUID().catch($spLog.error);
+        };
+
+        SPList.prototype.getTitle = function() {
+            return this.__list.getTitle().catch($spLog.error);
+        };
+
+        SPList.prototype.setTitle = function(title) {
+            return this.__list.setTitle(title).catch($spLog.error);
+        };
+
+        SPList.prototype.getDescription = function() {
+            return this.__list.getDescription().catch($spLog.error);
+        };
+
+        SPList.prototype.setDescription = function(desc) {
+            return this.__list.setDescription(desc).catch($spLog.error);
+        };
         /**
         * @ngdoc function
         * @name  SPList#create
         * @param  {object} data The Data you wanna create
         * @return {Promise}      A Promise which resolves when the insertion was sucessful
         */
-        SPList.prototype.create = function(data) {
-            return this.__list.create(data).catch($spLog.error);
+        SPList.prototype.create = function(data, serializer) {
+            return this.__list.create(data, serializer).catch($spLog.error);
         };
         /**
         * @ngdoc function
@@ -270,8 +312,8 @@ angular
         * @param {string} query A CamlQuery to filter for
         * @return {Promise} A Promise which resolves to the selected data
         */
-        SPList.prototype.read = function(query) {
-            return this.__list.read(query).catch($spLog.error);
+        SPList.prototype.read = function(query, serializer) {
+            return this.__list.read(query, serializer).catch($spLog.error);
         };
         /**
         * @ngdoc function
@@ -279,8 +321,8 @@ angular
         * @param  {object} data The Data you wanna update
         * @return {Promise}        A Promise which resolves when the update was sucessfull
         */
-        SPList.prototype.update = function(query, data) {
-            return this.__list.update(query, data).catch($spLog.error);
+        SPList.prototype.update = function(query, data, serializer) {
+            return this.__list.update(query, data, serializer).catch($spLog.error);
         };
         /**
         * @ngdoc function
@@ -307,16 +349,16 @@ angular
                 switch (query.type) {
                     case 'create':
                         if (angular.isDefined(query.data)) {
-                            return this.create(query.data);
+                            return this.create(query.data, query.serializer);
                         }else {
                             throw 'Query Data is not defined';
                         }
                         break;
                     case 'read':
-                        return this.read(builder.build());
+                        return this.read(builder.build(), query.serializer);
                     case 'update':
                         if (angular.isDefined(query.data)) {
-                            return this.update(builder.build(), query.data);
+                            return this.update(builder.build(), query.data, query.serializer);
                         }else {
                             throw 'Query Data is not defined';
                         }
@@ -333,259 +375,6 @@ angular
 
 angular
     .module('ngSharepoint.Lists')
-    .factory('DeleteQuery', ['SPList', 'CamlBuilder', 'WhereQuery', 'Query', function(SPList, CamlBuilder, WhereQuery, Query) {
-        var DeleteQuery = function() {
-            this.__where = [];
-            this.__list = null;
-            return this;
-        };
-        DeleteQuery.prototype = new Query();
-        DeleteQuery.prototype.from = function(list) {
-            this.__list = list;
-            return this;
-        };
-        DeleteQuery.prototype.where = function(key) {
-            var query = new WhereQuery(this, key);
-            this.__where.push(query);
-            return query;
-        };
-        DeleteQuery.prototype.__execute = function() {
-            var camlBuilder = new CamlBuilder();
-            var camlView = camlBuilder.push('View');
-            var queryTag;
-            if (this.__where.length === 1) {
-                queryTag = camlView.push('Query');
-                this.__where[0].push(queryTag.push('Where'));
-            }else if (this.__where.length > 1) {
-                queryTag = camlView.push('Query');
-                var andTag = queryTag.push('Where').push('And');
-                this.__where.forEach(function(where) {
-                    where.push(andTag);
-                });
-            }
-            return new SPList(this.__list).delete(camlBuilder.build());
-        };
-        return (DeleteQuery);
-    }]);
-
-angular
-    .module('ngSharepoint.Lists')
-    .factory('InsertIntoQuery', ['SPList', 'Query', function(SPList, Query) {
-        var InsertIntoQuery = function(list) {
-            this.__list = list;
-            this.__values = {};
-            return this;
-        };
-        InsertIntoQuery.prototype = new Query();
-        InsertIntoQuery.prototype.value = function(key, value) {
-            this.__values[key] = value;
-            return this;
-        };
-        InsertIntoQuery.prototype.__execute = function() {
-            return new SPList(this.__list).insert(this.__values);
-        };
-        return (InsertIntoQuery);
-    }]);
-
-angular
-    .module('ngSharepoint.Lists')
-    .factory('JoinQuery', ['$q', '$sp', function ($q, $sp) {
-        var JoinQuery = function() {
-
-        };
-        return (JoinQuery);
-    }]);
-
-angular
-    .module('ngSharepoint.Lists')
-    .factory('Query', function() {
-        var Query = function() {
-            //this.__queries = {};
-        };
-        Query.prototype.then = function(success, reject) {
-            return this.__execute().then(success, reject);
-        };
-        return (Query);
-    });
-
-angular
-    .module('ngSharepoint.Lists')
-    .factory('SelectQuery', ['SPList', 'CamlBuilder', 'Query', 'WhereQuery', function(SPList, CamlBuilder, Query, WhereQuery) {
-        var SelectQuery = function(fields) {
-            this.__values = fields;
-            this.__where = [];
-            this.__order = [];
-            return this;
-        };
-        SelectQuery.prototype = new Query();
-        SelectQuery.prototype.from = function(list) {
-            this.__list = list;
-            return this;
-        };
-        SelectQuery.prototype.where = function(field) {
-            var query = new WhereQuery(this, field);
-            this.__where.push(query);
-            return query;
-        };
-        SelectQuery.prototype.limit = function(amount) {
-            this.__limit = amount;
-            return this;
-        };
-        SelectQuery.prototype.orderBy = function(field, asc) {
-            if (angular.isUndefined(asc)) {
-                asc = true;
-            }
-            this.__order.push({column: field, asc: asc});
-            return this;
-        };
-        SelectQuery.prototype.exec = function() {
-            var builder = new CamlBuilder();
-            var query = {};
-            if (angular.isObject(this.__values)) {
-                query.columns = this.__values;
-            }
-            if (angular.isDefined(this.__limit)) {
-                query.limit = this.__limit;
-            }
-            if (angular.isDefined(this.__order)) {
-                query.order = this.__order;
-            }
-            builder.buildFromJson(query);
-            return new SPList(this.__list).read(builder.build());
-        };
-        SelectQuery.prototype.__execute = function() {
-            var camlBuilder = new CamlBuilder();
-            var camlView = camlBuilder.push('View');
-            if (this.__where.length > 0 || this.__order.length > 0) {
-                var queryTag = camlView.push('Query');
-                if (this.__where.length === 1) {
-                    var camlWhere = queryTag.push('Where');
-                    this.__where[0].push(camlWhere);
-                }else if (this.__where.length > 1) {
-                    var camlAnd = queryTag.push('Where').push('And');
-                    this.__where.forEach(function(where) {
-                        where.push(camlAnd);
-                    });
-                }
-                if (this.__order.length > 0) {
-                    var camlOrder = queryTag.push('OrderBy');
-                    this.__order.forEach(function(order) {
-                        camlOrder.push('FieldRef', {Name: order.field, Ascending: order.asc});
-                    });
-                }
-            }
-            var viewFields = camlView.push('ViewFields');
-            this.__values.forEach(function(field) {
-                viewFields.push('FieldRef', {Name: field});
-            });
-            if (this.__limit !== null) {
-                camlView.push('RowLimit', {}, this.__limit);
-            }
-            return new SPList(this.__list).select(camlBuilder.build());
-        };
-        return (SelectQuery);
-    }]);
-
-angular
-    .module('ngSharepoint.Lists')
-    .factory('UpdateQuery', ['SPList', 'CamlBuilder', 'WhereQuery', 'Query', function(SPList, CamlBuilder, WhereQuery, Query) {
-        var UpdateQuery = function(list) {
-            this.__list = list;
-            this.__values = {};
-            this.__where = [];
-            return this;
-        };
-        UpdateQuery.prototype = new Query();
-        UpdateQuery.prototype.set = function(key, value) {
-            this.__values[key] = value;
-            return this;
-        };
-        UpdateQuery.prototype.where = function(key) {
-            var query = new WhereQuery(this, key);
-            this.__where.push(query);
-            return query;
-        };
-        UpdateQuery.prototype.__execute = function() {
-            var camlBuilder = new CamlBuilder();
-            var camlView = camlBuilder.push('View');
-            var queryTag;
-            if (this.__where.length === 1) {
-                queryTag = camlView.push('Query');
-                this.__where[0].push(queryTag.push('Where'));
-            }else if (this.__where.length > 1) {
-                queryTag = camlView.push('Query');
-                var andTag = queryTag.push('Where').push('And');
-                this.__where.forEach(function(where) {
-                    where.push(andTag);
-                });
-            }
-            return new SPList(this.__list).update(camlBuilder.build(), this.__values);
-        };
-        return (UpdateQuery);
-    }]);
-
-angular
-    .module('ngSharepoint.Lists')
-    .factory('WhereQuery', function() {
-        var WhereQuery = function(query, field) {
-            this.__query = query;
-            this.__value = '';
-            this.__operator = '';
-            //this.__query.__queries.where.push(this);
-            this.__operators = {
-                BEGINS_WITH: ['<BeginsWith>', '</BeginsWith>'],
-                CONTAINS: ['<Contains>', '</Contains>'],
-                EQUALS: ['<Eq>', '</Eq>'],
-                GREATER_EQUALS: ['<Geq>', '</Geq>'],
-                GREATER: ['<Gt>', '</Gt>'],
-                INCLUDES: ['<Includes>', '</Includes>'],
-                IS_NOT_NULL: ['<IsNotNull>', '</IsNotNull>'],
-                IS_NULL: ['<IsNull>', '</IsNull>'],
-                LESS_EQUALS: ['<Leq>', '</Leq>'],
-                LESS: ['<Lt>', '</Lt>'],
-                NOT_EQUALS: ['<Neq>', '</Neq>'],
-                NOT_INCLUDES: ['<NotIncludes>', '</NotIncludes>']
-            };
-            if (angular.isString(field)) {
-                this.__field = field;
-            }else {
-                this.__fields = field;
-                this.__operator = 'equals';
-            }
-        };
-        WhereQuery.prototype.equals = function(value) {
-            this.__operator = 'equals';
-            this.__value = value;
-            return this.__query;
-        };
-        WhereQuery.prototype.beginsWith = function(value) {
-            this.__operator = this.__operators.BEGINS_WITH;
-        };
-        WhereQuery.prototype.push = function(caml) {
-            var query = this;
-            if (angular.isUndefined(query.__fields)) {
-                var op;
-                switch (query.__operator) {
-                    case 'equals':
-                        op = caml.push('Eq');
-                        break;
-                }
-                op.push('FieldRef', {Name: query.__field});
-                op.push('Value', {Type: 'Number'}, query.__value);
-            }else {
-                var and = caml.push('And');
-                Object.getOwnPropertyNames(query.__fields).forEach(function(field) {
-                    var op = and.push('Eq');
-                    op.push('FieldRef', {Name: field});
-                    op.push('Value', {Type: 'Number'}, query.__fields[field]);
-                });
-            }
-        };
-        return (WhereQuery);
-    });
-
-angular
-    .module('ngSharepoint.Lists')
     .factory('$query', $query);
 
 function $query($spList) {
@@ -594,6 +383,9 @@ function $query($spList) {
         this.list = undefined;
         this.type = undefined;
         this.query = undefined;
+        this.limit = undefined;
+        this.serializer = undefined;
+        this.order = [];
         this.data = {};
         this.read = function(cols) {
             if (angular.isUndefined(this.type)) {
@@ -650,14 +442,30 @@ function $query($spList) {
             return this;
         };
         this.where = function(col) {
-            var Where = function(col, obj) {
+            var Where = function(col, instance) {
                 this.equals = function(value) {
-                    obj.query = {
+                    instance.query = {
                         comparator: 'equals',
                         column: col,
                         value: value
                     };
-                    return obj;
+                    return instance;
+                };
+                this.greater = function(value) {
+                    instance.query = {
+                        comparator: 'greater',
+                        column: col,
+                        value: value
+                    };
+                    return instance;
+                };
+                this.smaller = function(value) {
+                    instance.query = {
+                        comparator: 'smaller',
+                        column: col,
+                        value: value
+                    };
+                    return instance;
                 };
             };
             return new Where(col, this);
@@ -669,6 +477,19 @@ function $query($spList) {
         this.value = function(column, value) {
             this.data[column] = value;
             return this;
+        };
+        this.class = function(serializer) {
+            this.serializer = serializer;
+            return this;
+        };
+        this.orderBy = function(field, asc) {
+            if (angular.isUndefined(asc)) {
+                asc = true;
+            }
+            this.order.push({column: field, asc: asc});
+        };
+        this.limit = function(limit) {
+            this.limit = limit;
         };
         this.exec = function() {
             return $spList.getList(this.list).query(this);
@@ -684,8 +505,8 @@ function $query($spList) {
         'read': function(cols) {
             return new Query().read(cols);
         },
-        'update': function() {
-            return new Query().update();
+        'update': function(data) {
+            return new Query().update(data);
         },
         'delete': function() {
             return new Query().delete();
