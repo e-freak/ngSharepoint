@@ -112,9 +112,11 @@ function $query($spList) {
                 asc = true;
             }
             this.order.push({column: field, asc: asc});
+            return this;
         };
         this.limit = function(limit) {
             this.limit = limit;
+            return this;
         };
         this.exec = function() {
             return $spList.getList(this.list).query(this);
