@@ -123,7 +123,9 @@ function $query($spList) {
                 }else {
                     throw 'No Query Type specified';
                 }
-                if (angular.isDefined(this.__columns)) {
+                if (angular.isDefined(this.__columns) &&
+                    angular.isArray(this.__columns) &&
+                    this.__columns.length > 0) {
                     query.columns = this.__columns;
                 }
                 if (angular.isDefined(this.__query)) {
