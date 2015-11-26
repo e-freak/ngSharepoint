@@ -7,12 +7,14 @@ describe('The camlBuilder', function() {
     beforeEach(inject(function(_CamlTag_) {
         CamlTag = _CamlTag_;
     }));
+    //findByName
     it('finds the right Tag', function() {
         var builder = new CamlBuilder();
         var testTag = builder.push('Test');
         builder.push('Value');
         expect(builder.findByName('Test')).toEqual([testTag]);
     });
+    //build
     it('builds a valid XML Tree', function() {
         var builder = new CamlBuilder();
         builder.push('Test').push('WithAttr', {Attr: 'attr'});
@@ -25,6 +27,7 @@ describe('The camlBuilder', function() {
         builder.push(new CamlTag('Test'));
         expect(builder.build()).toEqual('<Test/>');
     });
+    //isEmpty
     it('checks for an empty XML Tree', function() {
         var builder = new CamlBuilder();
         expect(builder.isEmpty()).toEqual(true);
@@ -54,5 +57,56 @@ describe('The camlBuilder', function() {
         var builder = new CamlBuilder();
         builder.push('Tag').push('Child');
         expect(builder.isEmpty()).toEqual(false);
+    });
+    //buildFromJson
+    it('builds a full camlquery from a json object', function() {
+        var json = {
+            columns: [
+                'Column1',
+                'Column2'
+            ],
+            query: {
+                comparator: '==',
+                column: 'Column1',
+                value: 'Value'
+            },
+            limit: 42,
+            order: [
+                {
+                    column: 'Column1'
+                },
+                {
+                    column: 'Column2',
+                    asc: false
+                }
+            ]
+        };
+        var caml = '<View>' +
+                '<ViewFields><FieldRef Name="Column1"/><FieldRef Name="Column2"/></ViewFields>' +
+                '<Query>' +
+                    '<Where><Eq><FieldRef Name="Column1"/><Value>Value</Value></Eq></Where>' +
+                    '<OrderBy><FieldRef Name="Column1" Ascending="TRUE"/><FieldRef Name="Column2" Ascending="FALSE"/></OrderBy>' +
+                '</Query>' +
+                '<RowLimit>42</RowLimit>' +
+            '</View>';
+        var builder = new CamlBuilder();
+        builder.buildFromJson(json);
+        expect(builder.build()).toEqual(caml);
+    });
+    it('adds camltags to an existing camlquery', function() {
+        var json = {
+            columns: ['Column1', 'Column2']
+        };
+        var builder = new CamlBuilder();
+        builder.push('View').push('RowLimit', {}, 42);
+        builder.buildFromJson(json);
+        expect(builder.build()).toEqual('<View><RowLimit>42</RowLimit><ViewFields><FieldRef Name="Column1"/><FieldRef Name="Column2"/></ViewFields></View>');
+    });
+    it('does nothing when passing a string', function() {
+        var json = 'string';
+        var builder = new CamlBuilder();
+        builder.push('Tag');
+        builder.buildFromJson(json);
+        expect(builder.build()).toEqual('<Tag/>');
     });
 });
