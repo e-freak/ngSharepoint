@@ -53,23 +53,25 @@ angular
             return this.caml.join('');
         };
         CamlBuilder.prototype.buildFromJson = function(json) {
-            var root = this.findByName('View');
-            if (root.length === 0) {
-                root = this.push('View');
-            }else {
-                root = root[0];
-            }
-            if (angular.isDefined(json.columns)) {
-                this.__buildViewFields(json.columns, root);
-            }
-            if (angular.isDefined(json.query)) {
-                this.__buildQuery(json.query, root);
-            }
-            if (angular.isDefined(json.limit)) {
-                this.__buildLimit(json.limit, root);
-            }
-            if (angular.isDefined(json.order) && json.order.length > 0) {
-                this.__buildOrder(json.order, root);
+            if (angular.isDefined(json) && angular.isObject(json)) {
+                var root = this.findByName('View');
+                if (root.length === 0) {
+                    root = this.push('View');
+                }else {
+                    root = root[0];
+                }
+                if (angular.isDefined(json.columns)) {
+                    this.__buildViewFields(json.columns, root);
+                }
+                if (angular.isDefined(json.query)) {
+                    this.__buildQuery(json.query, root);
+                }
+                if (angular.isDefined(json.limit)) {
+                    this.__buildLimit(json.limit, root);
+                }
+                if (angular.isDefined(json.order) && json.order.length > 0) {
+                    this.__buildOrder(json.order, root);
+                }
             }
         };
         CamlBuilder.prototype.__buildViewFields = function(columns, root) {
