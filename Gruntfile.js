@@ -7,9 +7,10 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-karma');
 	grunt.loadNpmTasks('grunt-ng-annotate');
+	grunt.loadNpmTasks('grunt-stripcomments');
 
 	grunt.registerTask('default', ['jshint', 'concat:dev', 'clean:coverage', 'karma:dist']);
-	grunt.registerTask('dist', ['jshint', 'eslint', 'jscs', 'clean:coverage', 'karma:dist', 'concat:dist', 'ngAnnotate:dist', 'uglify:dist', 'clean:build']);
+	grunt.registerTask('dist', ['jshint', 'eslint', 'jscs', 'clean:coverage', 'karma:dist', 'concat:dist', 'ngAnnotate:dist', 'comments', 'uglify:dist', 'clean:build']);
 	grunt.registerTask('test', ['jshint', 'eslint', 'jscs', 'clean:coverage', 'karma:dev']);
 
 	grunt.initConfig({
@@ -58,6 +59,11 @@ module.exports = function(grunt) {
 					'dist/angular-sharepoint-full.js': ['tmp/angular-sharepoint-full.js'],
 					'dist/angular-sharepoint-mocks.js': ['tmp/angular-sharepoint-mocks.js']
 				}
+			}
+		},
+		comments: {
+			default: {
+				src: ['dist/*.js']
 			}
 		},
 		uglify: {
