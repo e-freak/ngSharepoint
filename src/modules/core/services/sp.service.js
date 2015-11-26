@@ -18,18 +18,41 @@ function $spProvider() {
     return provider;
 
     function setSiteUrl(newUrl) {
-        siteUrl = newUrl;
+        if (angular.isDefined(newUrl) && angular.isString(newUrl)) {
+            siteUrl = newUrl;
+        }else {
+            throw 'Invalid Argument Exception';
+        }
     }
-    function setConnectionMode(newConnMode) { //Only JSOM Supported for now
-        if (newConnMode === 'JSOM' || newConnMode === 'REST') {
-            connMode = newConnMode;
+    function setConnectionMode(newConnMode) {
+        if (angular.isDefined(newConnMode) && angular.isString(newConnMode)) {
+            newConnMode = newConnMode.toUpperCase();
+            if (newConnMode === 'JSOM' || newConnMode === 'REST') {
+                connMode = newConnMode;
+            }else {
+                throw 'Invalid Argument Exception';
+            }
+        }else {
+            throw 'Invalid Argument Exception';
         }
     }
     function setAccessToken(newToken) {
-        token = newToken;
+        if (angular.isDefined(newToken) && angular.isString(newToken)) {
+            token = newToken;            
+        }else {
+            throw 'Invalid Argument Exception';
+        }
     }
     function setAutoload(newAutoload) {
-        autoload = newAutoload;
+        if (angular.isDefined(newAutoload)) {
+            if (newAutoload === true || newAutoload === false) {
+                autoload = newAutoload;
+            }else {
+                throw 'Invalid Argument Exception';
+            }
+        }else {
+            throw 'Invalid Argument Exception';
+        }
     }
 
     function $sp() {
