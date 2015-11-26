@@ -47,7 +47,7 @@ function $spProvider() {
     }
     function setAccessToken(newToken) {
         if (angular.isDefined(newToken) && angular.isString(newToken)) {
-            token = newToken;            
+            token = newToken;
         }else {
             throw 'Invalid Argument Exception';
         }
