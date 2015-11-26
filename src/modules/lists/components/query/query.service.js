@@ -2,7 +2,7 @@ angular
     .module('ngSharepoint.Lists')
     .factory('$query', $query);
 
-function $query($spList) {
+function $query($spList, $spLog) {
     var Query = function() {
         this.list = undefined;
         this.__columns = [];
@@ -64,6 +64,9 @@ function $query($spList) {
             return this;
         };
         this.where = function(col) {
+            if (angular.isDefined(this.__type) && this.__type === 'create') {
+                $spLog.warn('where call is not necessary while creating entries');
+            }
             var Where = function(col, instance) {
                 this.equals = function(value) {
                     instance.__query = {
@@ -93,18 +96,34 @@ function $query($spList) {
             return new Where(col, this);
         };
         this.set = function(column, value) {
+            if (angular.isDefined(this.__type) &&
+                this.__type !== 'create' &&
+                this.__type !== 'update') {
+                $spLog.warn('set call is not necessary while reading/deleting entries');
+            }
             this.__data[column] = value;
             return this;
         };
         this.value = function(column, value) {
+            if (angular.isDefined(this.__type) &&
+                this.__type !== 'create' &&
+                this.__type !== 'update') {
+                $spLog.warn('value call is not necessary while reading/deleting entries');
+            }
             this.__data[column] = value;
             return this;
         };
         this.class = function(serializer) {
+            if (angular.isDefined(this.__type) && this.__type === 'delete') {
+                $spLog.warn('class call is not necessary while deleting entries');
+            }
             this.__serializer = serializer;
             return this;
         };
         this.orderBy = function(field, asc) {
+            if (angular.isDefined(this.__type) && this.__type !== 'read') {
+                $spLog.warn('orderBy call is not necessary while reading entries');
+            }
             if (angular.isUndefined(asc)) {
                 asc = true;
             }
