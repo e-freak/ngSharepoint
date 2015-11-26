@@ -68,30 +68,36 @@ function $query($spList, $spLog) {
                 $spLog.warn('where call is not necessary while creating entries');
             }
             var Where = function(col, instance) {
-                this.equals = function(value) {
-                    instance.__query = {
-                        comparator: 'equals',
-                        column: col,
-                        value: value
+                var that = this;
+                var comparators = [
+                    'beginsWith',
+                    'contains',
+                    'daterangesOverlap',
+                    'eq',
+                    'equals',
+                    'geq',
+                    'greaterEquals',
+                    'greater',
+                    'in',
+                    'includes',
+                    'isNotNull',
+                    'isNull',
+                    'leq',
+                    'lessEquals',
+                    'less',
+                    'neq',
+                    'notEquals',
+                    'notIncludes'];
+                comparators.forEach(function(comparator) {
+                    that[comparator] = function(value) {
+                        instance.__query = {
+                            comparator: comparator,
+                            column: col,
+                            value: value
+                        };
+                        return instance;
                     };
-                    return instance;
-                };
-                this.greater = function(value) {
-                    instance.__query = {
-                        comparator: 'greater',
-                        column: col,
-                        value: value
-                    };
-                    return instance;
-                };
-                this.smaller = function(value) {
-                    instance.__query = {
-                        comparator: 'smaller',
-                        column: col,
-                        value: value
-                    };
-                    return instance;
-                };
+                });
             };
             return new Where(col, this);
         };
