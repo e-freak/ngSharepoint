@@ -1,7 +1,7 @@
 # ngSharepoint
 [![Build Status](https://img.shields.io/travis/maxjoehnk/ngSharepoint.svg?style=flat-square)](https://travis-ci.org/maxjoehnk/ngSharepoint)
 [![Code Climate](https://img.shields.io/codeclimate/github/maxjoehnk/ngSharepoint.svg?style=flat-square)](https://codeclimate.com/github/maxjoehnk/ngSharepoint)
-[![Coverage](https://img.shields.io/codeclimate/coverage/github/maxjoehnk/ngSharepoint.svg?style=flat-square)](https://codeclimate.com/github/maxjoehnk/ngSharepoint)
+[![Coverage](https://img.shields.io/codeclimate/coverage/github/maxjoehnk/ngSharepoint.svg?style=flat-square)](https://codeclimate.com/github/maxjoehnk/ngSharepoint/coverage)
 [![Codacy](https://img.shields.io/codacy/a46ee49ad795445789bd69df6073e180.svg?style=flat-square)](https://www.codacy.com/app/maxjoehnk/ngSharepoint/dashboard)
 [![bitHound Score](https://www.bithound.io/github/maxjoehnk/ngSharepoint/badges/score.svg)](https://www.bithound.io/github/maxjoehnk/ngSharepoint)
 [![License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg?style=flat-square)](https://github.com/maxjoehnk/ngSharepoint/blob/master/LICENSE)
