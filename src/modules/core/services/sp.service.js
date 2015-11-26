@@ -3,13 +3,15 @@ angular
     .provider('$sp', $spProvider);
 
 function $spProvider() {
-    var siteUrl = '';
+    var siteUrl;
+    var hostUrl;
     var connMode = 'JSOM';
     var token = false;
     var autoload = true;
 
     var provider = {
         setSiteUrl: setSiteUrl,
+        setHostUrl: setHostUrl,
         setConnectionMode: setConnectionMode,
         setAccessToken: setAccessToken,
         setAutoload: setAutoload,
@@ -17,6 +19,13 @@ function $spProvider() {
     };
     return provider;
 
+    function setHostUrl(newUrl) {
+        if (angular.isDefined(newUrl) && angular.isString(newUrl)) {
+            hostUrl = newUrl;
+        }else {
+            throw 'Invalid Argument Exception';
+        }
+    }
     function setSiteUrl(newUrl) {
         if (angular.isDefined(newUrl) && angular.isString(newUrl)) {
             siteUrl = newUrl;
@@ -58,6 +67,7 @@ function $spProvider() {
     function $sp() {
         var service = {
             getSiteUrl: getSiteUrl,
+            getHostUrl: getHostUrl,
             getConnectionMode: getConnectionMode,
             getAccessToken: getAccessToken,
             getContext: getContext,
@@ -70,6 +80,9 @@ function $spProvider() {
         }
         function getSiteUrl() {
             return siteUrl;
+        }
+        function getHostUrl() {
+            return hostUrl;
         }
         function getConnectionMode() {
             return connMode;
