@@ -116,15 +116,39 @@ function $query($spList) {
             return this;
         };
         this.exec = function() {
-            return $spList.getList(this.list).query({
-                columns: this.__columns,
-                type: this.__type,
-                query: this.__query,
-                limit: this.__limit,
-                serializer: this.__serializer,
-                order: this.__order,
-                data: this.__data
-            });
+            if (angular.isDefined(this.list) && angular.isString(this.list)) {
+                var query = {};
+                if (angular.isDefined(this.__type)) {
+                    query.type = this.__type;
+                }else {
+                    throw 'No Query Type specified';
+                }
+                if (angular.isDefined(this.__columns)) {
+                    query.columns = this.__columns;
+                }
+                if (angular.isDefined(this.__query)) {
+                    query.query = this.__query;
+                }
+                if (angular.isDefined(this.__limit)) {
+                    query.limit = this.__limit;
+                }
+                if (angular.isDefined(this.__serializer)) {
+                    query.serializer = this.__serializer;
+                }
+                if (angular.isDefined(this.__order) &&
+                    angular.isArray(this.__order) &&
+                    this.__order.length > 0) {
+                    query.order = this.__order;
+                }
+                if (angular.isDefined(this.__data) &&
+                    angular.isObject(this.__data) &&
+                    Object.getOwnPropertyNames(this.__data).length > 0) {
+                    query.data = this.__data;
+                }
+                return $spList.getList(this.list).query(query);
+            }else {
+                throw 'No List specified';
+            }
         };
         this.then = function(resolve, reject) {
             return this.exec().then(resolve, reject);
