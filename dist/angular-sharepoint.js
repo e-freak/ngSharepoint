@@ -70,23 +70,25 @@ angular
             return this.caml.join('');
         };
         CamlBuilder.prototype.buildFromJson = function(json) {
-            var root = this.findByName('View');
-            if (root.length === 0) {
-                root = this.push('View');
-            }else {
-                root = root[0];
-            }
-            if (angular.isDefined(json.columns)) {
-                this.__buildViewFields(json.columns, root);
-            }
-            if (angular.isDefined(json.query)) {
-                this.__buildQuery(json.query, root);
-            }
-            if (angular.isDefined(json.limit)) {
-                this.__buildLimit(json.limit, root);
-            }
-            if (angular.isDefined(json.order) && json.order.length > 0) {
-                this.__buildOrder(json.order, root);
+            if (angular.isDefined(json) && angular.isObject(json)) {
+                var root = this.findByName('View');
+                if (root.length === 0) {
+                    root = this.push('View');
+                }else {
+                    root = root[0];
+                }
+                if (angular.isDefined(json.columns)) {
+                    this.__buildViewFields(json.columns, root);
+                }
+                if (angular.isDefined(json.query)) {
+                    this.__buildQuery(json.query, root);
+                }
+                if (angular.isDefined(json.limit)) {
+                    this.__buildLimit(json.limit, root);
+                }
+                if (angular.isDefined(json.order) && json.order.length > 0) {
+                    this.__buildOrder(json.order, root);
+                }
             }
         };
         CamlBuilder.prototype.__buildViewFields = function(columns, root) {
@@ -230,7 +232,9 @@ angular
                 var queryTag = queryTags[0];
                 for (var j = 0; j < queryTag.childNodes.length; j++) {
                     var queryNode = queryTag.childNodes[j];
-                    if (queryNode.nodeName === 'Where' || queryNode.nodeName === 'And' || queryNode.nodeName === 'Or') {
+                    if (queryNode.nodeName === 'Where' ||
+                        queryNode.nodeName === 'And' ||
+                        queryNode.nodeName === 'Or') {
                         parser.__parseWhere(queryNode, parser.where);
                     }
                 }
@@ -274,13 +278,18 @@ angular
             return this.where;
         };
         CamlParser.prototype.hasWhere = function() {
-            return (angular.isDefined(this.where) && this.where !== null && Object.getOwnPropertyNames(this.where) > 0);
+            return (angular.isDefined(this.where) &&
+                this.where !== null &&
+                Object.getOwnPropertyNames(this.where) > 0);
         };
         CamlParser.prototype.getLimit = function() {
             return this.limit;
         };
         CamlParser.prototype.hasLimit = function() {
-            return (angular.isDefined(this.where) && this.limit !== null && !isNaN(this.limit) && this.limit >= 0);
+            return (angular.isDefined(this.where) &&
+                this.limit !== null &&
+                !isNaN(this.limit) &&
+                this.limit >= 0);
         };
         CamlParser.prototype.getQuery = function() {
             return this.query;
@@ -363,13 +372,15 @@ angular
     .provider('$sp', $spProvider);
 
 function $spProvider() {
-    var siteUrl = '';
+    var siteUrl;
+    var hostUrl;
     var connMode = 'JSOM';
     var token = false;
     var autoload = true;
 
     var provider = {
         setSiteUrl: setSiteUrl,
+        setHostUrl: setHostUrl,
         setConnectionMode: setConnectionMode,
         setAccessToken: setAccessToken,
         setAutoload: setAutoload,
@@ -377,24 +388,55 @@ function $spProvider() {
     };
     return provider;
 
-    function setSiteUrl(newUrl) {
-        siteUrl = newUrl;
+    function setHostUrl(newUrl) {
+        if (angular.isDefined(newUrl) && angular.isString(newUrl)) {
+            hostUrl = newUrl;
+        }else {
+            throw 'Invalid Argument Exception';
+        }
     }
-    function setConnectionMode(newConnMode) { //Only JSOM Supported for now
-        if (newConnMode === 'JSOM' || newConnMode === 'REST') {
-            connMode = newConnMode;
+    function setSiteUrl(newUrl) {
+        if (angular.isDefined(newUrl) && angular.isString(newUrl)) {
+            siteUrl = newUrl;
+        }else {
+            throw 'Invalid Argument Exception';
+        }
+    }
+    function setConnectionMode(newConnMode) {
+        if (angular.isDefined(newConnMode) && angular.isString(newConnMode)) {
+            newConnMode = newConnMode.toUpperCase();
+            if (newConnMode === 'JSOM' || newConnMode === 'REST') {
+                connMode = newConnMode;
+            }else {
+                throw 'Invalid Argument Exception';
+            }
+        }else {
+            throw 'Invalid Argument Exception';
         }
     }
     function setAccessToken(newToken) {
-        token = newToken;
+        if (angular.isDefined(newToken) && angular.isString(newToken)) {
+            token = newToken;
+        }else {
+            throw 'Invalid Argument Exception';
+        }
     }
     function setAutoload(newAutoload) {
-        autoload = newAutoload;
+        if (angular.isDefined(newAutoload)) {
+            if (newAutoload === true || newAutoload === false) {
+                autoload = newAutoload;
+            }else {
+                throw 'Invalid Argument Exception';
+            }
+        }else {
+            throw 'Invalid Argument Exception';
+        }
     }
 
     function $sp() {
         var service = {
             getSiteUrl: getSiteUrl,
+            getHostUrl: getHostUrl,
             getConnectionMode: getConnectionMode,
             getAccessToken: getAccessToken,
             getContext: getContext,
@@ -407,6 +449,9 @@ function $spProvider() {
         }
         function getSiteUrl() {
             return siteUrl;
+        }
+        function getHostUrl() {
+            return hostUrl;
         }
         function getConnectionMode() {
             return connMode;
@@ -462,47 +507,24 @@ angular
             });
         };
         SPLoader.query = function(queryObject) {
-            //TODO: Request the Request Digest in SPContext
             return $q(function(resolve, reject) {
-                $http({
-                    method: 'POST',
-                    url: $sp.getSiteUrl() + '_api/contextInfo',
+                var query = {
+                    url: $sp.getSiteUrl() + queryObject.url,
+                    method: queryObject.method,
                     headers: {
-                        'X-FORMS_BASED_AUTH_ACCEPTED': 'f',
                         'Accept': 'application/json; odata=verbose',
                         'Content-Type': 'application/json; odata=verbose'
                     }
-                }).then(function(data) {
-                    var query = {
-                        url: $sp.getSiteUrl() + queryObject.url,
-                        method: queryObject.method,
-                        headers: {
-                            //'X-FORMS_BASED_AUTH_ACCEPTED': 'f',
-                            'X-RequestDigest': data.d.GetContextWebInformation.FormDigestValue,
-                            'Accept': 'application/json; odata=verbose',
-                            'Content-Type': 'application/json; odata=verbose'
-                        }
-                    };
-                    if ($sp.getConnectionMode() === 'REST' && !$sp.getAccessToken()) {
-                        SPLoader.waitUntil('SP.RequestExecutor.js').then(function() {
-                            if (queryObject.hasOwnProperty('data') &&
-                                angular.isDefined(queryObject.data) &&
-                                queryObject !== null) {
-                                query.body = queryObject.data;
-                            }
-                            query.success = resolve;
-                            query.error = reject;
-                            new SP.RequestExecutor($sp.getSiteUrl()).executeAsync(query);
-                        });
-                    }else {
-                        if (queryObject.hasOwnProperty('data') &&
-                            angular.isDefined(queryObject.data) &&
-                            queryObject !== null) {
-                            query.data = queryObject.data;
-                        }
-                        query.headers.Authorization = 'Bearer ' + $sp.getAccessToken();
-                        $http(query).then(resolve, reject);
+                };
+                SPLoader.waitUntil('SP.RequestExecutor.js').then(function() {
+                    if (queryObject.hasOwnProperty('data') &&
+                        angular.isDefined(queryObject.data) &&
+                        queryObject !== null) {
+                        query.body = queryObject.data;
                     }
+                    query.success = resolve;
+                    query.error = reject;
+                    new SP.RequestExecutor($sp.getSiteUrl()).executeAsync(query);
                 });
             }).catch($spLog.error);
         };

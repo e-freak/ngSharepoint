@@ -13,7 +13,7 @@ angular
         };
         SPList.prototype.insert = function(data) {
             var list = this;
-            return $q(function(resolve, reject) {
+            return $q(function(resolve) {
                 var alignedData = [];
                 for (var i = 0; i < list.list.cols.length; i++) {
                     alignedData[i] = data[list.list.cols[i]];
@@ -84,7 +84,6 @@ angular
         };
         SPList.prototype.delete = function(query) {
             return $q(function(resolve, reject) {
-
             });
         };
         SPList.prototype.update = function(query, data) {
@@ -93,37 +92,6 @@ angular
             });
         };
         SPList.prototype.__filter = function(row, query) {
-            //TODO: Implement
             return true;
-            /*camlQuery = parser.parseFromString(query, 'text/xml');
-                var queryTag = camlQuery.getElementsByTagName('Query')[0];
-                if (queryTag !== null) {
-                    var equalTags = queryTag.getElementsByTagName('Eq');
-                    if (equalTags !== null) {
-                        var eqs = [];
-                        equalTags.forEach(function(tag) {
-                            var field = tag.getElementsByTagName('FieldRef')[0].attributes.Name.value;
-                            var fieldId = list.list.cols.indexOf(field);
-                            var value = tag.getElementsByTagName('Value')[0].childNodes[0];
-                            eqs.push({id: fieldId, value: value});
-                        });
-                        for (var i = 0; i < list.list.data.length; i++) {
-                            var row = list.list.data[i];
-                            var valid = true;
-                            for (var j = 0; j < eqs.length; j++) {
-                                var eq = eqs[j];
-                                if (row[eq.id] != eq.value) {
-                                    valid = false;
-                                    break;
-                                }
-                            }
-                            if (valid) {
-                                data.push(row);
-                            }
-                        }
-                    }
-                }else {
-                    data = list.list.data;
-                }*/
         };
     }]);

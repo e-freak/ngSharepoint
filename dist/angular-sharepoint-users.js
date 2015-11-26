@@ -109,7 +109,6 @@ angular
     .factory('$spUser', ['$q', '$sp', 'SPUser', function($q, $sp, SPUser) {
         return ({
             getCurrentUser: function() {
-                //TODO: Abstract with SPUser
                 return $q(function(resolve, reject) {
                     var context = $sp.getContext();
                     var peopleManager = new SP.UserProfiles.PeopleManager(context);

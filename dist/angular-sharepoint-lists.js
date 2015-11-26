@@ -278,7 +278,7 @@ angular
             this.title = title;
         };
         RestSPList.prototype.read = function(query) {
-            var endpoint = '_api/web/Lists/GetByTitle(\'' + this.title + '\')/GetItems';
+            var endpoint = '_api/web/Lists/GetByTitle(\'' + this.title + '\')/Items';
             var body = {
                 query: {
                     __metadata: {
@@ -293,7 +293,6 @@ angular
                     url: endpoint,
                     data: body
                 }).then(function(data) {
-                    //TODO: Parse Result
                 }, reject);
             });
         };
@@ -317,15 +316,12 @@ angular
                     url: endpoint,
                     data: body
                 }).then(function(data) {
-                    //TODO: Parse Result
                 }, reject);
             });
         };
         RestSPList.prototype.delete = function(query) {
-            //TODO: Implement
         };
         RestSPList.prototype.update = function(query, data) {
-            //TODO: Implement
         };
         return (RestSPList);
     }]);
@@ -333,17 +329,6 @@ angular
 angular
     .module('ngSharepoint.Lists')
     .factory('SPList', ['$sp', '$spLog', 'CamlBuilder', 'RestSPList', 'JsomSPList', function($sp, $spLog, CamlBuilder, RestSPList, JsomSPList) {
-        //TODO: Add all List APIs
-        /**
-        * @ngdoc object
-        * @name  SPList
-        * @param {string} title The List Title
-        *
-        * @module  ngSharepoint.Lists
-        *
-        * @description
-        * SPList represents a Sharepoint List
-        */
         var SPList = function(title) {
             this.title = title;
             if ($sp.getConnectionMode() === 'JSOM') {
@@ -372,46 +357,18 @@ angular
         SPList.prototype.setDescription = function(desc) {
             return this.__list.setDescription(desc).catch($spLog.error);
         };
-        /**
-        * @ngdoc function
-        * @name  SPList#create
-        * @param  {object} data The Data you wanna create
-        * @return {Promise}      A Promise which resolves when the insertion was sucessful
-        */
         SPList.prototype.create = function(data, serializer) {
             return this.__list.create(data, serializer).catch($spLog.error);
         };
-        /**
-        * @ngdoc function
-        * @name  SPList#read
-        * @param {string} query A CamlQuery to filter for
-        * @return {Promise} A Promise which resolves to the selected data
-        */
         SPList.prototype.read = function(query, serializer) {
             return this.__list.read(query, serializer).catch($spLog.error);
         };
-        /**
-        * @ngdoc function
-        * @param  {string} query  A CamlQuery which selects the rows to update
-        * @param  {object} data The Data you wanna update
-        * @return {Promise}        A Promise which resolves when the update was sucessfull
-        */
         SPList.prototype.update = function(query, data, serializer) {
             return this.__list.update(query, data, serializer).catch($spLog.error);
         };
-        /**
-        * @ngdoc function
-        * @param  {string} query A CamlQuery to filter for
-        * @return {Promise}       [description]
-        */
         SPList.prototype.delete = function(query) {
             return this.__list.delete(query).catch($spLog.error);
         };
-        /**
-         * @ngdoc function
-         * @param  {object} query [description]
-         * @return {Promise}       [description]
-         */
         SPList.prototype.query = function(query) {
             if (angular.isObject(query)) {
                 return this.__jsonQuery(query);
@@ -456,7 +413,7 @@ angular
     .module('ngSharepoint.Lists')
     .factory('$query', $query);
 
-function $query($spList) {
+function $query($spList, $spLog) {
     var Query = function() {
         this.list = undefined;
         this.__columns = [];
@@ -518,47 +475,74 @@ function $query($spList) {
             return this;
         };
         this.where = function(col) {
+            if (angular.isDefined(this.__type) && this.__type === 'create') {
+                $spLog.warn('where call is not necessary while creating entries');
+            }
             var Where = function(col, instance) {
-                this.equals = function(value) {
-                    instance.__query = {
-                        comparator: 'equals',
-                        column: col,
-                        value: value
+                var that = this;
+                var comparators = [
+                    'beginsWith',
+                    'contains',
+                    'dateRangesOverlap',
+                    'eq',
+                    'equals',
+                    'geq',
+                    'greaterEquals',
+                    'greater',
+                    'in',
+                    'includes',
+                    'isNotNull',
+                    'isNull',
+                    'leq',
+                    'lessEquals',
+                    'less',
+                    'neq',
+                    'notEquals',
+                    'notIncludes'];
+                comparators.forEach(function(comparator) {
+                    that[comparator] = function(value) {
+                        instance.__query = {
+                            comparator: comparator.toLowerCase(),
+                            column: col
+                        };
+                        if (angular.isDefined(value)) {
+                            instance.__query['value'] = value;
+                        }
+                        return instance;
                     };
-                    return instance;
-                };
-                this.greater = function(value) {
-                    instance.__query = {
-                        comparator: 'greater',
-                        column: col,
-                        value: value
-                    };
-                    return instance;
-                };
-                this.smaller = function(value) {
-                    instance.__query = {
-                        comparator: 'smaller',
-                        column: col,
-                        value: value
-                    };
-                    return instance;
-                };
+                });
             };
             return new Where(col, this);
         };
         this.set = function(column, value) {
+            if (angular.isDefined(this.__type) &&
+                this.__type !== 'create' &&
+                this.__type !== 'update') {
+                $spLog.warn('set call is not necessary while reading/deleting entries');
+            }
             this.__data[column] = value;
             return this;
         };
         this.value = function(column, value) {
+            if (angular.isDefined(this.__type) &&
+                this.__type !== 'create' &&
+                this.__type !== 'update') {
+                $spLog.warn('value call is not necessary while reading/deleting entries');
+            }
             this.__data[column] = value;
             return this;
         };
         this.class = function(serializer) {
+            if (angular.isDefined(this.__type) && this.__type === 'delete') {
+                $spLog.warn('class call is not necessary while deleting entries');
+            }
             this.__serializer = serializer;
             return this;
         };
         this.orderBy = function(field, asc) {
+            if (angular.isDefined(this.__type) && this.__type !== 'read') {
+                $spLog.warn('orderBy call is not necessary while reading entries');
+            }
             if (angular.isUndefined(asc)) {
                 asc = true;
             }
@@ -570,15 +554,41 @@ function $query($spList) {
             return this;
         };
         this.exec = function() {
-            return $spList.getList(this.list).query({
-                columns: this.__columns,
-                type: this.__type,
-                query: this.__query,
-                limit: this.__limit,
-                serializer: this.__serializer,
-                order: this.__order,
-                data: this.__data
-            });
+            if (angular.isDefined(this.list) && angular.isString(this.list)) {
+                var query = {};
+                if (angular.isDefined(this.__type)) {
+                    query.type = this.__type;
+                }else {
+                    throw 'No Query Type specified';
+                }
+                if (angular.isDefined(this.__columns) &&
+                    angular.isArray(this.__columns) &&
+                    this.__columns.length > 0) {
+                    query.columns = this.__columns;
+                }
+                if (angular.isDefined(this.__query)) {
+                    query.query = this.__query;
+                }
+                if (angular.isDefined(this.__limit)) {
+                    query.limit = this.__limit;
+                }
+                if (angular.isDefined(this.__serializer)) {
+                    query.serializer = this.__serializer;
+                }
+                if (angular.isDefined(this.__order) &&
+                    angular.isArray(this.__order) &&
+                    this.__order.length > 0) {
+                    query.order = this.__order;
+                }
+                if (angular.isDefined(this.__data) &&
+                    angular.isObject(this.__data) &&
+                    Object.getOwnPropertyNames(this.__data).length > 0) {
+                    query.data = this.__data;
+                }
+                return $spList.getList(this.list).query(query);
+            }else {
+                throw 'No List specified';
+            }
         };
         this.then = function(resolve, reject) {
             return this.exec().then(resolve, reject);
@@ -599,8 +609,195 @@ function $query($spList) {
         }
     });
 }
-$query.$inject = ['$spList'];
+$query.$inject = ['$spList', '$spLog'];
 
+describe('The $query Service', function() {
+    var $query;
+    var mock;
+    var spList;
+    var log;
+    beforeEach(module('ngSharepoint.Lists'));
+    beforeEach(function() {
+        spList = {
+            query: jasmine.createSpy()
+        };
+        mock = {
+            getList: function() {
+                return spList;
+            }
+        };
+        spyOn(mock, 'getList').and.callThrough();
+        module(function($provide) {
+            $provide.value('$spList', mock);
+        });
+        inject(function($injector) {
+            $query = $injector.get('$query');
+            log = $injector.get('$spLog');
+            spyOn(log, 'error');
+            spyOn(log, 'warn');
+            spyOn(log, 'log');
+        });
+    });
+    it('reads from a list', function() {
+        $query.read().from('List').exec();
+        expect(mock.getList).toHaveBeenCalledWith('List');
+        expect(spList.query).toHaveBeenCalledWith({type: 'read'});
+    });
+    it('reads only specific columns from a list', function() {
+        $query.read(['Column1']).from('List').exec();
+        expect(mock.getList).toHaveBeenCalledWith('List');
+        expect(spList.query).toHaveBeenCalledWith({type: 'read', columns: ['Column1']});
+    });
+    describe('reads only specific rows from a list', function() {
+        it('where fields begin with', function() {
+            $query.read().from('List').where('Column1').beginsWith('Te').exec();
+            expect(mock.getList).toHaveBeenCalledWith('List');
+            expect(spList.query).toHaveBeenCalledWith({type: 'read', query: {comparator: 'beginswith', column: 'Column1', value: 'Te'}});
+        });
+        it('where fields contain', function() {
+            $query.read().from('List').where('Column1').contains('es').exec();
+            expect(mock.getList).toHaveBeenCalledWith('List');
+            expect(spList.query).toHaveBeenCalledWith({type: 'read', query: {comparator: 'contains', column: 'Column1', value: 'es'}});
+        });
+        it('where fields date ranges overlap', function() {
+            var date = new Date();
+            $query.read().from('List').where('Column1').dateRangesOverlap(date).exec();
+            expect(mock.getList).toHaveBeenCalledWith('List');
+            expect(spList.query).toHaveBeenCalledWith({type: 'read', query: {comparator: 'daterangesoverlap', column: 'Column1', value: date}});
+        });
+        it('where fields are equal', function() {
+            $query.read().from('List').where('Column1').equals(4).exec();
+            expect(mock.getList).toHaveBeenCalledWith('List');
+            expect(spList.query).toHaveBeenCalledWith({type: 'read', query: {comparator: 'equals', column: 'Column1', value: 4}});
+        });
+        it('where fields are greater equal', function() {
+            $query.read().from('List').where('Column1').greaterEquals(4).exec();
+            expect(mock.getList).toHaveBeenCalledWith('List');
+            expect(spList.query).toHaveBeenCalledWith({type: 'read', query: {comparator: 'greaterequals', column: 'Column1', value: 4}});
+        });
+        it('where fields are greater', function() {
+            $query.read().from('List').where('Column1').greater(4).exec();
+            expect(mock.getList).toHaveBeenCalledWith('List');
+            expect(spList.query).toHaveBeenCalledWith({type: 'read', query: {comparator: 'greater', column: 'Column1', value: 4}});
+        });
+        it('where fields are in', function() {
+            $query.read().from('List').where('Column1').in(['Value']).exec();
+            expect(mock.getList).toHaveBeenCalledWith('List');
+            expect(spList.query).toHaveBeenCalledWith({type: 'read', query: {comparator: 'in', column: 'Column1', value: ['Value']}});
+        });
+        it('where fields include', function() {
+            $query.read().from('List').where('Column1').includes(4).exec();
+            expect(mock.getList).toHaveBeenCalledWith('List');
+            expect(spList.query).toHaveBeenCalledWith({type: 'read', query: {comparator: 'includes', column: 'Column1', value: 4}});
+        });
+        it('where fields are not null', function() {
+            $query.read().from('List').where('Column1').isNotNull().exec();
+            expect(mock.getList).toHaveBeenCalledWith('List');
+            expect(spList.query).toHaveBeenCalledWith({type: 'read', query: {comparator: 'isnotnull', column: 'Column1'}});
+        });
+        it('where fields are null', function() {
+            $query.read().from('List').where('Column1').isNull().exec();
+            expect(mock.getList).toHaveBeenCalledWith('List');
+            expect(spList.query).toHaveBeenCalledWith({type: 'read', query: {comparator: 'isnull', column: 'Column1'}});
+        });
+        it('where fields are less equal', function() {
+            $query.read().from('List').where('Column1').lessEquals(4).exec();
+            expect(mock.getList).toHaveBeenCalledWith('List');
+            expect(spList.query).toHaveBeenCalledWith({type: 'read', query: {comparator: 'lessequals', column: 'Column1', value: 4}});
+        });
+        it('where fields are less', function() {
+            $query.read().from('List').where('Column1').less(4).exec();
+            expect(mock.getList).toHaveBeenCalledWith('List');
+            expect(spList.query).toHaveBeenCalledWith({type: 'read', query: {comparator: 'less', column: 'Column1', value: 4}});            
+        });
+        it('where fields do not equal', function() {
+            $query.read().from('List').where('Column1').notEquals(4).exec();
+            expect(mock.getList).toHaveBeenCalledWith('List');
+            expect(spList.query).toHaveBeenCalledWith({type: 'read', query: {comparator: 'notequals', column: 'Column1', value: 4}});            
+        });
+        it('where fields do not include', function() {
+            $query.read().from('List').where('Column1').notIncludes(4).exec();
+            expect(mock.getList).toHaveBeenCalledWith('List');
+            expect(spList.query).toHaveBeenCalledWith({type: 'read', query: {comparator: 'notincludes', column: 'Column1', value: 4}});            
+        });
+    });
+    it('reads only a certain amount of rows', function() {
+        $query.read().from('List').limit(42).exec();
+        expect(mock.getList).toHaveBeenCalledWith('List');
+        expect(spList.query).toHaveBeenCalledWith({type: 'read', limit: 42});
+    });
+    it('reads from a list in a specific order', function() {
+        $query.read().from('List').orderBy('Column1').exec();
+        expect(mock.getList).toHaveBeenCalledWith('List');
+        expect(spList.query).toHaveBeenCalledWith({type: 'read', order: [{column: 'Column1', asc: true}]});
+    });
+    it('throws an exception when not specifying a list', function() {
+        expect(function() {
+            $query.read().exec();
+        }).toThrow('No List specified');
+    });
+    it('can not execute read after another query', function() {
+        expect(function() {
+            $query.create({Data: 'Value'}).in('List').read().exec();
+        }).toThrow('Cannot use read after another query type was selected');
+    });
+    it('selects all columns when specifying an empty list', function() {
+        $query.read([]).from('List').exec();
+        expect(mock.getList).toHaveBeenCalledWith('List');
+        expect(spList.query).toHaveBeenCalledWith({type: 'read'});
+    });
+    it('creates a row in a list', function() {
+        $query.create({Data: 'Value'}).in('List').exec();
+        expect(mock.getList).toHaveBeenCalledWith('List');
+        expect(spList.query).toHaveBeenCalledWith({type: 'create', data: {Data: 'Value'}});
+    });
+    it('creates a row in a list', function() {
+        $query.create().in('List').set('Data', 'Value').exec();
+        expect(mock.getList).toHaveBeenCalledWith('List');
+        expect(spList.query).toHaveBeenCalledWith({type: 'create', data: {Data: 'Value'}});
+    });
+    it('creates a row in a list', function() {
+        $query.create().in('List').value('Data', 'Value').exec();
+        expect(mock.getList).toHaveBeenCalledWith('List');
+        expect(spList.query).toHaveBeenCalledWith({type: 'create', data: {Data: 'Value'}});
+    });
+    it('warns when calling where while creating a row', function() {
+        $query.create({Data: 'Value'}).in('List').where('Data').equals('Value').exec();
+        expect(log.warn).toHaveBeenCalledWith('where call is not necessary while creating entries');
+        expect(mock.getList).toHaveBeenCalledWith('List');
+        expect(spList.query).toHaveBeenCalledWith({type: 'create', data: {Data: 'Value'}, query: {comparator: 'equals', column: 'Data', value: 'Value'}});
+    });
+    it('can not execute read after another query', function() {
+        expect(function() {
+            $query.read().from('List').create({Data: 'Value'}).exec();
+        }).toThrow('Cannot use create after another query type was selected');
+    });
+    it('updates all rows in a list', function() {
+        $query.update({Data: 'Value'}).in('List').exec();
+        expect(mock.getList).toHaveBeenCalledWith('List');
+        expect(spList.query).toHaveBeenCalledWith({type: 'update', data: {Data: 'Value'}});
+    });
+    it('updates all rows in a list', function() {
+        $query.update().in('List').set('Data', 'Value').exec();
+        expect(mock.getList).toHaveBeenCalledWith('List');
+        expect(spList.query).toHaveBeenCalledWith({type: 'update', data: {Data: 'Value'}});
+    });
+    it('can not execute update after another query', function() {
+        expect(function() {
+            $query.read().from('List').update({Data: 'Value'}).exec();
+        }).toThrow('Cannot use update after another query type was selected');
+    });
+    it('deletes all rows from a list', function() {
+        $query.delete().from('List').exec();
+        expect(mock.getList).toHaveBeenCalledWith('List');
+        expect(spList.query).toHaveBeenCalledWith({type: 'delete'});
+    });
+    it('can not execute delete after another query', function() {
+        expect(function() {
+            $query.create({Data: 'Value'}).in('List').delete().exec();
+        }).toThrow('Cannot use delete after another query type was selected');
+    });
+});
 angular
     .module('ngSharepoint.Lists')
     .factory('$spList', $spList);
