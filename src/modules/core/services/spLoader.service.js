@@ -40,47 +40,24 @@ angular
             });
         };
         SPLoader.query = function(queryObject) {
-            //TODO: Request the Request Digest in SPContext
             return $q(function(resolve, reject) {
-                $http({
-                    method: 'POST',
-                    url: $sp.getSiteUrl() + '_api/contextInfo',
+                var query = {
+                    url: $sp.getSiteUrl() + queryObject.url,
+                    method: queryObject.method,
                     headers: {
-                        'X-FORMS_BASED_AUTH_ACCEPTED': 'f',
                         'Accept': 'application/json; odata=verbose',
                         'Content-Type': 'application/json; odata=verbose'
                     }
-                }).then(function(data) {
-                    var query = {
-                        url: $sp.getSiteUrl() + queryObject.url,
-                        method: queryObject.method,
-                        headers: {
-                            //'X-FORMS_BASED_AUTH_ACCEPTED': 'f',
-                            'X-RequestDigest': data.d.GetContextWebInformation.FormDigestValue,
-                            'Accept': 'application/json; odata=verbose',
-                            'Content-Type': 'application/json; odata=verbose'
-                        }
-                    };
-                    if ($sp.getConnectionMode() === 'REST' && !$sp.getAccessToken()) {
-                        SPLoader.waitUntil('SP.RequestExecutor.js').then(function() {
-                            if (queryObject.hasOwnProperty('data') &&
-                                angular.isDefined(queryObject.data) &&
-                                queryObject !== null) {
-                                query.body = queryObject.data;
-                            }
-                            query.success = resolve;
-                            query.error = reject;
-                            new SP.RequestExecutor($sp.getSiteUrl()).executeAsync(query);
-                        });
-                    }else {
-                        if (queryObject.hasOwnProperty('data') &&
-                            angular.isDefined(queryObject.data) &&
-                            queryObject !== null) {
-                            query.data = queryObject.data;
-                        }
-                        query.headers.Authorization = 'Bearer ' + $sp.getAccessToken();
-                        $http(query).then(resolve, reject);
+                };
+                SPLoader.waitUntil('SP.RequestExecutor.js').then(function() {
+                    if (queryObject.hasOwnProperty('data') &&
+                        angular.isDefined(queryObject.data) &&
+                        queryObject !== null) {
+                        query.body = queryObject.data;
                     }
+                    query.success = resolve;
+                    query.error = reject;
+                    new SP.RequestExecutor($sp.getSiteUrl()).executeAsync(query);
                 });
             }).catch($spLog.error);
         };
