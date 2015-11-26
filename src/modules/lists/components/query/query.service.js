@@ -72,7 +72,7 @@ function $query($spList, $spLog) {
                 var comparators = [
                     'beginsWith',
                     'contains',
-                    'daterangesOverlap',
+                    'dateRangesOverlap',
                     'eq',
                     'equals',
                     'geq',
@@ -91,10 +91,12 @@ function $query($spList, $spLog) {
                 comparators.forEach(function(comparator) {
                     that[comparator] = function(value) {
                         instance.__query = {
-                            comparator: comparator,
-                            column: col,
-                            value: value
+                            comparator: comparator.toLowerCase(),
+                            column: col
                         };
+                        if (angular.isDefined(value)) {
+                            instance.__query['value'] = value;
+                        }
                         return instance;
                     };
                 });
