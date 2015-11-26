@@ -22,7 +22,9 @@ angular
                 var queryTag = queryTags[0];
                 for (var j = 0; j < queryTag.childNodes.length; j++) {
                     var queryNode = queryTag.childNodes[j];
-                    if (queryNode.nodeName === 'Where' || queryNode.nodeName === 'And' || queryNode.nodeName === 'Or') {
+                    if (queryNode.nodeName === 'Where' ||
+                        queryNode.nodeName === 'And' ||
+                        queryNode.nodeName === 'Or') {
                         parser.__parseWhere(queryNode, parser.where);
                     }
                 }
@@ -66,13 +68,18 @@ angular
             return this.where;
         };
         CamlParser.prototype.hasWhere = function() {
-            return (angular.isDefined(this.where) && this.where !== null && Object.getOwnPropertyNames(this.where) > 0);
+            return (angular.isDefined(this.where) &&
+                this.where !== null &&
+                Object.getOwnPropertyNames(this.where) > 0);
         };
         CamlParser.prototype.getLimit = function() {
             return this.limit;
         };
         CamlParser.prototype.hasLimit = function() {
-            return (angular.isDefined(this.where) && this.limit !== null && !isNaN(this.limit) && this.limit >= 0);
+            return (angular.isDefined(this.where) &&
+                this.limit !== null &&
+                !isNaN(this.limit) &&
+                this.limit >= 0);
         };
         CamlParser.prototype.getQuery = function() {
             return this.query;
