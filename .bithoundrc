@@ -1,5 +1,7 @@
 {
   "ignore": [
-    "**/dist/**"
+    "**/dist/**",
+    "**/*.spec.js",
+    "Gruntfile.js"
   ]
 }
