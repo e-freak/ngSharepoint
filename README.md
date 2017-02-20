@@ -1,5 +1,7 @@
 # ngSharepoint
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/maxjoehnk/ngSharepoint.svg)](https://greenkeeper.io/)
+
 [![Join the chat at https://gitter.im/maxjoehnk/ngSharepoint](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/maxjoehnk/ngSharepoint?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://img.shields.io/travis/maxjoehnk/ngSharepoint.svg?style=flat-square)](https://travis-ci.org/maxjoehnk/ngSharepoint)
 [![Code Climate](https://img.shields.io/codeclimate/github/maxjoehnk/ngSharepoint.svg?style=flat-square)](https://codeclimate.com/github/maxjoehnk/ngSharepoint)
